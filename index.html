@@ -77,6 +77,10 @@
   .search input::placeholder { color: var(--muted); }
   .search .mag { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 16px; pointer-events: none; }
   .results-head { font-size: 13px; color: var(--muted); margin: 0 0 12px; }
+  .section-label { display: flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 13px; }
+  .section-label.next { margin-top: 30px; }
+  .featured-grid { margin-bottom: 4px; }
+  .featured-grid .card .title { font-size: 17px; }
   .card .count .topic-tag { color: var(--muted); }
   .card {
     background: var(--card);
@@ -554,6 +558,9 @@ const KEYWORDS = {
 };
 FORMULAS.forEach(f => { f.keywords = KEYWORDS[f.id] || ''; });
 
+/* Most-used formulas shown at the top of the home page (by formula id) */
+const FEATURED = ['loan-payment', 'compound-interest', 'growing-annuity'];
+
 /* ============================================================
    ROUTER  (hash-based:  #  |  #topic/finance  |  #formula/loan-payment)
    ============================================================ */
@@ -571,9 +578,19 @@ function renderHome() {
       <div class="count">${count} formula${count===1?'':'s'} →</div>
     </a>`;
   }).join('');
+  const featured = FEATURED.map(id => {
+    const f = FORMULAS.find(x => x.id === id);
+    if (!f) return '';
+    const topic = TOPICS.find(t => t.id === f.topic) || {};
+    return `<a class="card" onclick="location.hash='formula/${f.id}'">
+      <div class="title">${esc(f.name)}</div>
+      <div class="desc">${esc(f.desc)}</div>
+      <div class="count"><span class="topic-tag">${topic.icon || ''} ${esc(topic.name || '')}</span> · Open →</div>
+    </a>`;
+  }).join('');
   app.innerHTML = `
     <h1>Find a formula</h1>
-    <p class="sub">Search by name or keyword, or browse by subject below.</p>
+    <p class="sub">Jump to a popular formula, search by keyword, or browse by subject.</p>
     <div class="search">
       <span class="mag">🔍</span>
       <input id="searchBox" type="text" autocomplete="off" spellcheck="false"
@@ -581,7 +598,12 @@ function renderHome() {
              oninput="doSearch(this.value)">
     </div>
     <div id="searchResults"></div>
-    <div id="topicGrid"><div class="grid">${cards}</div></div>`;
+    <div id="browse">
+      <div class="section-label">⭐ Most used</div>
+      <div class="grid featured-grid">${featured}</div>
+      <div class="section-label next">Browse by topic</div>
+      <div class="grid">${cards}</div>
+    </div>`;
   const sb = document.getElementById('searchBox');
   if (sb) sb.focus();
 }
@@ -589,10 +611,10 @@ function renderHome() {
 function doSearch(q) {
   q = (q || '').trim().toLowerCase();
   const results = document.getElementById('searchResults');
-  const topicGrid = document.getElementById('topicGrid');
-  if (!results || !topicGrid) return;
-  if (!q) { results.innerHTML = ''; topicGrid.style.display = ''; return; }
-  topicGrid.style.display = 'none';
+  const browse = document.getElementById('browse');
+  if (!results || !browse) return;
+  if (!q) { results.innerHTML = ''; browse.style.display = ''; return; }
+  browse.style.display = 'none';
   const terms = q.split(/\s+/);
   const matches = FORMULAS.filter(f => {
     const topic = TOPICS.find(t => t.id === f.topic) || {};
