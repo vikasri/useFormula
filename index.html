@@ -272,8 +272,8 @@ const FORMULAS = [
     format: money,
     defaults: { P: 300000, annualRate: 6.5, years: 30 },
     sliders: [
-      { key: 'annualRate', min: 0, max: 15, step: 0.1 },
-      { key: 'years', min: 5, max: 40, step: 1 },
+      { key: 'annualRate', span: 5, floor: 0, step: 0.1 },
+      { key: 'years', span: 15, floor: 1, step: 1 },
     ],
     series: v => {
       const r = (v.annualRate / 100) / 12, n = Math.max(1, Math.round(v.years * 12)), N = Math.min(n, 60), points = [];
@@ -307,8 +307,8 @@ const FORMULAS = [
     format: money,
     defaults: { PMT: 1000, rate: 6, growth: 3, n: 20 },
     sliders: [
-      { key: 'rate', min: 0, max: 15, step: 0.1 },
-      { key: 'growth', min: 0, max: 10, step: 0.1 },
+      { key: 'rate', span: 5, floor: 0, step: 0.1 },
+      { key: 'growth', span: 5, floor: 0, step: 0.1 },
     ],
     series: v => {
       const r = v.rate / 100, g = v.growth / 100, n = Math.max(1, Math.round(v.n)), N = Math.min(n, 60), points = [];
@@ -339,8 +339,8 @@ const FORMULAS = [
     format: money,
     defaults: { P: 10000, annualRate: 5, m: 12, t: 10 },
     sliders: [
-      { key: 'annualRate', min: 0, max: 15, step: 0.1 },
-      { key: 't', min: 1, max: 40, step: 1 },
+      { key: 'annualRate', span: 5, floor: 0, step: 0.1 },
+      { key: 't', span: 15, floor: 1, step: 1 },
     ],
     series: v => {
       const t = Math.max(1, v.t), N = Math.min(Math.max(4, Math.round(t * 4)), 60), points = [];
@@ -386,8 +386,8 @@ const FORMULAS = [
     format: money,
     defaults: { PMT: 500, rate: 5, n: 120 },
     sliders: [
-      { key: 'rate', min: 0, max: 15, step: 0.1 },
-      { key: 'n', min: 12, max: 480, step: 12 },
+      { key: 'rate', span: 5, floor: 0, step: 0.1 },
+      { key: 'n', span: 60, floor: 1, step: 12 },
     ],
     series: v => {
       const r = v.rate / 100, n = Math.max(1, Math.round(v.n)), N = Math.min(n, 60), points = [];
@@ -663,7 +663,7 @@ const KEYWORDS = {
 FORMULAS.forEach(f => { f.keywords = KEYWORDS[f.id] || ''; });
 
 /* Most-used formulas shown at the top of the home page (by formula id) */
-const FEATURED = ['loan-payment', 'compound-interest', 'growing-annuity'];
+const FEATURED = ['loan-payment', 'compound-interest', 'fv-annuity'];
 
 /* ============================================================
    ROUTER  (hash-based:  #  |  #topic/finance  |  #formula/loan-payment)
@@ -793,20 +793,20 @@ function renderFormula(id) {
   if (!f) return renderHome();
   const topic = TOPICS.find(t => t.id === f.topic);
   const dflt = f.defaults || {};
-  const live = f.series ? ` onchange="doCalc('${f.id}')"` : '';
   const fields = f.inputs.map(inp => `
     <div class="field">
       <label>${esc(inp.label)}${inp.unit ? ` <span class="unit">(${esc(inp.unit)})</span>` : ''}</label>
-      <input type="number" step="any" id="in_${inp.key}" placeholder="${esc(inp.hint || '')}"${dflt[inp.key] != null ? ` value="${dflt[inp.key]}"` : ''}${live}>
+      <input type="number" step="any" id="in_${inp.key}" placeholder="${esc(inp.hint || '')}"${dflt[inp.key] != null ? ` value="${dflt[inp.key]}"` : ''}${f.series ? ` onchange="onField('${f.id}','${inp.key}')"` : ''}>
     </div>`).join('');
 
   const sliders = (f.sliders || []).map(s => {
     const inp = f.inputs.find(i => i.key === s.key) || {};
-    const val = dflt[s.key] != null ? dflt[s.key] : s.min;
+    const val = dflt[s.key] != null ? dflt[s.key] : 0;
+    const rng = sliderRange(s, val);
     const suffix = inp.unit === '%' ? '%' : '';
     return `<div class="slider">
       <div class="slider-head"><span>${esc(inp.label || s.key)}</span><span class="slider-val" id="sv_${s.key}">${val}${suffix}</span></div>
-      <input type="range" id="sl_${s.key}" min="${s.min}" max="${s.max}" step="${s.step}" value="${val}" oninput="onSlider('${f.id}','${s.key}',this.value)">
+      <input type="range" id="sl_${s.key}" min="${rng.min}" max="${rng.max}" step="${s.step}" value="${val}" oninput="onSlider('${f.id}','${s.key}',this.value)">
     </div>`;
   }).join('');
 
@@ -880,6 +880,34 @@ function doCalc(id) {
     labEl.textContent = 'Cannot calculate';
     valEl.textContent = e.message;
   }
+}
+
+function sliderRange(s, val) {
+  let min = val - s.span, max = val + s.span;
+  if (s.floor != null && min < s.floor) min = s.floor;
+  if (s.ceil != null && max > s.ceil) max = s.ceil;
+  return { min: +min.toFixed(4), max: +max.toFixed(4) };
+}
+
+function recenterSlider(s, val) {
+  const sl = document.getElementById('sl_' + s.key);
+  if (!sl) return;
+  const rng = sliderRange(s, val);
+  sl.min = rng.min;
+  sl.max = rng.max;
+  sl.value = val;
+}
+
+// Called when a value is typed into a field: recenter that field's slider
+// so its range spans both below and above the entered value, then recompute.
+function onField(id, key) {
+  const f = FORMULAS.find(x => x.id === id);
+  const s = (f.sliders || []).find(sl => sl.key === key);
+  if (s) {
+    const val = parseFloat(document.getElementById('in_' + key).value);
+    if (isFinite(val)) recenterSlider(s, val);
+  }
+  doCalc(id);
 }
 
 function onSlider(id, key, val) {
