@@ -175,6 +175,22 @@
   .result .value .u { font-size: 16px; color: var(--muted); font-weight: 500; }
   .result.error .value { color: #f87171; font-size: 16px; font-weight: 500; }
   .notes { color: var(--muted); font-size: 13px; margin-top: 14px; }
+  .sliders { margin: 4px 0 6px; padding: 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; }
+  .sliders-label { font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); margin-bottom: 13px; }
+  .slider { margin-bottom: 15px; }
+  .slider:last-child { margin-bottom: 0; }
+  .slider-head { display: flex; justify-content: space-between; align-items: baseline; font-size: 13.5px; font-weight: 600; margin-bottom: 7px; }
+  .slider-val { color: var(--accent); font-variant-numeric: tabular-nums; }
+  .slider input[type=range] { width: 100%; accent-color: var(--accent); cursor: pointer; }
+  .chart-wrap { margin-top: 22px; }
+  .chart-title { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 10px; }
+  .chart { width: 100%; height: auto; display: block; overflow: visible; }
+  .chart .grid { stroke: var(--border); stroke-width: 1; }
+  .chart .area { fill: var(--accent-soft); stroke: none; }
+  .chart .cline { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+  .chart .dot { fill: var(--accent); }
+  .chart .ylab, .chart .xlab { fill: var(--muted); font-size: 11px; }
+  .chart .axlab { fill: var(--muted); font-size: 12px; font-weight: 600; }
   footer { text-align: center; color: var(--muted); font-size: 12.5px; margin-top: 40px; }
 </style>
 </head>
@@ -211,6 +227,7 @@ const TOPICS = [
 // helpers
 const money = n => '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const num   = n => (Math.abs(n) >= 1000 ? n.toLocaleString(undefined, { maximumFractionDigits: 4 }) : +n.toPrecision(6) + '');
+const kmoney = n => { const a = Math.abs(n); if (a >= 1e6) return '$' + (n / 1e6).toFixed(a >= 1e7 ? 0 : 1) + 'M'; if (a >= 1e3) return '$' + Math.round(n / 1e3) + 'k'; return '$' + Math.round(n); };
 
 const FORMULAS = [
   /* ---------------- FINANCE (2) ---------------- */
@@ -233,6 +250,21 @@ const FORMULAS = [
       return v.P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
     },
     format: money,
+    defaults: { P: 300000, annualRate: 6.5, years: 30 },
+    sliders: [
+      { key: 'annualRate', min: 0, max: 15, step: 0.1 },
+      { key: 'years', min: 5, max: 40, step: 1 },
+    ],
+    series: v => {
+      const r = (v.annualRate / 100) / 12, n = Math.max(1, Math.round(v.years * 12)), N = Math.min(n, 60), points = [];
+      for (let i = 0; i <= N; i++) {
+        const k = Math.round(i / N * n);
+        const bal = r === 0 ? v.P * (1 - k / n)
+          : v.P * (Math.pow(1 + r, n) - Math.pow(1 + r, k)) / (Math.pow(1 + r, n) - 1);
+        points.push({ x: k / 12, y: Math.max(0, bal) });
+      }
+      return { title: 'Loan balance over time', xLabel: 'Years', points, yTickFmt: kmoney };
+    },
   },
   {
     id: 'growing-annuity',
@@ -253,6 +285,21 @@ const FORMULAS = [
       return v.PMT * (Math.pow(1 + r, n) - Math.pow(1 + g, n)) / (r - g);
     },
     format: money,
+    defaults: { PMT: 1000, rate: 6, growth: 3, n: 20 },
+    sliders: [
+      { key: 'rate', min: 0, max: 15, step: 0.1 },
+      { key: 'growth', min: 0, max: 10, step: 0.1 },
+    ],
+    series: v => {
+      const r = v.rate / 100, g = v.growth / 100, n = Math.max(1, Math.round(v.n)), N = Math.min(n, 60), points = [];
+      for (let i = 0; i <= N; i++) {
+        const j = Math.round(i / N * n);
+        const val = Math.abs(r - g) < 1e-9 ? v.PMT * j * Math.pow(1 + r, Math.max(0, j - 1))
+          : v.PMT * (Math.pow(1 + r, j) - Math.pow(1 + g, j)) / (r - g);
+        points.push({ x: j, y: val });
+      }
+      return { title: 'Accumulated value over time', xLabel: 'Periods', points, yTickFmt: kmoney };
+    },
   },
 
   {
@@ -270,6 +317,19 @@ const FORMULAS = [
     output: { label: 'Future value', unit: '' },
     compute: v => v.P * Math.pow(1 + (v.annualRate / 100) / v.m, v.m * v.t),
     format: money,
+    defaults: { P: 10000, annualRate: 5, m: 12, t: 10 },
+    sliders: [
+      { key: 'annualRate', min: 0, max: 15, step: 0.1 },
+      { key: 't', min: 1, max: 40, step: 1 },
+    ],
+    series: v => {
+      const t = Math.max(1, v.t), N = Math.min(Math.max(4, Math.round(t * 4)), 60), points = [];
+      for (let i = 0; i <= N; i++) {
+        const yr = i / N * t;
+        points.push({ x: yr, y: v.P * Math.pow(1 + (v.annualRate / 100) / v.m, v.m * yr) });
+      }
+      return { title: 'Value over time', xLabel: 'Years', points, yTickFmt: kmoney };
+    },
   },
   {
     id: 'present-value',
@@ -304,6 +364,20 @@ const FORMULAS = [
       return v.PMT * (Math.pow(1 + r, v.n) - 1) / r;
     },
     format: money,
+    defaults: { PMT: 500, rate: 5, n: 120 },
+    sliders: [
+      { key: 'rate', min: 0, max: 15, step: 0.1 },
+      { key: 'n', min: 12, max: 480, step: 12 },
+    ],
+    series: v => {
+      const r = v.rate / 100, n = Math.max(1, Math.round(v.n)), N = Math.min(n, 60), points = [];
+      for (let i = 0; i <= N; i++) {
+        const j = Math.round(i / N * n);
+        const val = r === 0 ? v.PMT * j : v.PMT * (Math.pow(1 + r, j) - 1) / r;
+        points.push({ x: j, y: val });
+      }
+      return { title: 'Accumulated value over time', xLabel: 'Periods', points, yTickFmt: kmoney };
+    },
   },
   {
     id: 'roi',
@@ -698,11 +772,23 @@ function renderFormula(id) {
   const f = FORMULAS.find(x => x.id === id);
   if (!f) return renderHome();
   const topic = TOPICS.find(t => t.id === f.topic);
+  const dflt = f.defaults || {};
+  const live = f.series ? ` onchange="doCalc('${f.id}')"` : '';
   const fields = f.inputs.map(inp => `
     <div class="field">
       <label>${esc(inp.label)}${inp.unit ? ` <span class="unit">(${esc(inp.unit)})</span>` : ''}</label>
-      <input type="number" step="any" id="in_${inp.key}" placeholder="${esc(inp.hint || '')}">
+      <input type="number" step="any" id="in_${inp.key}" placeholder="${esc(inp.hint || '')}"${dflt[inp.key] != null ? ` value="${dflt[inp.key]}"` : ''}${live}>
     </div>`).join('');
+
+  const sliders = (f.sliders || []).map(s => {
+    const inp = f.inputs.find(i => i.key === s.key) || {};
+    const val = dflt[s.key] != null ? dflt[s.key] : s.min;
+    const suffix = inp.unit === '%' ? '%' : '';
+    return `<div class="slider">
+      <div class="slider-head"><span>${esc(inp.label || s.key)}</span><span class="slider-val" id="sv_${s.key}">${val}${suffix}</span></div>
+      <input type="range" id="sl_${s.key}" min="${s.min}" max="${s.max}" step="${s.step}" value="${val}" oninput="onSlider('${f.id}','${s.key}',this.value)">
+    </div>`;
+  }).join('');
 
   app.innerHTML = `
     <div class="crumbs">
@@ -715,12 +801,15 @@ function renderFormula(id) {
       <p class="sub">${esc(f.desc)}</p>
       <div class="eq">${esc(f.eq)}</div>
       ${fields}
+      ${f.sliders ? `<div class="sliders"><div class="sliders-label">Adjust to see the effect</div>${sliders}</div>` : ''}
       <button class="calc" onclick="doCalc('${f.id}')">Calculate</button>
       <div class="result" id="result">
         <div class="label" id="result-label"></div>
         <div class="value" id="result-value"></div>
       </div>
+      ${f.series ? `<div class="chart-wrap" id="chartWrap"></div>` : ''}
     </div>`;
+  if (f.series) doCalc(f.id);
 }
 
 function doCalc(id) {
@@ -753,11 +842,68 @@ function doCalc(id) {
     labEl.textContent = f.output.label;
     const shown = (f.format || num)(out);
     valEl.innerHTML = esc(shown) + (f.output.unit ? ` <span class="u">${esc(f.output.unit)}</span>` : '');
+    (f.sliders || []).forEach(s => {
+      const sl = document.getElementById('sl_' + s.key);
+      const sv = document.getElementById('sv_' + s.key);
+      const inp = f.inputs.find(i => i.key === s.key) || {};
+      if (v[s.key] != null) {
+        if (sl) sl.value = v[s.key];
+        if (sv) sv.textContent = v[s.key] + (inp.unit === '%' ? '%' : '');
+      }
+    });
+    if (f.series) {
+      const wrap = document.getElementById('chartWrap');
+      if (wrap) wrap.innerHTML = renderChartSVG(f.series(v));
+    }
   } catch (e) {
     box.classList.add('error');
     labEl.textContent = 'Cannot calculate';
     valEl.textContent = e.message;
   }
+}
+
+function onSlider(id, key, val) {
+  const input = document.getElementById('in_' + key);
+  if (input) input.value = val;
+  doCalc(id);
+}
+
+function renderChartSVG(series) {
+  const pts = series.points || [];
+  if (pts.length < 2) return '';
+  const W = 600, H = 250, padL = 62, padR = 14, padT = 14, padB = 42;
+  const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
+  const xMin = Math.min(...xs), xMax = Math.max(...xs);
+  const yMin = Math.min(0, ...ys), yMax = Math.max(...ys) || 1;
+  const sx = x => padL + (xMax === xMin ? 0 : (x - xMin) / (xMax - xMin)) * (W - padL - padR);
+  const sy = y => (H - padB) - (yMax === yMin ? 0 : (y - yMin) / (yMax - yMin)) * (H - padT - padB);
+  const yfmt = series.yTickFmt || (v => Math.round(v));
+  const xfmt = series.xTickFmt || (v => Math.round(v * 10) / 10);
+  const linePath = pts.map((p, i) => (i ? 'L' : 'M') + sx(p.x).toFixed(1) + ' ' + sy(p.y).toFixed(1)).join(' ');
+  const areaPath = 'M ' + sx(xs[0]).toFixed(1) + ' ' + sy(yMin).toFixed(1) + ' ' +
+    pts.map(p => 'L ' + sx(p.x).toFixed(1) + ' ' + sy(p.y).toFixed(1)).join(' ') +
+    ' L ' + sx(xs[xs.length - 1]).toFixed(1) + ' ' + sy(yMin).toFixed(1) + ' Z';
+  let grid = '';
+  for (let i = 0; i <= 4; i++) {
+    const yv = yMin + (yMax - yMin) * i / 4, yy = sy(yv);
+    grid += `<line x1="${padL}" y1="${yy.toFixed(1)}" x2="${W - padR}" y2="${yy.toFixed(1)}" class="grid"/>` +
+            `<text x="${padL - 8}" y="${(yy + 4).toFixed(1)}" class="ylab" text-anchor="end">${esc(String(yfmt(yv)))}</text>`;
+  }
+  let xlabels = '';
+  [0, 0.25, 0.5, 0.75, 1].forEach(fr => {
+    const xv = xMin + (xMax - xMin) * fr, xx = sx(xv);
+    xlabels += `<text x="${xx.toFixed(1)}" y="${H - 22}" class="xlab" text-anchor="middle">${esc(String(xfmt(xv)))}</text>`;
+  });
+  const last = pts[pts.length - 1];
+  return `<div class="chart-title">${esc(series.title || '')}</div>
+    <svg viewBox="0 0 ${W} ${H}" class="chart" preserveAspectRatio="xMidYMid meet" role="img">
+      ${grid}
+      <path d="${areaPath}" class="area"/>
+      <path d="${linePath}" class="cline"/>
+      <circle cx="${sx(last.x).toFixed(1)}" cy="${sy(last.y).toFixed(1)}" r="4" class="dot"/>
+      ${xlabels}
+      <text x="${((padL + (W - padR)) / 2).toFixed(1)}" y="${H - 4}" class="axlab" text-anchor="middle">${esc(series.xLabel || '')}</text>
+    </svg>`;
 }
 
 function route() {
