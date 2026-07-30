@@ -79,7 +79,7 @@
   .results-head { font-size: 13px; color: var(--muted); margin: 0 0 12px; }
   .section-label { display: flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 13px; }
   .section-label.next { margin-top: 30px; }
-  .featured-grid { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; margin-bottom: 4px; }
+  .featured-grid { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; margin-bottom: 24px; }
   .featured-grid .card {
     padding: 12px 14px;
     background: var(--accent-soft);
@@ -184,7 +184,7 @@
     <div class="logo" onclick="location.hash=''">use<span>Formula</span></div>
   </header>
   <div id="app"></div>
-  <footer>useFormula — enter your known values, get the answer.</footer>
+  <footer>Enter your known values and get the answer.</footer>
 </div>
 
 <script>
@@ -237,7 +237,7 @@ const FORMULAS = [
   {
     id: 'growing-annuity',
     topic: 'finance',
-    name: 'Growing Annuity — Future Net Income',
+    name: 'Growing Annuity (Future Net Income)',
     desc: 'Recurring income growing at a constant rate, valued at a future point',
     eq: 'FV = PMT · ((1+r)ⁿ − (1+g)ⁿ) / (r − g)',
     inputs: [
@@ -258,7 +258,7 @@ const FORMULAS = [
   {
     id: 'compound-interest',
     topic: 'finance',
-    name: 'Compound Interest — Future Value',
+    name: 'Compound Interest (Future Value)',
     desc: 'What a lump sum grows to with compounding',
     eq: 'A = P · (1 + r/m)^(m·t)',
     inputs: [
@@ -314,7 +314,7 @@ const FORMULAS = [
     inputs: [
       { key: 'cost', label: 'Initial cost / amount invested', unit: '$', hint: 'e.g. 10000' },
       { key: 'finalValue', label: 'Final / sale value', unit: '$', hint: 'e.g. 12000' },
-      { key: 'income', label: 'Income received (interest, dividends, etc.)', unit: '$', hint: 'optional — leave blank if none', optional: true },
+      { key: 'income', label: 'Income received (interest, dividends, etc.)', unit: '$', hint: 'leave blank if none', optional: true },
     ],
     output: { label: 'Return on investment', unit: '%' },
     compute: v => (v.finalValue - v.cost + v.income) / v.cost * 100,
@@ -484,7 +484,7 @@ const FORMULAS = [
   {
     id: 'ohms-voltage',
     topic: 'electrical',
-    name: "Ohm's Law — Voltage",
+    name: "Ohm's Law (Voltage)",
     desc: 'Voltage from current and resistance',
     eq: 'V = I · R',
     inputs: [
@@ -498,7 +498,7 @@ const FORMULAS = [
   {
     id: 'ohms-resistance',
     topic: 'electrical',
-    name: "Ohm's Law — Resistance",
+    name: "Ohm's Law (Resistance)",
     desc: 'Resistance from voltage and current',
     eq: 'R = V / I',
     inputs: [
@@ -540,7 +540,7 @@ const FORMULAS = [
 ];
 
 /* ============================================================
-   SEARCH KEYWORDS  (one entry per formula id — add words users
+   SEARCH KEYWORDS  (one entry per formula id; add words users
    might type. Merged onto each formula as f.keywords below.)
    ============================================================ */
 const KEYWORDS = {
@@ -600,18 +600,18 @@ function renderHome() {
   }).join('');
   app.innerHTML = `
     <h1>Find a formula</h1>
-    <p class="sub">Jump to a popular formula, search by keyword, or browse by subject.</p>
+    <p class="sub">Search for a formula or browse by topic.</p>
+    <div class="section-label">⭐ Most used</div>
+    <div class="grid featured-grid">${featured}</div>
     <div class="search">
       <span class="mag">🔍</span>
       <input id="searchBox" type="text" autocomplete="off" spellcheck="false"
-             placeholder="Search formulas — e.g. mortgage, ohm, area, momentum…"
+             placeholder="Search by name or keyword"
              oninput="doSearch(this.value)">
     </div>
     <div id="searchResults"></div>
     <div id="browse">
-      <div class="section-label">⭐ Most used</div>
-      <div class="grid featured-grid">${featured}</div>
-      <div class="section-label next">Browse by topic</div>
+      <div class="section-label">Browse by topic</div>
       <div class="grid">${cards}</div>
     </div>`;
   const sb = document.getElementById('searchBox');
@@ -667,7 +667,7 @@ function renderTopic(topicId) {
     <div class="search">
       <span class="mag">🔍</span>
       <input id="searchBox" type="text" autocomplete="off" spellcheck="false"
-             placeholder="Search within ${esc(topic.name)}…"
+             placeholder="Search within ${esc(topic.name)}"
              oninput="doTopicSearch('${topic.id}', this.value)">
     </div>
     <div id="topicResults"><div class="grid">${cards}</div></div>`;
@@ -700,9 +700,7 @@ function renderFormula(id) {
   const topic = TOPICS.find(t => t.id === f.topic);
   const fields = f.inputs.map(inp => `
     <div class="field">
-      <label>${esc(inp.label)} ${inp.unit ? `<span class="unit">(${esc(inp.unit)})</span>` : ''}
-        ${inp.hint ? `<span class="hint">— ${esc(inp.hint)}</span>` : ''}
-      </label>
+      <label>${esc(inp.label)}${inp.unit ? ` <span class="unit">(${esc(inp.unit)})</span>` : ''}</label>
       <input type="number" step="any" id="in_${inp.key}" placeholder="${esc(inp.hint || '')}">
     </div>`).join('');
 
