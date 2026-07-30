@@ -15,7 +15,10 @@
     --accent: #5b8cff;
     --accent-soft: rgba(91, 140, 255, 0.12);
     --good: #4ade80;
-    --radius: 14px;
+    --radius: 12px;
+    --field-radius: 6px;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+    --shadow-hover: 0 6px 18px rgba(0, 0, 0, 0.30);
   }
   @media (prefers-color-scheme: light) {
     :root {
@@ -28,6 +31,8 @@
       --accent: #2f6bff;
       --accent-soft: rgba(47, 107, 255, 0.08);
       --good: #16a34a;
+      --shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+      --shadow-hover: 0 8px 24px rgba(16, 24, 40, 0.10);
     }
   }
   * { box-sizing: border-box; }
@@ -48,7 +53,7 @@
     cursor: pointer;
   }
   header.site .logo span { color: var(--accent); }
-  .crumbs { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
+  .crumbs { font-size: 16.5px; font-weight: 500; color: var(--muted); margin-bottom: 22px; }
   .crumbs a { color: var(--accent); text-decoration: none; cursor: pointer; }
   .crumbs a:hover { text-decoration: underline; }
   h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.5px; }
@@ -60,13 +65,14 @@
     padding: 14px 16px 14px 44px;
     font-size: 16px;
     background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
     color: var(--text);
     outline: none;
-    transition: border-color .12s ease;
+    box-shadow: var(--shadow);
+    transition: border-color .12s ease, box-shadow .12s ease;
   }
-  .search input:focus { border-color: var(--accent); }
+  .search input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
   .search input::placeholder { color: var(--muted); }
   .search .mag { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 16px; pointer-events: none; }
   .results-head { font-size: 13px; color: var(--muted); margin: 0 0 12px; }
@@ -77,12 +83,13 @@
     border-radius: var(--radius);
     padding: 18px;
     cursor: pointer;
-    transition: transform .12s ease, background .12s ease, border-color .12s ease;
+    box-shadow: var(--shadow);
+    transition: transform .15s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease;
     text-decoration: none;
     color: inherit;
     display: block;
   }
-  .card:hover { background: var(--card-hover); transform: translateY(-2px); border-color: var(--accent); }
+  .card:hover { background: var(--card-hover); transform: translateY(-3px); border-color: var(--accent); box-shadow: var(--shadow-hover); }
   .card .icon { font-size: 26px; margin-bottom: 8px; }
   .card .title { font-weight: 650; font-size: 16px; margin-bottom: 3px; }
   .card .desc { color: var(--muted); font-size: 13.5px; }
@@ -92,15 +99,16 @@
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 22px;
+    padding: 24px;
     margin-bottom: 18px;
+    box-shadow: var(--shadow);
   }
   .eq {
     font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
     background: var(--accent-soft);
     color: var(--text);
     padding: 12px 14px;
-    border-radius: 10px;
+    border-radius: 8px;
     font-size: 15px;
     margin: 4px 0 22px;
     overflow-x: auto;
@@ -110,35 +118,39 @@
   .field .hint { color: var(--muted); font-weight: 400; font-size: 12.5px; }
   .field input {
     width: 100%;
-    padding: 11px 13px;
+    padding: 13px 14px;
     font-size: 15px;
     background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--field-radius);
     color: var(--text);
     outline: none;
-    transition: border-color .12s ease;
+    transition: border-color .12s ease, box-shadow .12s ease;
   }
-  .field input:focus { border-color: var(--accent); }
+  .field input:hover { border-color: var(--muted); }
+  .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .field input::placeholder { color: var(--muted); opacity: .7; }
   .field .unit { color: var(--muted); font-size: 12.5px; margin-left: 4px; }
   button.calc {
     width: 100%;
-    padding: 13px;
+    padding: 14px;
     font-size: 15.5px;
     font-weight: 650;
     background: var(--accent);
     color: #fff;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     cursor: pointer;
-    margin-top: 6px;
-    transition: filter .12s ease;
+    margin-top: 8px;
+    box-shadow: var(--shadow);
+    transition: filter .12s ease, transform .06s ease;
   }
   button.calc:hover { filter: brightness(1.08); }
+  button.calc:active { transform: translateY(1px); }
   .result {
     margin-top: 20px;
     padding: 18px;
-    border-radius: 10px;
+    border-radius: 8px;
     background: var(--accent-soft);
     border: 1px solid var(--border);
     display: none;
