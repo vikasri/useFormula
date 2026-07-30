@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>useFormula</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d27;
+    --card-hover: #222634;
+    --border: #2a2f3d;
+    --text: #e6e8ee;
+    --muted: #9aa0ad;
+    --accent: #5b8cff;
+    --accent-soft: rgba(91, 140, 255, 0.12);
+    --good: #4ade80;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f5f6f9;
+      --card: #ffffff;
+      --card-hover: #f0f3fb;
+      --border: #e2e5ec;
+      --text: #1a1d27;
+      --muted: #616875;
+      --accent: #2f6bff;
+      --accent-soft: rgba(47, 107, 255, 0.08);
+      --good: #16a34a;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 24px 20px 80px; }
+  header.site {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 0 26px;
+  }
+  header.site .logo {
+    font-size: 22px; font-weight: 700; letter-spacing: -0.5px;
+    cursor: pointer;
+  }
+  header.site .logo span { color: var(--accent); }
+  .crumbs { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
+  .crumbs a { color: var(--accent); text-decoration: none; cursor: pointer; }
+  .crumbs a:hover { text-decoration: underline; }
+  h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.5px; }
+  .sub { color: var(--muted); margin: 0 0 26px; font-size: 15px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+  .search { position: relative; margin: 0 0 26px; }
+  .search input {
+    width: 100%;
+    padding: 14px 16px 14px 44px;
+    font-size: 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    outline: none;
+    transition: border-color .12s ease;
+  }
+  .search input:focus { border-color: var(--accent); }
+  .search input::placeholder { color: var(--muted); }
+  .search .mag { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 16px; pointer-events: none; }
+  .results-head { font-size: 13px; color: var(--muted); margin: 0 0 12px; }
+  .card .count .topic-tag { color: var(--muted); }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    cursor: pointer;
+    transition: transform .12s ease, background .12s ease, border-color .12s ease;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .card:hover { background: var(--card-hover); transform: translateY(-2px); border-color: var(--accent); }
+  .card .icon { font-size: 26px; margin-bottom: 8px; }
+  .card .title { font-weight: 650; font-size: 16px; margin-bottom: 3px; }
+  .card .desc { color: var(--muted); font-size: 13.5px; }
+  .card .count { color: var(--accent); font-size: 12.5px; margin-top: 8px; font-weight: 600; }
+
+  .formula-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    margin-bottom: 18px;
+  }
+  .eq {
+    font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+    background: var(--accent-soft);
+    color: var(--text);
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 15px;
+    margin: 4px 0 22px;
+    overflow-x: auto;
+  }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+  .field .hint { color: var(--muted); font-weight: 400; font-size: 12.5px; }
+  .field input {
+    width: 100%;
+    padding: 11px 13px;
+    font-size: 15px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    outline: none;
+    transition: border-color .12s ease;
+  }
+  .field input:focus { border-color: var(--accent); }
+  .field .unit { color: var(--muted); font-size: 12.5px; margin-left: 4px; }
+  button.calc {
+    width: 100%;
+    padding: 13px;
+    font-size: 15.5px;
+    font-weight: 650;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: filter .12s ease;
+  }
+  button.calc:hover { filter: brightness(1.08); }
+  .result {
+    margin-top: 20px;
+    padding: 18px;
+    border-radius: 10px;
+    background: var(--accent-soft);
+    border: 1px solid var(--border);
+    display: none;
+  }
+  .result.show { display: block; }
+  .result .label { color: var(--muted); font-size: 13px; margin-bottom: 4px; }
+  .result .value { font-size: 28px; font-weight: 700; color: var(--good); letter-spacing: -0.5px; }
+  .result .value .u { font-size: 16px; color: var(--muted); font-weight: 500; }
+  .result.error .value { color: #f87171; font-size: 16px; font-weight: 500; }
+  .notes { color: var(--muted); font-size: 13px; margin-top: 14px; }
+  footer { text-align: center; color: var(--muted); font-size: 12.5px; margin-top: 40px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="site">
+    <div class="logo" onclick="location.hash=''">use<span>Formula</span></div>
+  </header>
+  <div id="app"></div>
+  <footer>useFormula — enter your known values, get the answer.</footer>
+</div>
+
+<script>
+/* ============================================================
+   DATA MODEL
+   Add a new topic  -> add to TOPICS.
+   Add a new formula -> add an object to FORMULAS.
+   Each formula:
+     id, topic, name, desc
+     eq      : human-readable equation string (display only)
+     inputs  : [{ key, label, unit, hint }]
+     output  : { label, unit }
+     compute : function(v) -> number   (v = {key: value})   returns the specific output
+     format  : optional function(n) -> string  (defaults to number)
+   ============================================================ */
+
+const TOPICS = [
+  { id: 'finance',    icon: '💰', name: 'Finance',    desc: 'Loans, annuities, growing income' },
+  { id: 'mechanics',  icon: '⚙️', name: 'Mechanics',  desc: 'Motion, force, energy' },
+  { id: 'geometry',   icon: '📐', name: 'Geometry',   desc: 'Areas, volumes, lengths' },
+  { id: 'electrical', icon: '⚡', name: 'Electrical', desc: 'Voltage, current, power' },
+];
+
+// helpers
+const money = n => '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const num   = n => (Math.abs(n) >= 1000 ? n.toLocaleString(undefined, { maximumFractionDigits: 4 }) : +n.toPrecision(6) + '');
+
+const FORMULAS = [
+  /* ---------------- FINANCE (2) ---------------- */
+  {
+    id: 'loan-payment',
+    topic: 'finance',
+    name: 'Loan Payment Calculator',
+    desc: 'Monthly payment for a fixed-rate loan or mortgage',
+    eq: 'M = P · r(1+r)ⁿ / ((1+r)ⁿ − 1)',
+    inputs: [
+      { key: 'P', label: 'Loan amount (principal)', unit: '$', hint: 'e.g. 300000' },
+      { key: 'annualRate', label: 'Annual interest rate', unit: '%', hint: 'e.g. 6.5' },
+      { key: 'years', label: 'Loan term', unit: 'years', hint: 'e.g. 30' },
+    ],
+    output: { label: 'Monthly payment', unit: '' },
+    compute: v => {
+      const r = (v.annualRate / 100) / 12;
+      const n = v.years * 12;
+      if (r === 0) return v.P / n;
+      return v.P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+    },
+    format: money,
+  },
+  {
+    id: 'growing-annuity',
+    topic: 'finance',
+    name: 'Growing Annuity — Future Net Income',
+    desc: 'Recurring income growing at a constant rate, valued at a future point',
+    eq: 'FV = PMT · ((1+r)ⁿ − (1+g)ⁿ) / (r − g)',
+    inputs: [
+      { key: 'PMT', label: 'First payment / income', unit: '$', hint: 'e.g. 1000' },
+      { key: 'rate', label: 'Return (discount) rate per period', unit: '%', hint: 'e.g. 6' },
+      { key: 'growth', label: 'Income growth rate per period', unit: '%', hint: 'e.g. 3' },
+      { key: 'n', label: 'Number of periods', unit: '', hint: 'e.g. 20' },
+    ],
+    output: { label: 'Future value of income stream', unit: '' },
+    compute: v => {
+      const r = v.rate / 100, g = v.growth / 100, n = v.n;
+      if (Math.abs(r - g) < 1e-9) return v.PMT * n * Math.pow(1 + r, n - 1);
+      return v.PMT * (Math.pow(1 + r, n) - Math.pow(1 + g, n)) / (r - g);
+    },
+    format: money,
+  },
+
+  {
+    id: 'compound-interest',
+    topic: 'finance',
+    name: 'Compound Interest — Future Value',
+    desc: 'What a lump sum grows to with compounding',
+    eq: 'A = P · (1 + r/m)^(m·t)',
+    inputs: [
+      { key: 'P', label: 'Principal', unit: '$', hint: 'e.g. 10000' },
+      { key: 'annualRate', label: 'Annual interest rate', unit: '%', hint: 'e.g. 5' },
+      { key: 'm', label: 'Compounds per year', unit: '', hint: '12 = monthly, 1 = yearly' },
+      { key: 't', label: 'Time', unit: 'years', hint: 'e.g. 10' },
+    ],
+    output: { label: 'Future value', unit: '' },
+    compute: v => v.P * Math.pow(1 + (v.annualRate / 100) / v.m, v.m * v.t),
+    format: money,
+  },
+  {
+    id: 'present-value',
+    topic: 'finance',
+    name: 'Present Value',
+    desc: "Today's worth of a future amount",
+    eq: 'PV = FV / (1 + r)ⁿ',
+    inputs: [
+      { key: 'FV', label: 'Future amount', unit: '$', hint: 'e.g. 20000' },
+      { key: 'rate', label: 'Discount rate per period', unit: '%', hint: 'e.g. 7' },
+      { key: 'n', label: 'Number of periods', unit: '', hint: 'e.g. 10' },
+    ],
+    output: { label: 'Present value', unit: '' },
+    compute: v => v.FV / Math.pow(1 + v.rate / 100, v.n),
+    format: money,
+  },
+  {
+    id: 'fv-annuity',
+    topic: 'finance',
+    name: 'Future Value of an Annuity',
+    desc: 'Value of equal recurring deposits',
+    eq: 'FV = PMT · ((1+r)ⁿ − 1) / r',
+    inputs: [
+      { key: 'PMT', label: 'Payment per period', unit: '$', hint: 'e.g. 500' },
+      { key: 'rate', label: 'Return rate per period', unit: '%', hint: 'e.g. 5' },
+      { key: 'n', label: 'Number of periods', unit: '', hint: 'e.g. 120' },
+    ],
+    output: { label: 'Future value', unit: '' },
+    compute: v => {
+      const r = v.rate / 100;
+      if (r === 0) return v.PMT * v.n;
+      return v.PMT * (Math.pow(1 + r, v.n) - 1) / r;
+    },
+    format: money,
+  },
+  {
+    id: 'roi',
+    topic: 'finance',
+    name: 'Return on Investment (ROI)',
+    desc: 'Percentage gain or loss on an investment',
+    eq: 'ROI = (Gain − Cost) / Cost × 100',
+    inputs: [
+      { key: 'gain', label: 'Final value / amount returned', unit: '$', hint: 'e.g. 12000' },
+      { key: 'cost', label: 'Initial cost / amount invested', unit: '$', hint: 'e.g. 10000' },
+    ],
+    output: { label: 'Return on investment', unit: '%' },
+    compute: v => (v.gain - v.cost) / v.cost * 100,
+    format: num,
+  },
+
+  /* ---------------- MECHANICS (5) ---------------- */
+  {
+    id: 'kinetic-energy',
+    topic: 'mechanics',
+    name: 'Kinetic Energy',
+    desc: 'Energy of a moving object',
+    eq: 'KE = ½ · m · v²',
+    inputs: [
+      { key: 'm', label: 'Mass', unit: 'kg', hint: 'e.g. 1200' },
+      { key: 'vel', label: 'Velocity', unit: 'm/s', hint: 'e.g. 25' },
+    ],
+    output: { label: 'Kinetic energy', unit: 'J' },
+    compute: v => 0.5 * v.m * v.vel * v.vel,
+    format: num,
+  },
+
+  {
+    id: 'newtons-second-law',
+    topic: 'mechanics',
+    name: "Newton's Second Law (Force)",
+    desc: 'Force from mass and acceleration',
+    eq: 'F = m · a',
+    inputs: [
+      { key: 'm', label: 'Mass', unit: 'kg', hint: 'e.g. 10' },
+      { key: 'a', label: 'Acceleration', unit: 'm/s²', hint: 'e.g. 9.8' },
+    ],
+    output: { label: 'Force', unit: 'N' },
+    compute: v => v.m * v.a,
+    format: num,
+  },
+  {
+    id: 'potential-energy',
+    topic: 'mechanics',
+    name: 'Gravitational Potential Energy',
+    desc: 'Energy stored due to height',
+    eq: 'PE = m · g · h',
+    inputs: [
+      { key: 'm', label: 'Mass', unit: 'kg', hint: 'e.g. 5' },
+      { key: 'g', label: 'Gravity', unit: 'm/s²', hint: '9.81 on Earth' },
+      { key: 'h', label: 'Height', unit: 'm', hint: 'e.g. 10' },
+    ],
+    output: { label: 'Potential energy', unit: 'J' },
+    compute: v => v.m * v.g * v.h,
+    format: num,
+  },
+  {
+    id: 'momentum',
+    topic: 'mechanics',
+    name: 'Momentum',
+    desc: 'Quantity of motion',
+    eq: 'p = m · v',
+    inputs: [
+      { key: 'm', label: 'Mass', unit: 'kg', hint: 'e.g. 1200' },
+      { key: 'vel', label: 'Velocity', unit: 'm/s', hint: 'e.g. 25' },
+    ],
+    output: { label: 'Momentum', unit: 'kg·m/s' },
+    compute: v => v.m * v.vel,
+    format: num,
+  },
+  {
+    id: 'work-done',
+    topic: 'mechanics',
+    name: 'Work Done',
+    desc: 'Work from a force acting over a distance',
+    eq: 'W = F · d · cos(θ)',
+    inputs: [
+      { key: 'F', label: 'Force', unit: 'N', hint: 'e.g. 50' },
+      { key: 'd', label: 'Distance', unit: 'm', hint: 'e.g. 8' },
+      { key: 'theta', label: 'Angle to direction of motion', unit: '°', hint: '0 if same direction' },
+    ],
+    output: { label: 'Work', unit: 'J' },
+    compute: v => v.F * v.d * Math.cos(v.theta * Math.PI / 180),
+    format: num,
+  },
+
+  /* ---------------- GEOMETRY (5) ---------------- */
+  {
+    id: 'circle-area',
+    topic: 'geometry',
+    name: 'Circle Area',
+    desc: 'Area from radius',
+    eq: 'A = π · r²',
+    inputs: [
+      { key: 'r', label: 'Radius', unit: '', hint: 'e.g. 5' },
+    ],
+    output: { label: 'Area', unit: 'sq units' },
+    compute: v => Math.PI * v.r * v.r,
+    format: num,
+  },
+
+  {
+    id: 'circle-circumference',
+    topic: 'geometry',
+    name: 'Circle Circumference',
+    desc: 'Perimeter of a circle',
+    eq: 'C = 2 · π · r',
+    inputs: [
+      { key: 'r', label: 'Radius', unit: '', hint: 'e.g. 5' },
+    ],
+    output: { label: 'Circumference', unit: 'units' },
+    compute: v => 2 * Math.PI * v.r,
+    format: num,
+  },
+  {
+    id: 'triangle-area',
+    topic: 'geometry',
+    name: 'Triangle Area',
+    desc: 'Area from base and height',
+    eq: 'A = ½ · b · h',
+    inputs: [
+      { key: 'b', label: 'Base', unit: '', hint: 'e.g. 10' },
+      { key: 'h', label: 'Height', unit: '', hint: 'e.g. 6' },
+    ],
+    output: { label: 'Area', unit: 'sq units' },
+    compute: v => 0.5 * v.b * v.h,
+    format: num,
+  },
+  {
+    id: 'sphere-volume',
+    topic: 'geometry',
+    name: 'Sphere Volume',
+    desc: 'Volume of a sphere',
+    eq: 'V = 4⁄3 · π · r³',
+    inputs: [
+      { key: 'r', label: 'Radius', unit: '', hint: 'e.g. 3' },
+    ],
+    output: { label: 'Volume', unit: 'cubic units' },
+    compute: v => (4 / 3) * Math.PI * Math.pow(v.r, 3),
+    format: num,
+  },
+  {
+    id: 'pythagoras',
+    topic: 'geometry',
+    name: 'Pythagorean Theorem',
+    desc: 'Hypotenuse of a right-angled triangle',
+    eq: 'c = √(a² + b²)',
+    inputs: [
+      { key: 'a', label: 'Side a', unit: '', hint: 'e.g. 3' },
+      { key: 'b', label: 'Side b', unit: '', hint: 'e.g. 4' },
+    ],
+    output: { label: 'Hypotenuse (c)', unit: 'units' },
+    compute: v => Math.sqrt(v.a * v.a + v.b * v.b),
+    format: num,
+  },
+
+  /* ---------------- ELECTRICAL (5) ---------------- */
+  {
+    id: 'electrical-power',
+    topic: 'electrical',
+    name: 'Electrical Power',
+    desc: 'Power from voltage and current',
+    eq: 'P = V · I',
+    inputs: [
+      { key: 'V', label: 'Voltage', unit: 'V', hint: 'e.g. 230' },
+      { key: 'I', label: 'Current', unit: 'A', hint: 'e.g. 10' },
+    ],
+    output: { label: 'Power', unit: 'W' },
+    compute: v => v.V * v.I,
+    format: num,
+  },
+  {
+    id: 'ohms-voltage',
+    topic: 'electrical',
+    name: "Ohm's Law — Voltage",
+    desc: 'Voltage from current and resistance',
+    eq: 'V = I · R',
+    inputs: [
+      { key: 'I', label: 'Current', unit: 'A', hint: 'e.g. 2' },
+      { key: 'R', label: 'Resistance', unit: 'Ω', hint: 'e.g. 100' },
+    ],
+    output: { label: 'Voltage', unit: 'V' },
+    compute: v => v.I * v.R,
+    format: num,
+  },
+  {
+    id: 'ohms-resistance',
+    topic: 'electrical',
+    name: "Ohm's Law — Resistance",
+    desc: 'Resistance from voltage and current',
+    eq: 'R = V / I',
+    inputs: [
+      { key: 'V', label: 'Voltage', unit: 'V', hint: 'e.g. 230' },
+      { key: 'I', label: 'Current', unit: 'A', hint: 'e.g. 5' },
+    ],
+    output: { label: 'Resistance', unit: 'Ω' },
+    compute: v => v.V / v.I,
+    format: num,
+  },
+  {
+    id: 'electrical-energy',
+    topic: 'electrical',
+    name: 'Electrical Energy',
+    desc: 'Energy used by a device over time',
+    eq: 'E = P · t',
+    inputs: [
+      { key: 'P', label: 'Power', unit: 'W', hint: 'e.g. 2000' },
+      { key: 't', label: 'Time', unit: 'hours', hint: 'e.g. 3' },
+    ],
+    output: { label: 'Energy', unit: 'Wh' },
+    compute: v => v.P * v.t,
+    format: num,
+  },
+  {
+    id: 'capacitor-charge',
+    topic: 'electrical',
+    name: 'Capacitor Charge',
+    desc: 'Charge stored on a capacitor',
+    eq: 'Q = C · V',
+    inputs: [
+      { key: 'C', label: 'Capacitance', unit: 'F', hint: 'e.g. 0.001' },
+      { key: 'V', label: 'Voltage', unit: 'V', hint: 'e.g. 12' },
+    ],
+    output: { label: 'Charge', unit: 'C' },
+    compute: v => v.C * v.V,
+    format: num,
+  },
+];
+
+/* ============================================================
+   SEARCH KEYWORDS  (one entry per formula id — add words users
+   might type. Merged onto each formula as f.keywords below.)
+   ============================================================ */
+const KEYWORDS = {
+  'loan-payment':        'mortgage loan emi installment repayment amortization home car borrow monthly payment principal debt',
+  'growing-annuity':     'growing annuity future net income stream growth rate recurring dividend pension retirement graduated',
+  'compound-interest':   'compound interest future value savings investment growth apy deposit accumulate',
+  'present-value':       'present value discount pv discounting time value of money today worth npv',
+  'fv-annuity':          'future value annuity sip regular deposits savings recurring ordinary retirement contributions',
+  'roi':                 'roi return on investment profit gain loss percentage yield performance',
+  'kinetic-energy':      'kinetic energy motion moving joules velocity speed mass ke',
+  'newtons-second-law':  'newton second law force mass acceleration f=ma dynamics push',
+  'potential-energy':    'gravitational potential energy height gravity stored mgh pe',
+  'momentum':            'momentum motion impulse mass velocity collision p=mv',
+  'work-done':           'work done force distance joules energy displacement',
+  'circle-area':         'circle area pi radius round disc surface',
+  'circle-circumference':'circle circumference perimeter pi radius round',
+  'triangle-area':       'triangle area base height half',
+  'sphere-volume':       'sphere volume ball radius round 3d',
+  'pythagoras':          'pythagoras pythagorean theorem hypotenuse right triangle sides',
+  'electrical-power':    'electrical power watts voltage current p=vi wattage',
+  'ohms-voltage':        'ohm law voltage volts current resistance v=ir',
+  'ohms-resistance':     'ohm law resistance ohms voltage current r=v/i',
+  'electrical-energy':   'electrical energy consumption kwh watt hours power time bill usage',
+  'capacitor-charge':    'capacitor charge coulombs capacitance voltage q=cv store',
+};
+FORMULAS.forEach(f => { f.keywords = KEYWORDS[f.id] || ''; });
+
+/* ============================================================
+   ROUTER  (hash-based:  #  |  #topic/finance  |  #formula/loan-payment)
+   ============================================================ */
+const app = document.getElementById('app');
+
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function renderHome() {
+  const cards = TOPICS.map(t => {
+    const count = FORMULAS.filter(f => f.topic === t.id).length;
+    return `<a class="card" onclick="location.hash='topic/${t.id}'">
+      <div class="icon">${t.icon}</div>
+      <div class="title">${esc(t.name)}</div>
+      <div class="desc">${esc(t.desc)}</div>
+      <div class="count">${count} formula${count===1?'':'s'} →</div>
+    </a>`;
+  }).join('');
+  app.innerHTML = `
+    <h1>Find a formula</h1>
+    <p class="sub">Search by name or keyword, or browse by subject below.</p>
+    <div class="search">
+      <span class="mag">🔍</span>
+      <input id="searchBox" type="text" autocomplete="off" spellcheck="false"
+             placeholder="Search formulas — e.g. mortgage, ohm, area, momentum…"
+             oninput="doSearch(this.value)">
+    </div>
+    <div id="searchResults"></div>
+    <div id="topicGrid"><div class="grid">${cards}</div></div>`;
+  const sb = document.getElementById('searchBox');
+  if (sb) sb.focus();
+}
+
+function doSearch(q) {
+  q = (q || '').trim().toLowerCase();
+  const results = document.getElementById('searchResults');
+  const topicGrid = document.getElementById('topicGrid');
+  if (!results || !topicGrid) return;
+  if (!q) { results.innerHTML = ''; topicGrid.style.display = ''; return; }
+  topicGrid.style.display = 'none';
+  const terms = q.split(/\s+/);
+  const matches = FORMULAS.filter(f => {
+    const topic = TOPICS.find(t => t.id === f.topic) || {};
+    const hay = (f.name + ' ' + f.desc + ' ' + f.keywords + ' ' + (topic.name || '')).toLowerCase();
+    return terms.every(t => hay.includes(t));
+  });
+  if (!matches.length) {
+    results.innerHTML = `<p class="sub">No formulas match “${esc(q)}”. Try another word.</p>`;
+    return;
+  }
+  const cards = matches.map(f => {
+    const topic = TOPICS.find(t => t.id === f.topic) || {};
+    return `<a class="card" onclick="location.hash='formula/${f.id}'">
+      <div class="title">${esc(f.name)}</div>
+      <div class="desc">${esc(f.desc)}</div>
+      <div class="count"><span class="topic-tag">${topic.icon || ''} ${esc(topic.name || '')}</span> · Open →</div>
+    </a>`;
+  }).join('');
+  results.innerHTML = `<p class="results-head">${matches.length} formula${matches.length === 1 ? '' : 's'} found</p><div class="grid">${cards}</div>`;
+}
+
+function topicCardsHTML(list) {
+  return list.map(f => `
+    <a class="card" onclick="location.hash='formula/${f.id}'">
+      <div class="title">${esc(f.name)}</div>
+      <div class="desc">${esc(f.desc)}</div>
+      <div class="count">Open →</div>
+    </a>`).join('');
+}
+
+function renderTopic(topicId) {
+  const topic = TOPICS.find(t => t.id === topicId);
+  if (!topic) return renderHome();
+  const list = FORMULAS.filter(f => f.topic === topicId);
+  const cards = topicCardsHTML(list) || `<p class="sub">No formulas here yet.</p>`;
+  app.innerHTML = `
+    <div class="crumbs"><a onclick="location.hash=''">Home</a> › ${esc(topic.name)}</div>
+    <h1>${topic.icon} ${esc(topic.name)}</h1>
+    <p class="sub">${esc(topic.desc)}</p>
+    <div class="search">
+      <span class="mag">🔍</span>
+      <input id="searchBox" type="text" autocomplete="off" spellcheck="false"
+             placeholder="Search within ${esc(topic.name)}…"
+             oninput="doTopicSearch('${topic.id}', this.value)">
+    </div>
+    <div id="topicResults"><div class="grid">${cards}</div></div>`;
+  const sb = document.getElementById('searchBox');
+  if (sb) sb.focus();
+}
+
+function doTopicSearch(topicId, q) {
+  q = (q || '').trim().toLowerCase();
+  const box = document.getElementById('topicResults');
+  if (!box) return;
+  const topic = TOPICS.find(t => t.id === topicId) || {};
+  const list = FORMULAS.filter(f => f.topic === topicId);
+  if (!q) { box.innerHTML = `<div class="grid">${topicCardsHTML(list)}</div>`; return; }
+  const terms = q.split(/\s+/);
+  const matches = list.filter(f => {
+    const hay = (f.name + ' ' + f.desc + ' ' + f.keywords).toLowerCase();
+    return terms.every(t => hay.includes(t));
+  });
+  if (!matches.length) {
+    box.innerHTML = `<p class="sub">No ${esc(topic.name || '')} formulas match “${esc(q)}”.</p>`;
+    return;
+  }
+  box.innerHTML = `<p class="results-head">${matches.length} of ${list.length} shown</p><div class="grid">${topicCardsHTML(matches)}</div>`;
+}
+
+function renderFormula(id) {
+  const f = FORMULAS.find(x => x.id === id);
+  if (!f) return renderHome();
+  const topic = TOPICS.find(t => t.id === f.topic);
+  const fields = f.inputs.map(inp => `
+    <div class="field">
+      <label>${esc(inp.label)} ${inp.unit ? `<span class="unit">(${esc(inp.unit)})</span>` : ''}
+        ${inp.hint ? `<span class="hint">— ${esc(inp.hint)}</span>` : ''}
+      </label>
+      <input type="number" step="any" id="in_${inp.key}" placeholder="${esc(inp.hint || '')}">
+    </div>`).join('');
+
+  app.innerHTML = `
+    <div class="crumbs">
+      <a onclick="location.hash=''">Home</a> ›
+      <a onclick="location.hash='topic/${topic.id}'">${esc(topic.name)}</a> ›
+      ${esc(f.name)}
+    </div>
+    <div class="formula-box">
+      <h1>${esc(f.name)}</h1>
+      <p class="sub">${esc(f.desc)}</p>
+      <div class="eq">${esc(f.eq)}</div>
+      ${fields}
+      <button class="calc" onclick="doCalc('${f.id}')">Calculate</button>
+      <div class="result" id="result">
+        <div class="label" id="result-label"></div>
+        <div class="value" id="result-value"></div>
+      </div>
+    </div>`;
+}
+
+function doCalc(id) {
+  const f = FORMULAS.find(x => x.id === id);
+  const box = document.getElementById('result');
+  const valEl = document.getElementById('result-value');
+  const labEl = document.getElementById('result-label');
+  const v = {};
+  let missing = [];
+  for (const inp of f.inputs) {
+    const raw = document.getElementById('in_' + inp.key).value.trim();
+    if (raw === '') { missing.push(inp.label); continue; }
+    v[inp.key] = parseFloat(raw);
+  }
+  box.classList.add('show');
+  if (missing.length) {
+    box.classList.add('error');
+    labEl.textContent = 'Missing values';
+    valEl.textContent = 'Please fill in: ' + missing.join(', ');
+    return;
+  }
+  try {
+    const out = f.compute(v);
+    if (!isFinite(out)) throw new Error('Result is undefined for these inputs.');
+    box.classList.remove('error');
+    labEl.textContent = f.output.label;
+    const shown = (f.format || num)(out);
+    valEl.innerHTML = esc(shown) + (f.output.unit ? ` <span class="u">${esc(f.output.unit)}</span>` : '');
+  } catch (e) {
+    box.classList.add('error');
+    labEl.textContent = 'Cannot calculate';
+    valEl.textContent = e.message;
+  }
+}
+
+function route() {
+  const h = location.hash.replace(/^#/, '');
+  const [page, arg] = h.split('/');
+  if (page === 'topic') renderTopic(arg);
+  else if (page === 'formula') renderFormula(arg);
+  else renderHome();
+  window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', route);
+route();
+</script>
+</body>
+</html>
