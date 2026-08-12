@@ -11,6 +11,7 @@
   --radius: 10px;
   --card-radius: 8px;
   --field-radius: 6px;
+  --field-optional: #0a0c12;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
   --shadow-hover: 0 6px 18px rgba(0, 0, 0, 0.30);
 }
@@ -25,6 +26,7 @@
     --accent: #2f6bff;
     --accent-soft: rgba(47, 107, 255, 0.08);
     --good: #16a34a;
+    --field-optional: #e7eaf1;
     --shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
     --shadow-hover: 0 8px 24px rgba(16, 24, 40, 0.10);
   }
@@ -172,6 +174,9 @@ h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.5px; }
 .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .field input::placeholder { color: var(--muted); opacity: .7; }
 .field .unit { color: var(--muted); font-size: 12.5px; margin-left: 4px; }
+/* Optional inputs read as secondary: grey label, slightly deeper fill */
+.field.optional label { color: var(--muted); font-weight: 500; }
+.field.optional input { background: var(--field-optional); }
 button.calc {
   width: 100%;
   padding: 14px;

@@ -222,7 +222,7 @@ function renderFormula(id) {
   const topic = TOPICS.find(t => t.id === f.topic);
   const dflt = f.defaults || {};
   const fields = f.inputs.map(inp => `
-    <div class="field">
+    <div class="field${inp.optional ? ' optional' : ''}">
       <label>${esc(inp.label)}${inp.unit ? ` <span class="unit">(${esc(inp.unit)})</span>` : ''}</label>
       <input type="number" step="any" id="in_${inp.key}" placeholder="${esc(inp.hint || '')}"${dflt[inp.key] != null ? ` value="${dflt[inp.key]}"` : ''}${f.series ? ` onchange="onField('${f.id}','${inp.key}')"` : ''}>
     </div>`).join('');
