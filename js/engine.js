@@ -294,9 +294,9 @@ function formulaBoxHTML(f, opts) {
       </div>
       ${f.extras ? `<div class="extras" id="extras"></div>` : ''}
       ${f.series ? `<div class="chart-wrap" id="chartWrap"></div>` : ''}
+      ${f.sliders ? `<div class="sliders"><div class="sliders-label">Adjust to see the effect</div>${sliders}</div>` : ''}
       ${f.extras ? `<div class="extras" id="extrasDetail"></div>` : ''}
       ${advancedPanel}
-      ${f.sliders ? `<div class="sliders"><div class="sliders-label">Adjust to see the effect</div>${sliders}</div>` : ''}
       ${setting('missionLine', '') ? `<p class="mission">${esc(setting('missionLine', ''))}</p>` : ''}
     </div>`;
 }
@@ -419,7 +419,7 @@ function renderExtras(f, v, out) {
   const wasOpen = was ? was.open : false;
   box.innerHTML = detail.length ? `
     <details class="breakdown">
-      <summary>Show detailed breakdown</summary>
+      <summary>More details</summary>
       <div class="extra-grid">${detail.map(cell).join('')}</div>
     </details>` : '';
   box.classList.toggle('show', detail.length > 0);
