@@ -66,8 +66,8 @@ registerFormulas([
       { key: 'downPct', label: 'Downpayment', unit: '%', hint: 'e.g. 20' },
       { key: 'annualRate', label: 'Annual interest rate', unit: '%', hint: 'e.g. 6.5' },
       { key: 'years', label: 'Loan term', unit: 'years', hint: 'e.g. 30' },
-      { key: 'extra', label: 'One extra payment', unit: '$', hint: 'optional', optional: true },
-      { key: 'extraAt', label: 'Extra payment at year', unit: 'years', hint: 'blank = halfway', optional: true },
+      { key: 'extra', label: 'Extra payment', unit: '$', hint: 'e.g. 10000', optional: true, advanced: true },
+      { key: 'extraAt', label: 'Paid at year', unit: 'years', hint: 'blank = halfway', optional: true, advanced: true },
     ],
     output: { label: 'Monthly payment', unit: '' },
     compute: v => {
@@ -113,28 +113,32 @@ registerFormulas([
         });
       }
 
-      /* The one-off extra payment, reported only once an amount is entered. */
-      if (v.extra > 0 && asIs) {
-        const at = extraPaymentMonth(v);
-        const withLump = loanSchedule(P, r, M, { lumpAmount: v.extra, lumpMonth: at, maxMonths: n });
-        /* Nothing to report if the payment lands after the loan is already
-           finished, or if a 0% loan makes it save nothing. */
-        if (withLump && asIs.interest - withLump.interest > 0.5) {
-          rows.push({
-            label: `One extra ${money(v.extra)} paid at year ${(at / 12).toFixed(1)}`,
-            wide: true,
-            value: `clears the loan in ${(withLump.months / 12).toFixed(1)} years, not ${(asIs.months / 12).toFixed(1)}`,
-          });
-          rows.push({
-            label: 'Interest after that extra payment',
-            wide: true,
-            value: `${money(withLump.interest)}, a saving of ${money(asIs.interest - withLump.interest)}`,
-          });
-        }
-      }
       return rows;
     },
-    defaults: { total: 375000, downPct: 20, annualRate: 6.5, years: 30, extra: 0, extraAt: 15 },
+
+    /* Kept out of the main form: a one-off extra payment leaves the monthly
+       payment untouched, so showing it beside the fields that set the payment
+       would only mislead. */
+    advanced: {
+      summary: 'What if you paid extra?',
+      intro: 'A one-off extra payment does not change your monthly payment. It shortens the loan and cuts the total interest. Enter an amount to see by how much, and watch the curves below.',
+      note: (v, M) => {
+        if (!(v.extra > 0)) return '';
+        const P = loanPrincipal(v);
+        const r = (v.annualRate / 100) / 12;
+        const n = Math.round(v.years * 12);
+        const at = extraPaymentMonth(v);
+        const asIs = loanSchedule(P, r, M, { maxMonths: n });
+        const withLump = loanSchedule(P, r, M, { lumpAmount: v.extra, lumpMonth: at, maxMonths: n });
+        /* Nothing to say if the payment lands after the loan is already
+           finished, or if a 0% loan makes it save nothing. */
+        if (!asIs || !withLump || asIs.interest - withLump.interest <= 0.5) return '';
+        return `Paying ${money(v.extra)} at year ${(at / 12).toFixed(1)} clears the loan in `
+          + `${(withLump.months / 12).toFixed(1)} years instead of ${(asIs.months / 12).toFixed(1)}, `
+          + `and saves ${money(asIs.interest - withLump.interest)} in interest.`;
+      },
+    },
+    defaults: { total: 375000, downPct: 20, annualRate: 6.5, years: 30 },
     sliders: [
       { key: 'downPct', span: 100, floor: 0, ceil: 100, step: 1 },
       { key: 'annualRate', span: 5, floor: 0, step: 0.1 },

@@ -223,6 +223,21 @@ button.calc:active { transform: translateY(1px); }
 .extra .v { display: block; font-weight: 650; font-size: 15px; }
 
 .notes { color: var(--muted); font-size: 13px; margin-top: 14px; }
+
+/* Advanced panel: collapsed by default so the basic path stays short */
+.advanced { margin: 18px 0 4px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); }
+.advanced > summary {
+  cursor: pointer; padding: 12px 14px; font-size: 14px; font-weight: 650;
+  display: flex; align-items: center; gap: 8px; list-style: none;
+}
+.advanced > summary::-webkit-details-marker { display: none; }
+.advanced > summary::before { content: '\25B8'; color: var(--muted); font-size: 11px; }
+.advanced[open] > summary::before { content: '\25BE'; }
+.advanced > summary:hover { color: var(--accent); }
+.advanced .body { padding: 0 14px 14px; }
+.advanced-intro { color: var(--muted); font-size: 13px; margin: 0 0 13px; }
+.advanced-note { font-size: 14px; font-weight: 600; line-height: 1.45; }
+.advanced-note:not(:empty) { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
 .sliders { margin: 4px 0 6px; padding: 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; }
 .sliders-label { font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); margin-bottom: 13px; }
 .slider { margin-bottom: 15px; }

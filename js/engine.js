@@ -11,7 +11,8 @@
    Each formula:
      id, topic, name, desc, keywords
      eq       : human-readable equation string (display only)
-     inputs   : [{ key, label, unit, hint, optional }]
+     inputs   : [{ key, label, unit, hint, optional, advanced }]
+                  advanced inputs move to a collapsed panel by the chart
      output   : { label, unit }
      compute  : function(v) -> number   (v = {key: value})
      format   : optional function(n) -> string  (defaults to num)
@@ -19,8 +20,10 @@
      sliders  : optional [{ key, span, floor, ceil, step }]
      series   : optional function(v) -> { points, xLabel, title, yTickFmt,
                   label, extra: [{ points, label, cls }] }   extra = more lines
-     extras   : optional function(v, answer) -> [{ label, value }]
-                  a breakdown listed under the answer
+     extras   : optional function(v, answer) -> [{ label, value, wide }]
+                  a breakdown listed under the answer, two per row
+     advanced : optional { summary, intro, note(v, answer) -> string }
+                  the panel holding the advanced inputs
    ============================================================ */
 
 // Registries — populated by the topic files, then read by the renderers.
@@ -221,11 +224,26 @@ function renderFormula(id) {
   if (!f) return renderHome();
   const topic = TOPICS.find(t => t.id === f.topic);
   const dflt = f.defaults || {};
-  const fields = f.inputs.map(inp => `
+  const fieldHTML = inp => `
     <div class="field${inp.optional ? ' optional' : ''}">
       <label>${esc(inp.label)}${inp.unit ? ` <span class="unit">(${esc(inp.unit)})</span>` : ''}</label>
       <input type="number" step="any" id="in_${inp.key}" placeholder="${esc(inp.hint || '')}"${dflt[inp.key] != null ? ` value="${dflt[inp.key]}"` : ''}${f.series ? ` onchange="onField('${f.id}','${inp.key}')"` : ''}>
-    </div>`).join('');
+    </div>`;
+
+  /* Inputs marked advanced do not change the headline answer, so they are kept
+     out of the main form and tucked into a panel next to the chart. */
+  const fields = f.inputs.filter(i => !i.advanced).map(fieldHTML).join('');
+  const advancedInputs = f.inputs.filter(i => i.advanced);
+  const adv = f.advanced || {};
+  const advancedPanel = advancedInputs.length ? `
+    <details class="advanced">
+      <summary>${esc(adv.summary || 'More options')}</summary>
+      <div class="body">
+        ${adv.intro ? `<p class="advanced-intro">${esc(adv.intro)}</p>` : ''}
+        <div class="fields">${advancedInputs.map(fieldHTML).join('')}</div>
+        <div class="advanced-note" id="advancedNote"></div>
+      </div>
+    </details>` : '';
 
   const sliders = (f.sliders || []).map(s => {
     const inp = f.inputs.find(i => i.key === s.key) || {};
@@ -258,6 +276,7 @@ function renderFormula(id) {
         <div class="value" id="result-value"></div>
       </div>
       ${f.extras ? `<div class="extras" id="extras"></div>` : ''}
+      ${advancedPanel}
       ${f.series ? `<div class="chart-wrap" id="chartWrap"></div>` : ''}
       ${f.sliders ? `<div class="sliders"><div class="sliders-label">Adjust to see the effect</div>${sliders}</div>` : ''}
     </div>`;
@@ -308,12 +327,24 @@ function doCalc(id) {
       if (wrap) wrap.innerHTML = renderChartSVG(f.series(v));
     }
     renderExtras(f, v, out);
+    renderAdvancedNote(f, v, out);
   } catch (e) {
     box.classList.add('error');
     labEl.textContent = 'Cannot calculate';
     valEl.textContent = e.message;
     renderExtras(null);
   }
+}
+
+/* The outcome of the advanced panel's own inputs, shown inside that panel so
+   the cause and its effect sit together. */
+function renderAdvancedNote(f, v, out) {
+  const el = document.getElementById('advancedNote');
+  if (!el) return;
+  let text = '';
+  try { text = (f && f.advanced && f.advanced.note && f.advanced.note(v, out)) || ''; }
+  catch (e) { text = ''; }
+  el.textContent = text;
 }
 
 /* Optional breakdown under the answer: a formula supplies

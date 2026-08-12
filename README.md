@@ -30,6 +30,9 @@ when `index.html` is opened directly from disk (double-click), not just over htt
 - **Add a formula** → add an object to the relevant `js/<topic>.js` via
   `registerFormulas([...])` (id, topic, name, desc, keywords, eq, inputs, output,
   compute; optional format, defaults, sliders, series).
+- **Hide a what-if input from the main form** → mark it `advanced: true` and give the
+  formula an `advanced: { summary, intro, note }`. It renders in a collapsed panel above
+  the chart, so the basic path stays short.
 - **Change the About page or the disclaimer** → `renderAbout()` in `js/engine.js`, reached
   at `#about`. The one-line version in the page footer lives in `index.html`.
 - **Turn a feature on or off** → edit `js/settings.js`. `showEquation: false` hides the
