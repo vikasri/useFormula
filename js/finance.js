@@ -108,9 +108,9 @@ registerFormulas([
       const half = asIs && asIs.rows.find(row => row.balance <= P / 2);
       if (half && half.month > 0) {
         rows.push({
-          label: 'Half the loan paid off after',
-          detail: true,
-          value: `${(half.month / 12).toFixed(1)} of ${v.years} years`,
+          label: 'Half of the principal amount of the loan paid off in',
+          detail: true, wide: true,
+          value: `${(half.month / 12).toFixed(1)} years`,
         });
       }
 
