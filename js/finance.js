@@ -98,9 +98,9 @@ registerFormulas([
       rows.push(
         { label: 'Total interest', value: money(interest) },
         { label: `Total paid over ${v.years} year${v.years === 1 ? '' : 's'}`, value: money(paid) },
-        { label: 'Interest per $1 borrowed', value: '$' + (interest / P).toFixed(2) },
-        { label: 'Cash out of pocket', value: money(down + paid) },
-        { label: 'First payment goes to', wide: true, value: `${money(firstInterest)} interest, ${money(M - firstInterest)} principal` },
+        { label: 'Interest per $1 borrowed', detail: true, value: '$' + (interest / P).toFixed(2) },
+        { label: 'Cash out of pocket', detail: true, value: money(down + paid) },
+        { label: 'First payment goes to', wide: true, detail: true, value: `${money(firstInterest)} interest, ${money(M - firstInterest)} principal` },
       );
       const asIs = loanSchedule(P, r, M, { maxMonths: n });
       const faster = loanSchedule(P, r, M, { extraPerMonth: M / 12, maxMonths: n + 12 });
@@ -109,7 +109,7 @@ registerFormulas([
         const yearsSaved = ((asIs.months - faster.months) / 12).toFixed(1);
         rows.push({
           label: 'Paying one extra payment a year',
-          wide: true,
+          wide: true, detail: true,
           value: `clears it ${yearsSaved} years sooner and saves ${money(asIs.interest - faster.interest)}`,
         });
       }

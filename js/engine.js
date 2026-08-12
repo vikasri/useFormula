@@ -20,8 +20,9 @@
      sliders  : optional [{ key, span, floor, ceil, step }]
      series   : optional function(v) -> { points, xLabel, title, yTickFmt,
                   label, extra: [{ points, label, cls }] }   extra = more lines
-     extras   : optional function(v, answer) -> [{ label, value, wide }]
-                  a breakdown listed under the answer, two per row
+     extras   : optional function(v, answer) -> [{ label, value, wide, detail }]
+                  listed under the answer, two per row; detail rows are
+                  tucked behind a "Show detailed breakdown" toggle
      advanced : optional { summary, intro, note(v, answer) -> string }
                   the panel holding the advanced inputs
      short    : optional shorter name for cards and shortcuts
@@ -292,8 +293,9 @@ function formulaBoxHTML(f, opts) {
         <div class="value" id="result-value"></div>
       </div>
       ${f.extras ? `<div class="extras" id="extras"></div>` : ''}
-      ${advancedPanel}
       ${f.series ? `<div class="chart-wrap" id="chartWrap"></div>` : ''}
+      ${f.extras ? `<div class="extras" id="extrasDetail"></div>` : ''}
+      ${advancedPanel}
       ${f.sliders ? `<div class="sliders"><div class="sliders-label">Adjust to see the effect</div>${sliders}</div>` : ''}
       ${setting('missionLine', '') ? `<p class="mission">${esc(setting('missionLine', ''))}</p>` : ''}
     </div>`;
@@ -401,9 +403,28 @@ function renderExtras(f, v, out) {
   } catch (e) { rows = []; }
   /* Two per row. A row marked wide keeps the full width, for values too long
      to read in half of a phone screen. */
-  el.innerHTML = rows.map(r =>
-    `<div class="extra${r.wide ? ' wide' : ''}"><span class="k">${esc(r.label)}</span><span class="v">${esc(r.value)}</span></div>`).join('');
-  el.classList.toggle('show', rows.length > 0);
+  const cell = r =>
+    `<div class="extra${r.wide ? ' wide' : ''}"><span class="k">${esc(r.label)}</span><span class="v">${esc(r.value)}</span></div>`;
+  const main = rows.filter(r => !r.detail);
+  const detail = rows.filter(r => r.detail);
+
+  el.innerHTML = `<div class="extra-grid">${main.map(cell).join('')}</div>`;
+  el.classList.toggle('show', main.length > 0);
+
+  /* The rest of the numbers live below the chart, behind a toggle. It is
+     rebuilt on every calculation, so remember whether it was open. */
+  const box = document.getElementById('extrasDetail');
+  if (!box) return;
+  const was = box.querySelector('details.breakdown');
+  const wasOpen = was ? was.open : false;
+  box.innerHTML = detail.length ? `
+    <details class="breakdown">
+      <summary>Show detailed breakdown</summary>
+      <div class="extra-grid">${detail.map(cell).join('')}</div>
+    </details>` : '';
+  box.classList.toggle('show', detail.length > 0);
+  const now = box.querySelector('details.breakdown');
+  if (now) now.open = wasOpen;
 }
 
 function sliderRange(s, val) {

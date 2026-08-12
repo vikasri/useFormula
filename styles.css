@@ -234,7 +234,9 @@ button.calc:active { transform: translateY(1px); }
 /* Breakdown under the answer (see a formula's `extras`): two per row, each a
    small label over its value. Rows flagged wide take the whole width. */
 .extras { display: none; margin-top: 14px; border-top: 1px solid var(--border); }
-.extras.show { display: grid; grid-template-columns: repeat(2, 1fr); column-gap: 20px; }
+.extras.show { display: block; }
+#extrasDetail { margin-top: 10px; border-top: 0; }
+.extra-grid { display: grid; grid-template-columns: repeat(2, 1fr); column-gap: 20px; }
 .extra { padding: 9px 1px; border-bottom: 1px solid var(--border); min-width: 0; }
 .extra.wide { grid-column: 1 / -1; }
 .extra .k { display: block; color: var(--muted); font-size: 13.5px; line-height: 1.3; margin-bottom: 1px; }
@@ -258,6 +260,16 @@ button.calc:active { transform: translateY(1px); }
 .advanced > summary:hover { color: var(--accent); }
 .advanced .body { padding: 0 14px 14px; }
 .advanced-intro { color: var(--muted); font-size: 14px; margin: 0 0 11px; }
+.breakdown > summary {
+  cursor: pointer; padding: 10px 1px 2px; list-style: none;
+  font-size: 13.5px; font-weight: 650; color: var(--accent);
+  display: flex; align-items: center; gap: 7px;
+}
+.breakdown > summary::-webkit-details-marker { display: none; }
+.breakdown > summary::before { content: '\25B8'; font-size: 11px; }
+.breakdown[open] > summary::before { content: '\25BE'; }
+.breakdown[open] > summary { margin-bottom: 2px; }
+
 .clear-advanced {
   margin-top: 10px; padding: 7px 14px; cursor: pointer;
   font-size: 13px; font-weight: 600; color: var(--muted);
@@ -340,7 +352,7 @@ footer a:hover { color: var(--accent); }
   .slider input[type=range] { height: 28px; }
   .slider-head { font-size: 14px; }
   .result .value { font-size: 27px; }
-  .extras.show { column-gap: 12px; }
+  .extra-grid { column-gap: 12px; }
   .extra .k { font-size: 12.5px; }
   .extra .v { font-size: 15px; }
   .chart { max-width: 100%; }
