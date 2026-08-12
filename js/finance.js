@@ -29,9 +29,16 @@ function loanSchedule(P, r, M, opts) {
   return { rows, months: month, interest: paidInterest };
 }
 
+/* What is actually borrowed, once the downpayment is taken off the total. */
+function loanPrincipal(v) {
+  const pct = Math.min(100, Math.max(0, v.downPct || 0));
+  return Math.max(0, (v.total || 0) * (1 - pct / 100));
+}
+
 /* Thins a schedule down to at most 60 plotted points. */
 function schedulePoints(rows, key) {
   const last = rows.length - 1;
+  if (last < 1) return [];
   const steps = Math.min(last, 60), out = [];
   for (let i = 0; i <= steps; i++) {
     const row = rows[Math.round(i / steps * last)];
@@ -55,40 +62,53 @@ registerFormulas([
     keywords: 'mortgage loan emi installment repayment amortization home car borrow monthly payment principal debt',
     eq: 'M = P · r(1+r)ⁿ / ((1+r)ⁿ − 1)',
     inputs: [
-      { key: 'P', label: 'Loan amount (principal)', unit: '$', hint: 'e.g. 300000' },
+      { key: 'total', label: 'Total money required', unit: '$', hint: 'e.g. 375000' },
+      { key: 'downPct', label: 'Downpayment', unit: '%', hint: 'e.g. 20' },
       { key: 'annualRate', label: 'Annual interest rate', unit: '%', hint: 'e.g. 6.5' },
       { key: 'years', label: 'Loan term', unit: 'years', hint: 'e.g. 30' },
-      { key: 'extra', label: 'One extra payment (optional)', unit: '$', hint: 'e.g. 10000', optional: true },
-      { key: 'extraAt', label: 'Extra payment made at year', unit: 'years', hint: 'blank means halfway', optional: true },
+      { key: 'extra', label: 'One extra payment', unit: '$', hint: 'optional', optional: true },
+      { key: 'extraAt', label: 'Extra payment at year', unit: 'years', hint: 'blank = halfway', optional: true },
     ],
     output: { label: 'Monthly payment', unit: '' },
     compute: v => {
+      const P = loanPrincipal(v);
       const r = (v.annualRate / 100) / 12;
       const n = v.years * 12;
-      if (r === 0) return v.P / n;
-      return v.P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+      if (P <= 0) return 0;
+      if (r === 0) return P / n;
+      return P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
     },
     format: money,
     extras: (v, M) => {
       const r = (v.annualRate / 100) / 12;
       const n = Math.round(v.years * 12);
-      const total = M * n;
-      const interest = total - v.P;
-      const firstInterest = v.P * r;
+      const P = loanPrincipal(v);
+      const down = v.total - P;
+      const paid = M * n;
+      const interest = paid - P;
+      const firstInterest = P * r;
+      /* Paired two per row, so short values sit side by side and only the
+         sentence-length ones take a full row. */
       const rows = [
-        { label: 'Amount borrowed', value: money(v.P) },
-        { label: 'Total interest', value: money(interest) },
-        { label: `Total paid over ${v.years} year${v.years === 1 ? '' : 's'}`, value: money(total) },
-        { label: 'Interest per $1 borrowed', value: '$' + (interest / v.P).toFixed(2) },
-        { label: 'First payment goes to', value: `${money(firstInterest)} interest, ${money(M - firstInterest)} principal` },
+        { label: `Downpayment (${+(v.downPct || 0).toFixed(2)}%)`, value: money(down) },
+        { label: 'Amount borrowed', value: money(P) },
       ];
-      const asIs = loanSchedule(v.P, r, M, { maxMonths: n });
-      const faster = loanSchedule(v.P, r, M, { extraPerMonth: M / 12, maxMonths: n + 12 });
+      if (P <= 0) return rows;
+      rows.push(
+        { label: 'Total interest', value: money(interest) },
+        { label: `Total paid over ${v.years} year${v.years === 1 ? '' : 's'}`, value: money(paid) },
+        { label: 'Interest per $1 borrowed', value: '$' + (interest / P).toFixed(2) },
+        { label: 'Cash out of pocket', value: money(down + paid) },
+        { label: 'First payment goes to', wide: true, value: `${money(firstInterest)} interest, ${money(M - firstInterest)} principal` },
+      );
+      const asIs = loanSchedule(P, r, M, { maxMonths: n });
+      const faster = loanSchedule(P, r, M, { extraPerMonth: M / 12, maxMonths: n + 12 });
       /* Skipped at 0% interest, where paying early saves time but no money. */
       if (asIs && faster && faster.months < asIs.months && asIs.interest - faster.interest > 0.5) {
         const yearsSaved = ((asIs.months - faster.months) / 12).toFixed(1);
         rows.push({
           label: 'Paying one extra payment a year',
+          wide: true,
           value: `clears it ${yearsSaved} years sooner and saves ${money(asIs.interest - faster.interest)}`,
         });
       }
@@ -96,34 +116,38 @@ registerFormulas([
       /* The one-off extra payment, reported only once an amount is entered. */
       if (v.extra > 0 && asIs) {
         const at = extraPaymentMonth(v);
-        const withLump = loanSchedule(v.P, r, M, { lumpAmount: v.extra, lumpMonth: at, maxMonths: n });
+        const withLump = loanSchedule(P, r, M, { lumpAmount: v.extra, lumpMonth: at, maxMonths: n });
         /* Nothing to report if the payment lands after the loan is already
            finished, or if a 0% loan makes it save nothing. */
         if (withLump && asIs.interest - withLump.interest > 0.5) {
           rows.push({
             label: `One extra ${money(v.extra)} paid at year ${(at / 12).toFixed(1)}`,
+            wide: true,
             value: `clears the loan in ${(withLump.months / 12).toFixed(1)} years, not ${(asIs.months / 12).toFixed(1)}`,
           });
           rows.push({
             label: 'Interest after that extra payment',
+            wide: true,
             value: `${money(withLump.interest)}, a saving of ${money(asIs.interest - withLump.interest)}`,
           });
         }
       }
       return rows;
     },
-    defaults: { P: 300000, annualRate: 6.5, years: 30, extra: 0, extraAt: 15 },
+    defaults: { total: 375000, downPct: 20, annualRate: 6.5, years: 30, extra: 0, extraAt: 15 },
     sliders: [
+      { key: 'downPct', span: 100, floor: 0, ceil: 100, step: 1 },
       { key: 'annualRate', span: 5, floor: 0, step: 0.1 },
       { key: 'years', span: 15, floor: 1, step: 1 },
     ],
     series: v => {
       const r = (v.annualRate / 100) / 12, n = Math.max(1, Math.round(v.years * 12));
       const at = extraPaymentMonth(v);
-      const M = v.P * (r === 0 ? 1 / n : (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1));
+      const P = loanPrincipal(v);
+      const M = P * (r === 0 ? 1 / n : (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1));
       /* Plot the schedule the visitor actually asked about: with the extra
          payment folded in when they entered one, so its effect is visible. */
-      const plan = loanSchedule(v.P, r, M, {
+      const plan = loanSchedule(P, r, M, {
         lumpAmount: v.extra > 0 ? v.extra : 0, lumpMonth: at, maxMonths: n,
       });
       if (!plan) return { points: [] };

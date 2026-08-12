@@ -251,7 +251,7 @@ function renderFormula(id) {
       </div>
       <p class="sub">${esc(f.desc)}</p>
       ${setting('showEquation', true) ? `<div class="eq">${esc(f.eq)}</div>` : ''}
-      ${fields}
+      <div class="fields">${fields}</div>
       <button class="calc" onclick="doCalc('${f.id}')">Calculate</button>
       <div class="result" id="result">
         <div class="label" id="result-label"></div>
@@ -326,8 +326,10 @@ function renderExtras(f, v, out) {
   try {
     if (f && f.extras) rows = f.extras(v, out) || [];
   } catch (e) { rows = []; }
+  /* Two per row. A row marked wide keeps the full width, for values too long
+     to read in half of a phone screen. */
   el.innerHTML = rows.map(r =>
-    `<div class="extra"><span class="k">${esc(r.label)}</span><span class="v">${esc(r.value)}</span></div>`).join('');
+    `<div class="extra${r.wide ? ' wide' : ''}"><span class="k">${esc(r.label)}</span><span class="v">${esc(r.value)}</span></div>`).join('');
   el.classList.toggle('show', rows.length > 0);
 }
 

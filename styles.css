@@ -11,7 +11,7 @@
   --radius: 10px;
   --card-radius: 8px;
   --field-radius: 6px;
-  --field-optional: #0a0c12;
+  --field-optional: #04050a;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
   --shadow-hover: 0 6px 18px rgba(0, 0, 0, 0.30);
 }
@@ -26,7 +26,7 @@
     --accent: #2f6bff;
     --accent-soft: rgba(47, 107, 255, 0.08);
     --good: #16a34a;
-    --field-optional: #e7eaf1;
+    --field-optional: #d3d9e6;
     --shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
     --shadow-hover: 0 8px 24px rgba(16, 24, 40, 0.10);
   }
@@ -155,7 +155,14 @@ h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.5px; }
   margin: 4px 0 22px;
   overflow-x: auto;
 }
-.field { margin-bottom: 16px; }
+.fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px 12px; margin-bottom: 18px; }
+/* Label takes the slack so every input in a row lines up, however many lines
+   its label wrapped to. A lone field on the last row spans the full width. */
+/* min-width:0 stops the number inputs' intrinsic width from pushing the
+   grid wider than the screen. */
+.field { display: flex; flex-direction: column; margin-bottom: 0; min-width: 0; }
+.field label { flex: 1; }
+.field:last-child:nth-child(odd) { grid-column: 1 / -1; }
 .field label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
 .field .hint { color: var(--muted); font-weight: 400; font-size: 12.5px; }
 .field input {
@@ -206,16 +213,14 @@ button.calc:active { transform: translateY(1px); }
 .result .value { font-size: 28px; font-weight: 700; color: var(--good); letter-spacing: -0.5px; }
 .result .value .u { font-size: 16px; color: var(--muted); font-weight: 500; }
 .result.error .value { color: #f87171; font-size: 16px; font-weight: 500; }
-/* Breakdown rows under the answer (see a formula's `extras`) */
+/* Breakdown under the answer (see a formula's `extras`): two per row, each a
+   small label over its value. Rows flagged wide take the whole width. */
 .extras { display: none; margin-top: 14px; border-top: 1px solid var(--border); }
-.extras.show { display: block; }
-.extra {
-  display: flex; justify-content: space-between; align-items: baseline; gap: 14px;
-  padding: 9px 2px; border-bottom: 1px solid var(--border); font-size: 14px;
-}
-.extra:last-child { border-bottom: 0; }
-.extra .k { color: var(--muted); }
-.extra .v { font-weight: 650; text-align: right; }
+.extras.show { display: grid; grid-template-columns: repeat(2, 1fr); column-gap: 20px; }
+.extra { padding: 9px 1px; border-bottom: 1px solid var(--border); min-width: 0; }
+.extra.wide { grid-column: 1 / -1; }
+.extra .k { display: block; color: var(--muted); font-size: 12.5px; line-height: 1.35; margin-bottom: 1px; }
+.extra .v { display: block; font-weight: 650; font-size: 15px; }
 
 .notes { color: var(--muted); font-size: 13px; margin-top: 14px; }
 .sliders { margin: 4px 0 6px; padding: 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; }
@@ -271,12 +276,17 @@ footer a:hover { color: var(--accent); }
   .featured-grid .heart { top: 3px; right: 2px; font-size: 13px; padding: 2px 3px; }
   .card.slot, .featured-grid .card.slot { font-size: 10px; min-height: 46px; padding: 8px 6px; }
   .field input, .search input { font-size: 16px; }   /* 16px avoids iOS focus-zoom */
+  .fields { gap: 12px 8px; }
+  .field label { font-size: 13px; margin-bottom: 5px; }
+  .field .unit { margin-left: 3px; font-size: 11.5px; }
+  .field input { padding: 11px 10px; }
   button.calc { font-size: 17px; padding: 15px; }
   .slider input[type=range] { height: 28px; }
   .slider-head { font-size: 14px; }
   .result .value { font-size: 25px; }
-  .extra { flex-direction: column; gap: 2px; }
-  .extra .v { text-align: left; }
+  .extras.show { column-gap: 12px; }
+  .extra .k { font-size: 11.5px; }
+  .extra .v { font-size: 14px; }
   .chart { max-width: 100%; }
   .chart .ylab, .chart .xlab { font-size: 15px; }
   .chart .axlab { font-size: 15px; }
