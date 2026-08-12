@@ -163,7 +163,8 @@ h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.5px; }
   background: var(--bg);
   border: 1.5px solid var(--border);
   border-radius: var(--field-radius);
-  color: var(--text);
+  color: var(--accent);
+  font-weight: 600;
   outline: none;
   transition: border-color .12s ease, box-shadow .12s ease;
 }
@@ -228,12 +229,15 @@ button.calc:active { transform: translateY(1px); }
 .chart .dot { fill: var(--accent); }
 .chart .cline.green { stroke: var(--good); }
 .chart .dot.green { fill: var(--good); }
+.chart .cline.red { stroke: #ef4444; }
+.chart .dot.red { fill: #ef4444; }
 .chart-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--muted); margin: 0 0 8px; }
 .chart-legend .lg { display: inline-flex; align-items: center; gap: 6px; }
 .chart-legend .sw { width: 13px; height: 3px; border-radius: 2px; background: var(--accent); flex: none; }
 .chart-legend .sw.green { background: var(--good); }
-.chart .ylab, .chart .xlab { fill: var(--muted); font-size: 11px; }
-.chart .axlab { fill: var(--muted); font-size: 12px; font-weight: 600; }
+.chart-legend .sw.red { background: #ef4444; }
+.chart .ylab, .chart .xlab { fill: var(--muted); font-size: 13.5px; }
+.chart .axlab { fill: var(--muted); font-size: 14px; font-weight: 600; }
 footer { text-align: center; color: var(--muted); font-size: 12.5px; margin-top: 40px; }
 footer .disclaimer { display: block; max-width: 34em; margin: 7px auto 0; font-size: 11.5px; opacity: 0.85; }
 footer a { color: var(--muted); text-decoration: underline; }
@@ -269,6 +273,6 @@ footer a:hover { color: var(--accent); }
   .extra { flex-direction: column; gap: 2px; }
   .extra .v { text-align: left; }
   .chart { max-width: 100%; }
-  .chart .ylab, .chart .xlab { font-size: 13px; }
-  .chart .axlab { font-size: 13px; }
+  .chart .ylab, .chart .xlab { font-size: 15px; }
+  .chart .axlab { font-size: 15px; }
 }
