@@ -41,6 +41,12 @@ const FAV_SLOTS = 4;
 
 const app = document.getElementById('app');
 
+/* Reads a switch from js/settings.js. Falls back to the default given here,
+   so the site still renders if that file is missing or a key was removed. */
+function setting(key, dflt) {
+  return (typeof SETTINGS === 'object' && SETTINGS && key in SETTINGS) ? SETTINGS[key] : dflt;
+}
+
 function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
 /* localStorage throws in some private-browsing modes, so every use is guarded
@@ -237,7 +243,7 @@ function renderFormula(id) {
         ${starHTML(f.id)}
       </div>
       <p class="sub">${esc(f.desc)}</p>
-      <div class="eq">${esc(f.eq)}</div>
+      ${setting('showEquation', true) ? `<div class="eq">${esc(f.eq)}</div>` : ''}
       ${fields}
       <button class="calc" onclick="doCalc('${f.id}')">Calculate</button>
       <div class="result" id="result">

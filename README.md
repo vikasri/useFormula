@@ -12,6 +12,7 @@ or search by name/keyword, enter your known values, and get the answer.
 ```
 index.html      – page shell; loads the CSS and the scripts (in order)
 styles.css      – all styling
+js/settings.js  – on/off switches for site features
 js/engine.js    – rendering, routing, calculation, sliders, charts (no data)
 js/topics.js    – the broad topics (Finance, Mechanics, …)
 js/finance.js   – Finance formulas
@@ -29,6 +30,9 @@ when `index.html` is opened directly from disk (double-click), not just over htt
 - **Add a formula** → add an object to the relevant `js/<topic>.js` via
   `registerFormulas([...])` (id, topic, name, desc, keywords, eq, inputs, output,
   compute; optional format, defaults, sliders, series).
+- **Turn a feature on or off** → edit `js/settings.js`. `showEquation: false` hides the
+  equation line on every formula page; inputs, the answer, sliders and charts are unaffected.
+  Add a new switch by putting it in `SETTINGS` and reading it with `setting('name', default)`.
 - **Change the "Most used" shortcuts** → edit the `FEATURED` list in `js/engine.js`.
 - **Search keywords** live on each formula's `keywords` field, inside its topic file.
 
