@@ -40,6 +40,9 @@ const kmoney = n => { const a = Math.abs(n); if (a >= 1e6) return '$' + (n / 1e6
 // Most-used formulas shown at the top of the home page (by formula id).
 const FEATURED = ['loan-payment', 'compound-interest', 'fv-annuity'];
 
+// The calculator embedded on the home page, ready to use straight away.
+const FLAGSHIP = 'loan-payment';
+
 /* Favourites live in this browser only: no account, no server, nothing leaves
    the machine. Cleared if the visitor clears site data. */
 const FAV_KEY = 'useformula.favorites';
@@ -96,6 +99,10 @@ function heartHTML(id) {
     onclick="return toggleFav('${id}', event)">${on ? '♥' : '♡'}</button>`;
 }
 
+/* Cards and shortcuts use `short` when a formula has one, so the blocks stay
+   compact. The full name is kept for the formula's own page. */
+function shortName(f) { return f.short || f.name; }
+
 function formulaCardHTML(f, showTopic) {
   const topic = TOPICS.find(t => t.id === f.topic) || {};
   /* Separator lives inside the span so hiding the tag on small screens does not
@@ -104,10 +111,21 @@ function formulaCardHTML(f, showTopic) {
     `<span class="topic-tag">${topic.icon || ''} ${esc(topic.name || '')} · </span>`;
   return `<a class="card" onclick="location.hash='formula/${f.id}'">
       ${heartHTML(f.id)}
-      <div class="title">${esc(f.name)}</div>
+      <div class="title">${esc(shortName(f))}</div>
       <div class="desc">${esc(f.desc)}</div>
       <div class="count">${tag}Open →</div>
     </a>`;
+}
+
+/* Category links for the site header. Dormant: index.html carries no
+   <nav id="topnav"> at the moment, so this is a no-op until that is added back. */
+function renderNav() {
+  const el = document.getElementById('topnav');
+  if (!el) return;
+  const here = location.hash.replace(/^#/, '').split('/');
+  el.innerHTML = TOPICS.map(t =>
+    `<a class="navlink${here[0] === 'topic' && here[1] === t.id ? ' on' : ''}"
+        onclick="location.hash='topic/${t.id}'">${t.icon} ${esc(t.name)}</a>`).join('');
 }
 
 function byId(ids) { return ids.map(id => FORMULAS.find(f => f.id === id)).filter(Boolean); }
@@ -133,9 +151,10 @@ function renderHome() {
   const favNote = favIds.length > ROW_SLOTS
     ? `<span class="label-note">newest ${ROW_SLOTS} of ${favIds.length}</span>` : '';
 
+  /* The one calculator most visitors came for, ready to use without a click. */
+  const flagship = FORMULAS.find(x => x.id === FLAGSHIP);
+
   app.innerHTML = `
-    <h1>Simply find answers to your questions with our free calculators</h1>
-    <p class="sub">Search for a formula or Browse by topic.</p>
     <div class="section-label">🔥 Most used</div>
     <div class="grid featured-grid">${featured}</div>
     <div class="section-label next">❤️ Your favorites ${favNote}</div>
@@ -147,10 +166,12 @@ function renderHome() {
              oninput="doSearch(this.value)">
     </div>
     <div id="searchResults"></div>
-    <div id="browse">
-      <div class="section-label">Browse by topic</div>
+    <div id="belowSearch">
+      ${flagship ? `<div class="section-label">🏆 ${esc(flagship.name)}</div>${formulaBoxHTML(flagship, { asFlagship: true })}` : ''}
+      <div class="section-label next">Browse by topic</div>
       <div class="grid">${cards}</div>
     </div>`;
+  if (flagship && flagship.series) doCalc(flagship.id);
   const sb = document.getElementById('searchBox');
   if (sb) sb.focus();
 }
@@ -158,7 +179,7 @@ function renderHome() {
 function doSearch(q) {
   q = (q || '').trim().toLowerCase();
   const results = document.getElementById('searchResults');
-  const browse = document.getElementById('browse');
+  const browse = document.getElementById('belowSearch');
   if (!results || !browse) return;
   if (!q) { results.innerHTML = ''; browse.style.display = ''; return; }
   browse.style.display = 'none';
@@ -219,10 +240,10 @@ function doTopicSearch(topicId, q) {
   box.innerHTML = `<p class="results-head">${matches.length} of ${list.length} shown</p><div class="grid">${topicCardsHTML(matches)}</div>`;
 }
 
-function renderFormula(id) {
-  const f = FORMULAS.find(x => x.id === id);
-  if (!f) return renderHome();
-  const topic = TOPICS.find(t => t.id === f.topic);
+/* The calculator itself: title, inputs, answer, breakdown, chart, sliders.
+   Shared by the formula page and the flagship calculator on the home page. */
+function formulaBoxHTML(f, opts) {
+  opts = opts || {};
   const dflt = f.defaults || {};
   const fieldHTML = inp => `
     <div class="field${inp.optional ? ' optional' : ''}">
@@ -256,15 +277,16 @@ function renderFormula(id) {
     </div>`;
   }).join('');
 
-  app.innerHTML = `
-    <div class="crumbs">
-      <a onclick="location.hash=''">Home</a> ›
-      <a onclick="location.hash='topic/${topic.id}'">${esc(topic.name)}</a> ›
-      ${esc(f.name)}
-    </div>
+  /* On the home page the section label above already names the calculator, so
+     the box shows only its description and a link to its own page. */
+  const heading = opts.asFlagship
+    ? `<a class="open-page" onclick="location.hash='formula/${f.id}'">Open its own page →</a>`
+    : `<h1>${esc(f.name)}</h1>`;
+
+  return `
     <div class="formula-box">
       <div class="formula-head">
-        <h1>${esc(f.name)}</h1>
+        <div class="formula-title">${heading}</div>
         ${heartHTML(f.id)}
       </div>
       <p class="sub">${esc(f.desc)}</p>
@@ -280,6 +302,18 @@ function renderFormula(id) {
       ${f.series ? `<div class="chart-wrap" id="chartWrap"></div>` : ''}
       ${f.sliders ? `<div class="sliders"><div class="sliders-label">Adjust to see the effect</div>${sliders}</div>` : ''}
     </div>`;
+}
+
+function renderFormula(id) {
+  const f = FORMULAS.find(x => x.id === id);
+  if (!f) return renderHome();
+  const topic = TOPICS.find(t => t.id === f.topic);
+  app.innerHTML = `
+    <div class="crumbs">
+      <a onclick="location.hash=''">Home</a> ›
+      <a onclick="location.hash='topic/${topic.id}'">${esc(topic.name)}</a> ›
+      ${esc(f.name)}
+    </div>` + formulaBoxHTML(f);
   if (f.series) doCalc(f.id);
 }
 
@@ -491,5 +525,6 @@ function route() {
   else if (page === 'formula') renderFormula(arg);
   else if (page === 'about') renderAbout();
   else renderHome();
+  renderNav();
   window.scrollTo(0, 0);
 }
