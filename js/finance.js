@@ -84,6 +84,7 @@ registerFormulas([
       const r = (v.annualRate / 100) / 12;
       const n = Math.round(v.years * 12);
       const P = loanPrincipal(v);
+      const asIs = loanSchedule(P, r, M, { maxMonths: n });
       const down = v.total - P;
       const paid = M * n;
       const interest = paid - P;
@@ -100,9 +101,22 @@ registerFormulas([
         { label: `Total paid over ${v.years} year${v.years === 1 ? '' : 's'}`, value: money(paid) },
         { label: 'Interest per $1 borrowed', detail: true, value: '$' + (interest / P).toFixed(2) },
         { label: 'Cash out of pocket', detail: true, value: money(down + paid) },
+      );
+
+      /* Early payments are mostly interest, so the halfway point in the debt
+         arrives well past the halfway point in time. */
+      const half = asIs && asIs.rows.find(row => row.balance <= P / 2);
+      if (half && half.month > 0) {
+        rows.push({
+          label: 'Half the loan paid off after',
+          detail: true,
+          value: `${(half.month / 12).toFixed(1)} of ${v.years} years`,
+        });
+      }
+
+      rows.push(
         { label: 'First payment goes to', wide: true, detail: true, value: `${money(firstInterest)} interest, ${money(M - firstInterest)} principal` },
       );
-      const asIs = loanSchedule(P, r, M, { maxMonths: n });
       const faster = loanSchedule(P, r, M, { extraPerMonth: M / 12, maxMonths: n + 12 });
       /* Skipped at 0% interest, where paying early saves time but no money. */
       if (asIs && faster && faster.months < asIs.months && asIs.interest - faster.interest > 0.5) {
