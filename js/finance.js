@@ -1,4 +1,22 @@
 /* Finance formulas. `money`, `num`, `kmoney` come from engine.js. */
+
+/* Walks a loan month by month at rate r, paying M (plus any extra) each month.
+   Returns how long it took and the interest paid, or null if the payment never
+   covers the interest and the balance would never fall. */
+function amortize(P, r, M, extra, maxMonths) {
+  let balance = P, interest = 0, months = 0;
+  while (balance > 0.005 && months < maxMonths) {
+    const owed = balance * r;
+    let paidOffThisMonth = M + extra - owed;
+    if (paidOffThisMonth <= 0) return null;
+    if (paidOffThisMonth > balance) paidOffThisMonth = balance;
+    interest += owed;
+    balance -= paidOffThisMonth;
+    months++;
+  }
+  return { months, interest };
+}
+
 registerFormulas([
   {
     id: 'loan-payment',
@@ -20,20 +38,55 @@ registerFormulas([
       return v.P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
     },
     format: money,
+    extras: (v, M) => {
+      const r = (v.annualRate / 100) / 12;
+      const n = Math.round(v.years * 12);
+      const total = M * n;
+      const interest = total - v.P;
+      const firstInterest = v.P * r;
+      const rows = [
+        { label: 'Amount borrowed', value: money(v.P) },
+        { label: 'Total interest', value: money(interest) },
+        { label: `Total paid over ${v.years} year${v.years === 1 ? '' : 's'}`, value: money(total) },
+        { label: 'Interest per $1 borrowed', value: '$' + (interest / v.P).toFixed(2) },
+        { label: 'First payment goes to', value: `${money(firstInterest)} interest, ${money(M - firstInterest)} principal` },
+      ];
+      const asIs = amortize(v.P, r, M, 0, n + 12);
+      const faster = amortize(v.P, r, M, M / 12, n + 12);
+      /* Skipped at 0% interest, where paying early saves time but no money. */
+      if (asIs && faster && faster.months < asIs.months && asIs.interest - faster.interest > 0.5) {
+        const yearsSaved = ((asIs.months - faster.months) / 12).toFixed(1);
+        rows.push({
+          label: 'Paying one extra payment a year',
+          value: `clears it ${yearsSaved} years sooner and saves ${money(asIs.interest - faster.interest)}`,
+        });
+      }
+      return rows;
+    },
     defaults: { P: 300000, annualRate: 6.5, years: 30 },
     sliders: [
       { key: 'annualRate', span: 5, floor: 0, step: 0.1 },
       { key: 'years', span: 15, floor: 1, step: 1 },
     ],
     series: v => {
-      const r = (v.annualRate / 100) / 12, n = Math.max(1, Math.round(v.years * 12)), N = Math.min(n, 60), points = [];
+      const r = (v.annualRate / 100) / 12, n = Math.max(1, Math.round(v.years * 12)), N = Math.min(n, 60);
+      const balance = [], principalPaid = [];
       for (let i = 0; i <= N; i++) {
         const k = Math.round(i / N * n);
         const bal = r === 0 ? v.P * (1 - k / n)
           : v.P * (Math.pow(1 + r, n) - Math.pow(1 + r, k)) / (Math.pow(1 + r, n) - 1);
-        points.push({ x: k / 12, y: Math.max(0, bal) });
+        const left = Math.max(0, bal);
+        balance.push({ x: k / 12, y: left });
+        principalPaid.push({ x: k / 12, y: v.P - left });   // what you have actually paid off
       }
-      return { title: 'Loan balance over time', xLabel: 'Years', points, yTickFmt: kmoney };
+      return {
+        title: 'What you still owe, and what you have paid off',
+        xLabel: 'Years',
+        points: balance,
+        label: 'Balance left',
+        extra: [{ points: principalPaid, label: 'Principal paid', cls: 'green' }],
+        yTickFmt: kmoney,
+      };
     },
   },
   {

@@ -74,7 +74,7 @@ h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.5px; }
 .results-head { font-size: 13px; color: var(--muted); margin: 0 0 12px; }
 .section-label { display: flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 13px; }
 .section-label.next { margin-top: 30px; }
-.featured-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px; }
+.featured-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; }
 .featured-grid .card {
   padding: 12px 14px;
   background: var(--accent-soft);
@@ -90,16 +90,16 @@ h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.5px; }
   text-transform: none; letter-spacing: 0; font-weight: 500; font-size: 11.5px; opacity: 0.75;
 }
 
-/* Save-to-favorites star, top right of every formula card */
-.star {
+/* Save-to-favorites heart, top right of every formula card */
+.heart {
   position: absolute; top: 6px; right: 6px;
   background: none; border: 0; padding: 3px 5px;
   font-size: 15px; line-height: 1; cursor: pointer;
   color: var(--muted); border-radius: 6px;
   transition: color .15s ease, background .15s ease;
 }
-.star:hover { color: #e8a317; background: var(--accent-soft); }
-.star.on { color: #e8a317; }
+.heart:hover { color: #e0245e; background: rgba(224, 36, 94, 0.10); }
+.heart.on { color: #e0245e; }
 .card .title { padding-right: 24px; }
 
 /* Empty favorite slots: dashed, so the row reads as fillable, not broken */
@@ -133,7 +133,7 @@ h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.5px; }
 
 .formula-head { display: flex; align-items: flex-start; gap: 10px; }
 .formula-head h1 { flex: 1; }
-.formula-head .star { position: static; font-size: 21px; padding: 2px 6px; }
+.formula-head .heart { position: static; font-size: 21px; padding: 2px 6px; }
 
 .formula-box {
   background: var(--card);
@@ -200,6 +200,17 @@ button.calc:active { transform: translateY(1px); }
 .result .value { font-size: 28px; font-weight: 700; color: var(--good); letter-spacing: -0.5px; }
 .result .value .u { font-size: 16px; color: var(--muted); font-weight: 500; }
 .result.error .value { color: #f87171; font-size: 16px; font-weight: 500; }
+/* Breakdown rows under the answer (see a formula's `extras`) */
+.extras { display: none; margin-top: 14px; border-top: 1px solid var(--border); }
+.extras.show { display: block; }
+.extra {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 14px;
+  padding: 9px 2px; border-bottom: 1px solid var(--border); font-size: 14px;
+}
+.extra:last-child { border-bottom: 0; }
+.extra .k { color: var(--muted); }
+.extra .v { font-weight: 650; text-align: right; }
+
 .notes { color: var(--muted); font-size: 13px; margin-top: 14px; }
 .sliders { margin: 4px 0 6px; padding: 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; }
 .sliders-label { font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); margin-bottom: 13px; }
@@ -215,12 +226,16 @@ button.calc:active { transform: translateY(1px); }
 .chart .area { fill: var(--accent-soft); stroke: none; }
 .chart .cline { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
 .chart .dot { fill: var(--accent); }
+.chart .cline.green { stroke: var(--good); }
+.chart .dot.green { fill: var(--good); }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--muted); margin: 0 0 8px; }
+.chart-legend .lg { display: inline-flex; align-items: center; gap: 6px; }
+.chart-legend .sw { width: 13px; height: 3px; border-radius: 2px; background: var(--accent); flex: none; }
+.chart-legend .sw.green { background: var(--good); }
 .chart .ylab, .chart .xlab { fill: var(--muted); font-size: 11px; }
 .chart .axlab { fill: var(--muted); font-size: 12px; font-weight: 600; }
 footer { text-align: center; color: var(--muted); font-size: 12.5px; margin-top: 40px; }
-@media (max-width: 720px) {
-  .featured-grid { grid-template-columns: repeat(2, 1fr); }
-}
+footer .disclaimer { display: block; max-width: 34em; margin: 7px auto 0; font-size: 11.5px; opacity: 0.85; }
 @media (max-width: 560px) {
   .wrap { padding: 16px 14px 56px; }
   header.site { padding: 4px 0 20px; }
@@ -230,13 +245,22 @@ footer { text-align: center; color: var(--muted); font-size: 12.5px; margin-top:
   .formula-box { padding: 18px 15px; }
   .eq { font-size: 13px; padding: 11px 12px; }
   .grid { grid-template-columns: 1fr; }
-  /* Compact cards stay two-up on phones: four stacked rows twice over is too long */
-  .featured-grid { grid-template-columns: repeat(2, 1fr); }
+  /* Both shortcut rows stay three-across on a phone, so each is a single row.
+     Everything inside them shrinks to fit roughly a third of the screen. */
+  .featured-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 20px; }
+  .featured-grid .card { padding: 9px 8px; }
+  .featured-grid .card .title { font-size: 12px; line-height: 1.3; padding-right: 15px; }
+  .featured-grid .card .count { font-size: 10px; margin-top: 4px; }
+  .featured-grid .card .topic-tag { display: none; }   /* no room for it beside the name */
+  .featured-grid .heart { top: 3px; right: 2px; font-size: 13px; padding: 2px 3px; }
+  .card.slot, .featured-grid .card.slot { font-size: 10px; min-height: 46px; padding: 8px 6px; }
   .field input, .search input { font-size: 16px; }   /* 16px avoids iOS focus-zoom */
   button.calc { font-size: 17px; padding: 15px; }
   .slider input[type=range] { height: 28px; }
   .slider-head { font-size: 14px; }
   .result .value { font-size: 25px; }
+  .extra { flex-direction: column; gap: 2px; }
+  .extra .v { text-align: left; }
   .chart { max-width: 100%; }
   .chart .ylab, .chart .xlab { font-size: 13px; }
   .chart .axlab { font-size: 13px; }

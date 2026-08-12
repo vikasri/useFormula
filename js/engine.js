@@ -17,7 +17,10 @@
      format   : optional function(n) -> string  (defaults to num)
      defaults : optional {key: value}   pre-filled values
      sliders  : optional [{ key, span, floor, ceil, step }]
-     series   : optional function(v) -> { points, xLabel, title, yTickFmt }
+     series   : optional function(v) -> { points, xLabel, title, yTickFmt,
+                  label, extra: [{ points, label, cls }] }   extra = more lines
+     extras   : optional function(v, answer) -> [{ label, value }]
+                  a breakdown listed under the answer
    ============================================================ */
 
 // Registries — populated by the topic files, then read by the renderers.
@@ -32,12 +35,14 @@ const num   = n => (Math.abs(n) >= 1000 ? n.toLocaleString(undefined, { maximumF
 const kmoney = n => { const a = Math.abs(n); if (a >= 1e6) return '$' + (n / 1e6).toFixed(a >= 1e7 ? 0 : 1) + 'M'; if (a >= 1e3) return '$' + Math.round(n / 1e3) + 'k'; return '$' + Math.round(n); };
 
 // Most-used formulas shown at the top of the home page (by formula id).
-const FEATURED = ['loan-payment', 'compound-interest', 'fv-annuity', 'roi'];
+const FEATURED = ['loan-payment', 'compound-interest', 'fv-annuity'];
 
 /* Favourites live in this browser only: no account, no server, nothing leaves
    the machine. Cleared if the visitor clears site data. */
 const FAV_KEY = 'useformula.favorites';
-const FAV_SLOTS = 4;
+/* Cards per row, for both Most used and Your favorites. Kept at 3 so the row
+   still fits across a phone screen without wrapping. */
+const ROW_SLOTS = 3;
 
 const app = document.getElementById('app');
 
@@ -74,26 +79,28 @@ function toggleFav(id, ev) {
   const on = isFav(id);                             // elsewhere: update in place, keep typed values
   document.querySelectorAll('[data-fav="' + id + '"]').forEach(el => {
     el.classList.toggle('on', on);
-    el.textContent = on ? '★' : '☆';
+    el.textContent = on ? '♥' : '♡';
     el.title = on ? 'Saved. Click to remove' : 'Save to your favorites';
   });
   return false;
 }
 
-function starHTML(id) {
+function heartHTML(id) {
   const on = isFav(id);
-  return `<button class="star${on ? ' on' : ''}" data-fav="${id}"
+  return `<button class="heart${on ? ' on' : ''}" data-fav="${id}"
     title="${on ? 'Saved. Click to remove' : 'Save to your favorites'}"
     aria-label="${on ? 'Remove from favorites' : 'Save to favorites'}"
-    onclick="return toggleFav('${id}', event)">${on ? '★' : '☆'}</button>`;
+    onclick="return toggleFav('${id}', event)">${on ? '♥' : '♡'}</button>`;
 }
 
 function formulaCardHTML(f, showTopic) {
   const topic = TOPICS.find(t => t.id === f.topic) || {};
+  /* Separator lives inside the span so hiding the tag on small screens does not
+     leave a stray "·" in front of Open. */
   const tag = showTopic === false ? '' :
-    `<span class="topic-tag">${topic.icon || ''} ${esc(topic.name || '')}</span> · `;
+    `<span class="topic-tag">${topic.icon || ''} ${esc(topic.name || '')} · </span>`;
   return `<a class="card" onclick="location.hash='formula/${f.id}'">
-      ${starHTML(f.id)}
+      ${heartHTML(f.id)}
       <div class="title">${esc(f.name)}</div>
       <div class="desc">${esc(f.desc)}</div>
       <div class="count">${tag}Open →</div>
@@ -110,25 +117,25 @@ function renderHome() {
       <div class="count">Browse →</div>
     </a>`).join('');
 
-  const featured = byId(FEATURED).slice(0, FAV_SLOTS).map(f => formulaCardHTML(f)).join('');
+  const featured = byId(FEATURED).slice(0, ROW_SLOTS).map(f => formulaCardHTML(f)).join('');
 
-  /* Favourites row is always FAV_SLOTS wide: saved formulas first, then dashed
+  /* Favourites row is always ROW_SLOTS wide: saved formulas first, then dashed
      slots so the row reads as something to fill rather than as a gap. */
   const favIds = getFavs();
-  const shown = byId(favIds.slice(0, FAV_SLOTS));
-  const empty = FAV_SLOTS - shown.length;
+  const shown = byId(favIds.slice(0, ROW_SLOTS));
+  const empty = ROW_SLOTS - shown.length;
   const favCards = shown.map(f => formulaCardHTML(f)).join('') +
     Array.from({ length: empty }, (_, i) =>
-      `<div class="card slot">${i === 0 ? 'Tap ☆ on any formula to save it here' : '☆'}</div>`).join('');
-  const favNote = favIds.length > FAV_SLOTS
-    ? `<span class="label-note">newest ${FAV_SLOTS} of ${favIds.length}</span>` : '';
+      `<div class="card slot">${i === 0 ? 'Tap ♡ to save' : '♡'}</div>`).join('');
+  const favNote = favIds.length > ROW_SLOTS
+    ? `<span class="label-note">newest ${ROW_SLOTS} of ${favIds.length}</span>` : '';
 
   app.innerHTML = `
     <h1>Find the formula and answers to your questions</h1>
     <p class="sub">Search for a formula or Browse by topic.</p>
     <div class="section-label">🔥 Most used</div>
     <div class="grid featured-grid">${featured}</div>
-    <div class="section-label next">⭐ Your favorites ${favNote}</div>
+    <div class="section-label next">❤️ Your favorites ${favNote}</div>
     <div class="grid featured-grid">${favCards}</div>
     <div class="search">
       <span class="mag">🔍</span>
@@ -240,7 +247,7 @@ function renderFormula(id) {
     <div class="formula-box">
       <div class="formula-head">
         <h1>${esc(f.name)}</h1>
-        ${starHTML(f.id)}
+        ${heartHTML(f.id)}
       </div>
       <p class="sub">${esc(f.desc)}</p>
       ${setting('showEquation', true) ? `<div class="eq">${esc(f.eq)}</div>` : ''}
@@ -250,6 +257,7 @@ function renderFormula(id) {
         <div class="label" id="result-label"></div>
         <div class="value" id="result-value"></div>
       </div>
+      ${f.extras ? `<div class="extras" id="extras"></div>` : ''}
       ${f.series ? `<div class="chart-wrap" id="chartWrap"></div>` : ''}
       ${f.sliders ? `<div class="sliders"><div class="sliders-label">Adjust to see the effect</div>${sliders}</div>` : ''}
     </div>`;
@@ -299,11 +307,28 @@ function doCalc(id) {
       const wrap = document.getElementById('chartWrap');
       if (wrap) wrap.innerHTML = renderChartSVG(f.series(v));
     }
+    renderExtras(f, v, out);
   } catch (e) {
     box.classList.add('error');
     labEl.textContent = 'Cannot calculate';
     valEl.textContent = e.message;
+    renderExtras(null);
   }
+}
+
+/* Optional breakdown under the answer: a formula supplies
+   extras: (inputs, answer) -> [{ label, value }]. Kept in its own try so a
+   problem here can never take down the answer itself. */
+function renderExtras(f, v, out) {
+  const el = document.getElementById('extras');
+  if (!el) return;
+  let rows = [];
+  try {
+    if (f && f.extras) rows = f.extras(v, out) || [];
+  } catch (e) { rows = []; }
+  el.innerHTML = rows.map(r =>
+    `<div class="extra"><span class="k">${esc(r.label)}</span><span class="v">${esc(r.value)}</span></div>`).join('');
+  el.classList.toggle('show', rows.length > 0);
 }
 
 function sliderRange(s, val) {
@@ -340,21 +365,28 @@ function onSlider(id, key, val) {
   doCalc(id);
 }
 
+/* series.points is the main line (drawn with a filled area under it).
+   series.extra is an optional list of further lines plotted on the same axes:
+   [{ points, label, cls }], where cls picks the colour, e.g. 'green'.
+   A legend appears only when there is more than one line to tell apart. */
 function renderChartSVG(series) {
   const pts = series.points || [];
   if (pts.length < 2) return '';
+  const extra = (series.extra || []).filter(s => s.points && s.points.length > 1);
   const W = 560, H = 205, padL = 58, padR = 12, padT = 12, padB = 40;
-  const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
+  const scalePts = pts.concat(...extra.map(s => s.points));   // every line shares one y-scale
+  const xs = scalePts.map(p => p.x), ys = scalePts.map(p => p.y);
   const xMin = Math.min(...xs), xMax = Math.max(...xs);
   const yMin = Math.min(0, ...ys), yMax = Math.max(...ys) || 1;
   const sx = x => padL + (xMax === xMin ? 0 : (x - xMin) / (xMax - xMin)) * (W - padL - padR);
   const sy = y => (H - padB) - (yMax === yMin ? 0 : (y - yMin) / (yMax - yMin)) * (H - padT - padB);
   const yfmt = series.yTickFmt || (v => Math.round(v));
   const xfmt = series.xTickFmt || (v => Math.round(v * 10) / 10);
-  const linePath = pts.map((p, i) => (i ? 'L' : 'M') + sx(p.x).toFixed(1) + ' ' + sy(p.y).toFixed(1)).join(' ');
-  const areaPath = 'M ' + sx(xs[0]).toFixed(1) + ' ' + sy(yMin).toFixed(1) + ' ' +
+  const pathOf = ps => ps.map((p, i) => (i ? 'L' : 'M') + sx(p.x).toFixed(1) + ' ' + sy(p.y).toFixed(1)).join(' ');
+  const linePath = pathOf(pts);
+  const areaPath = 'M ' + sx(pts[0].x).toFixed(1) + ' ' + sy(yMin).toFixed(1) + ' ' +
     pts.map(p => 'L ' + sx(p.x).toFixed(1) + ' ' + sy(p.y).toFixed(1)).join(' ') +
-    ' L ' + sx(xs[xs.length - 1]).toFixed(1) + ' ' + sy(yMin).toFixed(1) + ' Z';
+    ' L ' + sx(pts[pts.length - 1].x).toFixed(1) + ' ' + sy(yMin).toFixed(1) + ' Z';
   let grid = '';
   for (let i = 0; i <= 4; i++) {
     const yv = yMin + (yMax - yMin) * i / 4, yy = sy(yv);
@@ -367,11 +399,20 @@ function renderChartSVG(series) {
     xlabels += `<text x="${xx.toFixed(1)}" y="${H - 22}" class="xlab" text-anchor="middle">${esc(String(xfmt(xv)))}</text>`;
   });
   const last = pts[pts.length - 1];
-  return `<div class="chart-title">${esc(series.title || '')}</div>
+  const extraLines = extra.map(s =>
+    `<path d="${pathOf(s.points)}" class="cline ${esc(s.cls || '')}"/>` +
+    `<circle cx="${sx(s.points[s.points.length - 1].x).toFixed(1)}" cy="${sy(s.points[s.points.length - 1].y).toFixed(1)}" r="4" class="dot ${esc(s.cls || '')}"/>`
+  ).join('');
+  const legend = extra.length ? `<div class="chart-legend">
+      <span class="lg"><i class="sw"></i>${esc(series.label || 'Value')}</span>
+      ${extra.map(s => `<span class="lg"><i class="sw ${esc(s.cls || '')}"></i>${esc(s.label || '')}</span>`).join('')}
+    </div>` : '';
+  return `<div class="chart-title">${esc(series.title || '')}</div>${legend}
     <svg viewBox="0 0 ${W} ${H}" class="chart" preserveAspectRatio="xMidYMid meet" role="img">
       ${grid}
       <path d="${areaPath}" class="area"/>
       <path d="${linePath}" class="cline"/>
+      ${extraLines}
       <circle cx="${sx(last.x).toFixed(1)}" cy="${sy(last.y).toFixed(1)}" r="4" class="dot"/>
       ${xlabels}
       <text x="${((padL + (W - padR)) / 2).toFixed(1)}" y="${H - 4}" class="axlab" text-anchor="middle">${esc(series.xLabel || '')}</text>
