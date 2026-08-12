@@ -41,9 +41,6 @@ const kmoney = n => { const a = Math.abs(n); if (a >= 1e6) return '$' + (n / 1e6
 // Most-used formulas shown at the top of the home page (by formula id).
 const FEATURED = ['loan-payment', 'compound-interest', 'fv-annuity'];
 
-// The calculator embedded on the home page, ready to use straight away.
-const FLAGSHIP = 'loan-payment';
-
 /* Favourites live in this browser only: no account, no server, nothing leaves
    the machine. Cleared if the visitor clears site data. */
 const FAV_KEY = 'useformula.favorites';
@@ -152,14 +149,7 @@ function renderHome() {
   const favNote = favIds.length > ROW_SLOTS
     ? `<span class="label-note">newest ${ROW_SLOTS} of ${favIds.length}</span>` : '';
 
-  /* The one calculator most visitors came for, ready to use without a click. */
-  const flagship = FORMULAS.find(x => x.id === FLAGSHIP);
-
   app.innerHTML = `
-    <div class="section-label">🔥 Most used</div>
-    <div class="grid featured-grid">${featured}</div>
-    <div class="section-label next">❤️ Your favorites ${favNote}</div>
-    <div class="grid featured-grid">${favCards}</div>
     <div class="search">
       <span class="mag">🔍</span>
       <input id="searchBox" type="text" autocomplete="off" spellcheck="false"
@@ -168,11 +158,13 @@ function renderHome() {
     </div>
     <div id="searchResults"></div>
     <div id="belowSearch">
-      ${flagship ? `<div class="section-label flagship">🏆 ${esc(flagship.name)}</div>${formulaBoxHTML(flagship, { asFlagship: true })}` : ''}
+      <div class="section-label">🔥 Popular calculators</div>
+      <div class="grid featured-grid">${featured}</div>
+      <div class="section-label next">❤️ Your favorites ${favNote}</div>
+      <div class="grid featured-grid">${favCards}</div>
       <div class="section-label next">Browse by topic</div>
       <div class="grid">${cards}</div>
     </div>`;
-  if (flagship && flagship.series) doCalc(flagship.id);
   const sb = document.getElementById('searchBox');
   if (sb) sb.focus();
 }
