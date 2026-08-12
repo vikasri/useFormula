@@ -32,37 +32,98 @@ const num   = n => (Math.abs(n) >= 1000 ? n.toLocaleString(undefined, { maximumF
 const kmoney = n => { const a = Math.abs(n); if (a >= 1e6) return '$' + (n / 1e6).toFixed(a >= 1e7 ? 0 : 1) + 'M'; if (a >= 1e3) return '$' + Math.round(n / 1e3) + 'k'; return '$' + Math.round(n); };
 
 // Most-used formulas shown at the top of the home page (by formula id).
-const FEATURED = ['loan-payment', 'compound-interest', 'fv-annuity'];
+const FEATURED = ['loan-payment', 'compound-interest', 'fv-annuity', 'roi'];
+
+/* Favourites live in this browser only: no account, no server, nothing leaves
+   the machine. Cleared if the visitor clears site data. */
+const FAV_KEY = 'useformula.favorites';
+const FAV_SLOTS = 4;
 
 const app = document.getElementById('app');
 
 function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
+/* localStorage throws in some private-browsing modes, so every use is guarded
+   and the site stays usable with favourites simply doing nothing. */
+function getFavs() {
+  try {
+    const list = JSON.parse(localStorage.getItem(FAV_KEY) || '[]');
+    if (!Array.isArray(list)) return [];
+    return list.filter(id => FORMULAS.some(f => f.id === id));   // drop ids no longer on the site
+  } catch (e) { return []; }
+}
+
+function isFav(id) { return getFavs().indexOf(id) !== -1; }
+
+/* Newest first, so the row shows what was saved most recently. */
+function toggleFav(id, ev) {
+  if (ev) { ev.stopPropagation(); ev.preventDefault(); }
+  const list = getFavs();
+  const at = list.indexOf(id);
+  if (at === -1) list.unshift(id); else list.splice(at, 1);
+  try { localStorage.setItem(FAV_KEY, JSON.stringify(list)); } catch (e) {}
+
+  const page = location.hash.replace(/^#/, '').split('/')[0];
+  if (!page) { renderHome(); return false; }        // home: the card moves rows, so redraw
+  const on = isFav(id);                             // elsewhere: update in place, keep typed values
+  document.querySelectorAll('[data-fav="' + id + '"]').forEach(el => {
+    el.classList.toggle('on', on);
+    el.textContent = on ? '★' : '☆';
+    el.title = on ? 'Saved. Click to remove' : 'Save to your favorites';
+  });
+  return false;
+}
+
+function starHTML(id) {
+  const on = isFav(id);
+  return `<button class="star${on ? ' on' : ''}" data-fav="${id}"
+    title="${on ? 'Saved. Click to remove' : 'Save to your favorites'}"
+    aria-label="${on ? 'Remove from favorites' : 'Save to favorites'}"
+    onclick="return toggleFav('${id}', event)">${on ? '★' : '☆'}</button>`;
+}
+
+function formulaCardHTML(f, showTopic) {
+  const topic = TOPICS.find(t => t.id === f.topic) || {};
+  const tag = showTopic === false ? '' :
+    `<span class="topic-tag">${topic.icon || ''} ${esc(topic.name || '')}</span> · `;
+  return `<a class="card" onclick="location.hash='formula/${f.id}'">
+      ${starHTML(f.id)}
+      <div class="title">${esc(f.name)}</div>
+      <div class="desc">${esc(f.desc)}</div>
+      <div class="count">${tag}Open →</div>
+    </a>`;
+}
+
+function byId(ids) { return ids.map(id => FORMULAS.find(f => f.id === id)).filter(Boolean); }
+
 function renderHome() {
-  const cards = TOPICS.map(t => {
-    const count = FORMULAS.filter(f => f.topic === t.id).length;
-    return `<a class="card" onclick="location.hash='topic/${t.id}'">
+  const cards = TOPICS.map(t => `<a class="card" onclick="location.hash='topic/${t.id}'">
       <div class="icon">${t.icon}</div>
       <div class="title">${esc(t.name)}</div>
       <div class="desc">${esc(t.desc)}</div>
-      <div class="count">${count} formula${count===1?'':'s'} →</div>
-    </a>`;
-  }).join('');
-  const featured = FEATURED.map(id => {
-    const f = FORMULAS.find(x => x.id === id);
-    if (!f) return '';
-    const topic = TOPICS.find(t => t.id === f.topic) || {};
-    return `<a class="card" onclick="location.hash='formula/${f.id}'">
-      <div class="title">${esc(f.name)}</div>
-      <div class="desc">${esc(f.desc)}</div>
-      <div class="count"><span class="topic-tag">${topic.icon || ''} ${esc(topic.name || '')}</span> · Open →</div>
-    </a>`;
-  }).join('');
+      <div class="count">Browse →</div>
+    </a>`).join('');
+
+  const featured = byId(FEATURED).slice(0, FAV_SLOTS).map(f => formulaCardHTML(f)).join('');
+
+  /* Favourites row is always FAV_SLOTS wide: saved formulas first, then dashed
+     slots so the row reads as something to fill rather than as a gap. */
+  const favIds = getFavs();
+  const shown = byId(favIds.slice(0, FAV_SLOTS));
+  const empty = FAV_SLOTS - shown.length;
+  const favCards = shown.map(f => formulaCardHTML(f)).join('') +
+    Array.from({ length: empty }, (_, i) =>
+      `<div class="card slot">${i === 0 ? 'Tap ☆ on any formula to save it here' : '☆'}</div>`).join('');
+  const favNote = favIds.length > FAV_SLOTS
+    ? `<span class="label-note">newest ${FAV_SLOTS} of ${favIds.length}</span>` : '';
+
   app.innerHTML = `
     <h1>Find the formula and answers to your questions</h1>
     <p class="sub">Search for a formula or Browse by topic.</p>
-    <div class="section-label">⭐ Most used</div>
+    <div class="section-label">🔥 Most used</div>
     <div class="grid featured-grid">${featured}</div>
+    <div class="section-label next">⭐ Your favorites ${favNote}</div>
+    <div class="grid featured-grid">${favCards}</div>
     <div class="search">
       <span class="mag">🔍</span>
       <input id="searchBox" type="text" autocomplete="off" spellcheck="false"
@@ -95,24 +156,12 @@ function doSearch(q) {
     results.innerHTML = `<p class="sub">No formulas match “${esc(q)}”. Try another word.</p>`;
     return;
   }
-  const cards = matches.map(f => {
-    const topic = TOPICS.find(t => t.id === f.topic) || {};
-    return `<a class="card" onclick="location.hash='formula/${f.id}'">
-      <div class="title">${esc(f.name)}</div>
-      <div class="desc">${esc(f.desc)}</div>
-      <div class="count"><span class="topic-tag">${topic.icon || ''} ${esc(topic.name || '')}</span> · Open →</div>
-    </a>`;
-  }).join('');
+  const cards = matches.map(f => formulaCardHTML(f)).join('');
   results.innerHTML = `<p class="results-head">${matches.length} formula${matches.length === 1 ? '' : 's'} found</p><div class="grid">${cards}</div>`;
 }
 
 function topicCardsHTML(list) {
-  return list.map(f => `
-    <a class="card" onclick="location.hash='formula/${f.id}'">
-      <div class="title">${esc(f.name)}</div>
-      <div class="desc">${esc(f.desc)}</div>
-      <div class="count">Open →</div>
-    </a>`).join('');
+  return list.map(f => formulaCardHTML(f, false)).join('');
 }
 
 function renderTopic(topicId) {
@@ -183,7 +232,10 @@ function renderFormula(id) {
       ${esc(f.name)}
     </div>
     <div class="formula-box">
-      <h1>${esc(f.name)}</h1>
+      <div class="formula-head">
+        <h1>${esc(f.name)}</h1>
+        ${starHTML(f.id)}
+      </div>
       <p class="sub">${esc(f.desc)}</p>
       <div class="eq">${esc(f.eq)}</div>
       ${fields}
