@@ -5,7 +5,7 @@
    DATA MODEL
    Topics are registered by js/topics.js (registerTopics).
    Formulas are registered by one file per topic
-   (js/finance.js, js/mechanics.js, js/geometry.js, js/electrical.js)
+   (js/finance.js, js/mechanics.js)
    via registerFormulas([...]). No data lives in this file.
 
    Each formula:

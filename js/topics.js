@@ -4,6 +4,4 @@
 registerTopics([
   { id: 'finance',    icon: '💰', name: 'Finance',    desc: 'Loans, annuities, growing income' },
   { id: 'mechanics',  icon: '⚙️', name: 'Mechanics',  desc: 'Motion, force, energy' },
-  { id: 'geometry',   icon: '📐', name: 'Geometry',   desc: 'Areas, volumes, lengths' },
-  { id: 'electrical', icon: '⚡', name: 'Electrical', desc: 'Voltage, current, power' },
 ]);

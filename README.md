@@ -1,7 +1,7 @@
 # useFormula
 
-A single-page formula calculator site. Browse formulas by topic (Finance, Mechanics,
-Geometry, Electrical) or search by name/keyword, enter your known values, and get the answer.
+A single-page formula calculator site. Browse formulas by topic (Finance, Mechanics)
+or search by name/keyword, enter your known values, and get the answer.
 
 - **Live site:** https://useFormula.com
 - **Tech:** plain HTML/CSS/JS, no build step, no dependencies.
@@ -16,8 +16,6 @@ js/engine.js    – rendering, routing, calculation, sliders, charts (no data)
 js/topics.js    – the broad topics (Finance, Mechanics, …)
 js/finance.js   – Finance formulas
 js/mechanics.js – Mechanics formulas
-js/geometry.js  – Geometry formulas
-js/electrical.js– Electrical formulas
 js/boot.js      – starts the app after all topics have registered
 ```
 
