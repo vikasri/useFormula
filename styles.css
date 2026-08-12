@@ -241,6 +241,10 @@ button.calc:active { transform: translateY(1px); }
 .extra .v { display: block; font-weight: 650; font-size: 16.5px; }
 
 .notes { color: var(--muted); font-size: 13px; margin-top: 14px; }
+.mission {
+  margin: 16px 0 0; padding-top: 13px; border-top: 1px solid var(--border);
+  color: var(--muted); font-size: 13.5px; line-height: 1.45; text-align: center;
+}
 
 /* Advanced panel: collapsed by default so the basic path stays short */
 .advanced { margin: 14px 0 4px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); }

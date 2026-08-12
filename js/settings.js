@@ -12,4 +12,8 @@ const SETTINGS = {
      false = visitors see only the inputs and the answer. */
   showEquation: true,
 
+  /* A line shown at the bottom of every calculator.
+     Set it to '' to remove it everywhere. */
+  missionLine: 'Our goal is to make financial knowledge and tools available for every consumer',
+
 };

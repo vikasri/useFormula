@@ -24,6 +24,7 @@
                   a breakdown listed under the answer, two per row
      advanced : optional { summary, intro, note(v, answer) -> string }
                   the panel holding the advanced inputs
+     short    : optional shorter name for cards and shortcuts
    ============================================================ */
 
 // Registries — populated by the topic files, then read by the renderers.
@@ -302,6 +303,7 @@ function formulaBoxHTML(f, opts) {
       ${advancedPanel}
       ${f.series ? `<div class="chart-wrap" id="chartWrap"></div>` : ''}
       ${f.sliders ? `<div class="sliders"><div class="sliders-label">Adjust to see the effect</div>${sliders}</div>` : ''}
+      ${setting('missionLine', '') ? `<p class="mission">${esc(setting('missionLine', ''))}</p>` : ''}
     </div>`;
 }
 
