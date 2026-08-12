@@ -131,7 +131,7 @@ function renderHome() {
     ? `<span class="label-note">newest ${ROW_SLOTS} of ${favIds.length}</span>` : '';
 
   app.innerHTML = `
-    <h1>Find the formula and answers to your questions</h1>
+    <h1>Simply find answers to your questions with our free calculators</h1>
     <p class="sub">Search for a formula or Browse by topic.</p>
     <div class="section-label">🔥 Most used</div>
     <div class="grid featured-grid">${featured}</div>
