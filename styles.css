@@ -53,7 +53,7 @@ header.site .brand {
 header.site .logo {
   font-size: 22px; font-weight: 700; letter-spacing: -0.5px;
 }
-header.site .tagline { color: var(--muted); font-size: 13.5px; }
+header.site .tagline { color: var(--muted); font-size: 14.5px; }
 header.site .logo span { color: var(--accent); }
 header.site nav { display: flex; gap: 4px; margin-left: auto; flex-wrap: wrap; }
 .navlink {
@@ -63,13 +63,13 @@ header.site nav { display: flex; gap: 4px; margin-left: auto; flex-wrap: wrap; }
 }
 .navlink:hover { color: var(--accent); background: var(--accent-soft); }
 .navlink.on { color: var(--accent); background: var(--accent-soft); }
-.crumbs { font-size: 16.5px; font-weight: 500; color: var(--muted); margin-bottom: 22px; }
+.crumbs { font-size: 16px; font-weight: 500; color: var(--muted); margin-bottom: 14px; }
 .crumbs a { color: var(--accent); text-decoration: none; cursor: pointer; }
 .crumbs a:hover { text-decoration: underline; }
 h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.5px; }
-.sub { color: var(--muted); margin: 0 0 26px; font-size: 15px; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
-.search { position: relative; margin: 0 0 26px; }
+.sub { color: var(--muted); margin: 0 0 16px; font-size: 15.5px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.search { position: relative; margin: 0 0 18px; }
 .search input {
   width: 100%;
   padding: 14px 16px 14px 44px;
@@ -86,9 +86,11 @@ h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.5px; }
 .search input::placeholder { color: var(--muted); }
 .search .mag { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 16px; pointer-events: none; }
 .results-head { font-size: 13px; color: var(--muted); margin: 0 0 12px; }
-.section-label { display: flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 13px; }
-.section-label.next { margin-top: 30px; }
-.featured-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; }
+.section-label { display: flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+/* The flagship calculator's own heading: the biggest thing on the page */
+.section-label.flagship { font-size: 25px; font-weight: 800; letter-spacing: -0.6px; text-transform: none; color: var(--text); margin: 0 0 12px; }
+.section-label.next { margin-top: 22px; }
+.featured-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
 .featured-grid .card {
   padding: 10px 12px;
   background: var(--accent-soft);
@@ -97,7 +99,7 @@ h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.5px; }
   display: flex; align-items: center; min-height: 42px;
 }
 .featured-grid .card:hover { transform: translateY(-1px); border-color: var(--accent); box-shadow: var(--shadow); background: var(--accent-soft); }
-.featured-grid .card .title { font-size: 13.5px; font-weight: 600; margin-bottom: 0; line-height: 1.3; padding-right: 18px; }
+.featured-grid .card .title { font-size: 14.5px; font-weight: 650; margin-bottom: 0; line-height: 1.3; padding-right: 18px; }
 .featured-grid .card .desc, .featured-grid .card .count { display: none; }
 .card .count .topic-tag { color: var(--muted); }
 .section-label .label-note {
@@ -130,7 +132,7 @@ h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.5px; }
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--card-radius);
-  padding: 18px;
+  padding: 16px;
   cursor: pointer;
   box-shadow: var(--shadow);
   transition: transform .15s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease;
@@ -157,8 +159,8 @@ h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.5px; }
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 24px;
-  margin-bottom: 18px;
+  padding: 20px;
+  margin-bottom: 14px;
   box-shadow: var(--shadow);
 }
 .eq {
@@ -168,10 +170,10 @@ h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.5px; }
   padding: 12px 14px;
   border-radius: 8px;
   font-size: 15px;
-  margin: 4px 0 22px;
+  margin: 2px 0 16px;
   overflow-x: auto;
 }
-.fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px 12px; margin-bottom: 18px; }
+.fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 13px 12px; margin-bottom: 14px; }
 /* Label takes the slack so every input in a row lines up, however many lines
    its label wrapped to. A lone field on the last row spans the full width. */
 /* min-width:0 stops the number inputs' intrinsic width from pushing the
@@ -179,12 +181,12 @@ h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.5px; }
 .field { display: flex; flex-direction: column; margin-bottom: 0; min-width: 0; }
 .field label { flex: 1; }
 .field:last-child:nth-child(odd) { grid-column: 1 / -1; }
-.field label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+.field label { display: block; font-size: 15px; font-weight: 600; margin-bottom: 5px; }
 .field .hint { color: var(--muted); font-weight: 400; font-size: 12.5px; }
 .field input {
   width: 100%;
-  padding: 13px 14px;
-  font-size: 15px;
+  padding: 12px 14px;
+  font-size: 16.5px;
   background: var(--bg);
   border: 1.5px solid var(--border);
   border-radius: var(--field-radius);
@@ -217,16 +219,16 @@ button.calc {
 button.calc:hover { filter: brightness(1.08); }
 button.calc:active { transform: translateY(1px); }
 .result {
-  margin-top: 20px;
-  padding: 18px;
+  margin-top: 16px;
+  padding: 16px;
   border-radius: 8px;
   background: var(--accent-soft);
   border: 1px solid var(--border);
   display: none;
 }
 .result.show { display: block; }
-.result .label { color: var(--muted); font-size: 13px; margin-bottom: 4px; }
-.result .value { font-size: 28px; font-weight: 700; color: var(--good); letter-spacing: -0.5px; }
+.result .label { color: var(--muted); font-size: 14px; margin-bottom: 3px; }
+.result .value { font-size: 31px; font-weight: 700; color: var(--good); letter-spacing: -0.5px; }
 .result .value .u { font-size: 16px; color: var(--muted); font-weight: 500; }
 .result.error .value { color: #f87171; font-size: 16px; font-weight: 500; }
 /* Breakdown under the answer (see a formula's `extras`): two per row, each a
@@ -235,13 +237,13 @@ button.calc:active { transform: translateY(1px); }
 .extras.show { display: grid; grid-template-columns: repeat(2, 1fr); column-gap: 20px; }
 .extra { padding: 9px 1px; border-bottom: 1px solid var(--border); min-width: 0; }
 .extra.wide { grid-column: 1 / -1; }
-.extra .k { display: block; color: var(--muted); font-size: 12.5px; line-height: 1.35; margin-bottom: 1px; }
-.extra .v { display: block; font-weight: 650; font-size: 15px; }
+.extra .k { display: block; color: var(--muted); font-size: 13.5px; line-height: 1.3; margin-bottom: 1px; }
+.extra .v { display: block; font-weight: 650; font-size: 16.5px; }
 
 .notes { color: var(--muted); font-size: 13px; margin-top: 14px; }
 
 /* Advanced panel: collapsed by default so the basic path stays short */
-.advanced { margin: 18px 0 4px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); }
+.advanced { margin: 14px 0 4px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); }
 .advanced > summary {
   cursor: pointer; padding: 12px 14px; font-size: 14px; font-weight: 650;
   display: flex; align-items: center; gap: 8px; list-style: none;
@@ -251,10 +253,16 @@ button.calc:active { transform: translateY(1px); }
 .advanced[open] > summary::before { content: '\25BE'; }
 .advanced > summary:hover { color: var(--accent); }
 .advanced .body { padding: 0 14px 14px; }
-.advanced-intro { color: var(--muted); font-size: 13px; margin: 0 0 13px; }
-.advanced-note { font-size: 14px; font-weight: 600; line-height: 1.45; }
+.advanced-intro { color: var(--muted); font-size: 14px; margin: 0 0 11px; }
+.clear-advanced {
+  margin-top: 10px; padding: 7px 14px; cursor: pointer;
+  font-size: 13px; font-weight: 600; color: var(--muted);
+  background: var(--card); border: 1px solid var(--border); border-radius: 6px;
+}
+.clear-advanced:hover { color: var(--accent); border-color: var(--accent); }
+.advanced-note { font-size: 15px; font-weight: 600; line-height: 1.45; }
 .advanced-note:not(:empty) { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
-.sliders { margin: 4px 0 6px; padding: 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; }
+.sliders { margin: 4px 0 6px; padding: 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; }
 .sliders-label { font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); margin-bottom: 13px; }
 .slider { margin-bottom: 15px; }
 .slider:last-child { margin-bottom: 0; }
@@ -271,16 +279,20 @@ button.calc:active { transform: translateY(1px); }
 .chart .cline.green { stroke: var(--good); }
 .chart .dot.green { fill: var(--good); }
 .chart .cline.red { stroke: #ef4444; }
+.chart .cline.dash { stroke-dasharray: 5 4; }
 .chart .dot.red { fill: #ef4444; }
-.chart-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--muted); margin: 0 0 8px; }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 5px 15px; font-size: 13px; color: var(--muted); margin: 0 0 7px; }
 .chart-legend .lg { display: inline-flex; align-items: center; gap: 6px; }
 .chart-legend .sw { width: 13px; height: 3px; border-radius: 2px; background: var(--accent); flex: none; }
 .chart-legend .sw.green { background: var(--good); }
 .chart-legend .sw.red { background: #ef4444; }
+/* Dashed swatch, so the legend matches the dotted comparison lines */
+.chart-legend .sw.dash { background: repeating-linear-gradient(90deg, var(--accent) 0 4px, transparent 4px 7px); }
+.chart-legend .sw.green.dash { background: repeating-linear-gradient(90deg, var(--good) 0 4px, transparent 4px 7px); }
 .chart .ylab, .chart .xlab { fill: var(--muted); font-size: 13.5px; }
 .chart .axlab { fill: var(--muted); font-size: 14px; font-weight: 600; }
-footer { text-align: center; color: var(--muted); font-size: 12.5px; margin-top: 40px; }
-footer .disclaimer { display: block; max-width: 34em; margin: 7px auto 0; font-size: 11.5px; opacity: 0.85; }
+footer { text-align: center; color: var(--muted); font-size: 13.5px; margin-top: 30px; }
+footer .disclaimer { display: block; max-width: 36em; margin: 6px auto 0; font-size: 12.5px; opacity: 0.85; }
 footer a { color: var(--muted); text-decoration: underline; }
 footer a:hover { color: var(--accent); }
 
@@ -296,36 +308,37 @@ footer a:hover { color: var(--accent); }
   header.site .logo { font-size: 20px; }
   header.site .tagline { font-size: 12px; line-height: 1.35; }
   .navlink { padding: 5px 9px; font-size: 12.5px; }
-  .section-label { margin-bottom: 10px; }
-  .section-label.next { margin-top: 22px; }
+  .section-label { margin-bottom: 9px; }
+  .section-label.next { margin-top: 18px; }
+  .section-label.flagship { font-size: 21px; margin-top: 4px; }
   header.site { padding: 4px 0 20px; }
   h1 { font-size: 22px; }
   .sub { font-size: 14px; }
   .crumbs { font-size: 15px; margin-bottom: 18px; }
-  .formula-box { padding: 18px 15px; }
+  .formula-box { padding: 16px 14px; }
   .eq { font-size: 13px; padding: 11px 12px; }
   .grid { grid-template-columns: 1fr; }
   /* Both shortcut rows stay three-across on a phone, so each is a single row.
      Everything inside them shrinks to fit roughly a third of the screen. */
   .featured-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 20px; }
   .featured-grid .card { padding: 9px 8px; }
-  .featured-grid .card .title { font-size: 12px; line-height: 1.3; padding-right: 15px; }
+  .featured-grid .card .title { font-size: 12.5px; line-height: 1.25; padding-right: 15px; }
   .featured-grid .card .count { font-size: 10px; margin-top: 4px; }
   .featured-grid .card .topic-tag { display: none; }   /* no room for it beside the name */
   .featured-grid .heart { top: 2px; right: 1px; font-size: 13px; padding: 2px 3px; }
   .card.slot, .featured-grid .card.slot { font-size: 10px; min-height: 46px; padding: 8px 6px; }
   .field input, .search input { font-size: 16px; }   /* 16px avoids iOS focus-zoom */
   .fields { gap: 12px 8px; }
-  .field label { font-size: 13px; margin-bottom: 5px; }
+  .field label { font-size: 13.5px; margin-bottom: 4px; }
   .field .unit { margin-left: 3px; font-size: 11.5px; }
   .field input { padding: 11px 10px; }
   button.calc { font-size: 17px; padding: 15px; }
   .slider input[type=range] { height: 28px; }
   .slider-head { font-size: 14px; }
-  .result .value { font-size: 25px; }
+  .result .value { font-size: 27px; }
   .extras.show { column-gap: 12px; }
-  .extra .k { font-size: 11.5px; }
-  .extra .v { font-size: 14px; }
+  .extra .k { font-size: 12.5px; }
+  .extra .v { font-size: 15px; }
   .chart { max-width: 100%; }
   .chart .ylab, .chart .xlab { font-size: 15px; }
   .chart .axlab { font-size: 15px; }

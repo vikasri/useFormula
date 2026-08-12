@@ -167,7 +167,7 @@ function renderHome() {
     </div>
     <div id="searchResults"></div>
     <div id="belowSearch">
-      ${flagship ? `<div class="section-label">🏆 ${esc(flagship.name)}</div>${formulaBoxHTML(flagship, { asFlagship: true })}` : ''}
+      ${flagship ? `<div class="section-label flagship">🏆 ${esc(flagship.name)}</div>${formulaBoxHTML(flagship, { asFlagship: true })}` : ''}
       <div class="section-label next">Browse by topic</div>
       <div class="grid">${cards}</div>
     </div>`;
@@ -262,6 +262,7 @@ function formulaBoxHTML(f, opts) {
       <div class="body">
         ${adv.intro ? `<p class="advanced-intro">${esc(adv.intro)}</p>` : ''}
         <div class="fields">${advancedInputs.map(fieldHTML).join('')}</div>
+        <button type="button" class="clear-advanced" onclick="clearAdvanced('${f.id}')">Clear</button>
         <div class="advanced-note" id="advancedNote"></div>
       </div>
     </details>` : '';
@@ -370,6 +371,19 @@ function doCalc(id) {
   }
 }
 
+/* Empties every advanced input, which puts them back to their documented
+   defaults (blank means nothing entered, and halfway for the timing) and drops
+   the comparison lines from the chart. */
+function clearAdvanced(id) {
+  const f = FORMULAS.find(x => x.id === id);
+  if (!f) return;
+  f.inputs.filter(i => i.advanced).forEach(i => {
+    const el = document.getElementById('in_' + i.key);
+    if (el) el.value = '';
+  });
+  doCalc(id);
+}
+
 /* The outcome of the advanced panel's own inputs, shown inside that panel so
    the cause and its effect sit together. */
 function renderAdvancedNote(f, v, out) {
@@ -467,12 +481,12 @@ function renderChartSVG(series) {
   });
   const last = pts[pts.length - 1];
   const extraLines = extra.map(s =>
-    `<path d="${pathOf(s.points)}" class="cline ${esc(s.cls || '')}"/>` +
-    `<circle cx="${sx(s.points[s.points.length - 1].x).toFixed(1)}" cy="${sy(s.points[s.points.length - 1].y).toFixed(1)}" r="4" class="dot ${esc(s.cls || '')}"/>`
+    `<path d="${pathOf(s.points)}" class="cline ${esc(s.cls || '')}${s.dash ? ' dash' : ''}"/>` +
+    (s.dash ? '' : `<circle cx="${sx(s.points[s.points.length - 1].x).toFixed(1)}" cy="${sy(s.points[s.points.length - 1].y).toFixed(1)}" r="4" class="dot ${esc(s.cls || '')}"/>`)
   ).join('');
   const legend = extra.length ? `<div class="chart-legend">
       <span class="lg"><i class="sw"></i>${esc(series.label || 'Value')}</span>
-      ${extra.map(s => `<span class="lg"><i class="sw ${esc(s.cls || '')}"></i>${esc(s.label || '')}</span>`).join('')}
+      ${extra.map(s => `<span class="lg"><i class="sw ${esc(s.cls || '')}${s.dash ? ' dash' : ''}"></i>${esc(s.label || '')}</span>`).join('')}
     </div>` : '';
   return `<div class="chart-title">${esc(series.title || '')}</div>${legend}
     <svg viewBox="0 0 ${W} ${H}" class="chart" preserveAspectRatio="xMidYMid meet" role="img">

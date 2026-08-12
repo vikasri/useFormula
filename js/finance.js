@@ -147,26 +147,36 @@ registerFormulas([
     ],
     series: v => {
       const r = (v.annualRate / 100) / 12, n = Math.max(1, Math.round(v.years * 12));
-      const at = extraPaymentMonth(v);
       const P = loanPrincipal(v);
       const M = P * (r === 0 ? 1 / n : (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1));
-      /* Plot the schedule the visitor actually asked about: with the extra
-         payment folded in when they entered one, so its effect is visible. */
-      const plan = loanSchedule(P, r, M, {
-        lumpAmount: v.extra > 0 ? v.extra : 0, lumpMonth: at, maxMonths: n,
-      });
-      if (!plan) return { points: [] };
+      const base = loanSchedule(P, r, M, { maxMonths: n });
+      if (!base) return { points: [] };
+
+      const lines = [
+        { points: schedulePoints(base.rows, 'principalPaid'), label: 'Principal paid', cls: 'green' },
+        { points: schedulePoints(base.rows, 'interestPaid'), label: 'Interest paid', cls: 'red' },
+      ];
+
+      /* An extra payment adds dotted lines beside the originals rather than
+         replacing them, so the two schedules can be compared directly. */
+      let withLump = null;
+      if (v.extra > 0) {
+        const at = extraPaymentMonth(v);
+        withLump = loanSchedule(P, r, M, { lumpAmount: v.extra, lumpMonth: at, maxMonths: n });
+        if (withLump) {
+          lines.push({ points: schedulePoints(withLump.rows, 'balance'), label: 'Balance with extra', dash: true });
+          lines.push({ points: schedulePoints(withLump.rows, 'principalPaid'), label: 'Principal with extra', cls: 'green', dash: true });
+        }
+      }
+
       return {
-        title: v.extra > 0
-          ? `Your loan with one extra ${money(v.extra)} at year ${(at / 12).toFixed(1)}`
+        title: withLump
+          ? 'Your loan, plain lines as scheduled and dotted with the extra payment'
           : 'What you still owe, what you have paid off, and what it cost',
         xLabel: 'Years',
-        points: schedulePoints(plan.rows, 'balance'),
+        points: schedulePoints(base.rows, 'balance'),
         label: 'Balance left',
-        extra: [
-          { points: schedulePoints(plan.rows, 'principalPaid'), label: 'Principal paid', cls: 'green' },
-          { points: schedulePoints(plan.rows, 'interestPaid'), label: 'Interest paid', cls: 'red' },
-        ],
+        extra: lines,
         yTickFmt: kmoney,
       };
     },
