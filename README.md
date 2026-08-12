@@ -30,6 +30,8 @@ when `index.html` is opened directly from disk (double-click), not just over htt
 - **Add a formula** → add an object to the relevant `js/<topic>.js` via
   `registerFormulas([...])` (id, topic, name, desc, keywords, eq, inputs, output,
   compute; optional format, defaults, sliders, series).
+- **Change the About page or the disclaimer** → `renderAbout()` in `js/engine.js`, reached
+  at `#about`. The one-line version in the page footer lives in `index.html`.
 - **Turn a feature on or off** → edit `js/settings.js`. `showEquation: false` hides the
   equation line on every formula page; inputs, the answer, sliders and charts are unaffected.
   Add a new switch by putting it in `SETTINGS` and reading it with `setting('name', default)`.

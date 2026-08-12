@@ -419,11 +419,44 @@ function renderChartSVG(series) {
     </svg>`;
 }
 
+function renderAbout() {
+  app.innerHTML = `
+    <div class="crumbs"><a onclick="location.hash=''">Home</a> › About</div>
+    <div class="prose">
+      <h1>About useFormula</h1>
+      <p>useFormula is a free calculator for everyday formulas. Pick a formula, enter
+      what you know, and get the answer. There is no account to make, nothing to
+      install, and no charge.</p>
+      <p>Topics today are Finance and Mechanics. More will follow.</p>
+
+      <h2>Your favorites stay on your device</h2>
+      <p>Tapping ♡ on a formula saves it in your own browser's storage. It is never
+      sent to a server, never shared, and never used to identify you. Clearing your
+      browser data removes it, and favorites do not follow you to another device.</p>
+
+      <h2>Disclaimer</h2>
+      <p>useFormula is for general information and education only. It is not
+      professional advice of any kind, including financial, investment, tax, legal,
+      accounting or engineering advice.</p>
+      <p>Every result is an estimate produced by a standard formula from the numbers
+      you enter. Real outcomes depend on details these calculators do not model. A
+      loan payment, for example, assumes a fixed interest rate and equal monthly
+      payments, and leaves out fees, taxes, insurance and early-repayment charges.</p>
+      <p>Check any result with additional professional resources before you act on
+      it. Do not rely on useFormula alone for a decision that matters.</p>
+      <p>This site is provided as is, without warranty of any kind, express or
+      implied. To the fullest extent permitted by law, useFormula and its authors
+      accept no liability for any loss or damage arising from use of this site or
+      from reliance on its results. You use it entirely at your own risk.</p>
+    </div>`;
+}
+
 function route() {
   const h = location.hash.replace(/^#/, '');
   const [page, arg] = h.split('/');
   if (page === 'topic') renderTopic(arg);
   else if (page === 'formula') renderFormula(arg);
+  else if (page === 'about') renderAbout();
   else renderHome();
   window.scrollTo(0, 0);
 }
