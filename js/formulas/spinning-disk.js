@@ -25,7 +25,7 @@ registerFormula({
     'Nothing is pushing on a spinning disk. The stress comes from its own mass: every part of it is trying to carry on in a straight line, and the material inboard has to hold it in. That pull is worst at the internal surface, where the least material is doing the most holding.',
     'Cutting a hole in the middle roughly doubles the peak stress, however small the hole. A solid disk carries its highest stress at the dead centre; put a hole there and what remains at its edge takes twice the load. Additional Information compares the two.',
     'Switching the unit system here converts the numbers, since ρω²r² carries dimensions and the arithmetic genuinely changes. Rev/min means the same thing either way, so only the diameters and the density move.',
-    'Uniform thickness, free at both faces, thin enough to treat as plane stress. Blades, a shrunk-on rim, a keyway or a press fit all change it, and none of that is here. Nor is any allowance for temperature, creep or the margin a real rotor is designed to.',
+    'Uniform thickness, free at both faces, thin enough to treat as plane stress, and elastic throughout — once any of it yields the stress redistributes and these numbers no longer hold. Blades, a shrunk-on rim, a keyway or a press fit all change it, and none of that is here. Nor is any allowance for temperature, creep or the margin a real rotor is designed to.',
   ],
   eq: 'σθ,max = ((3+ν)/4) · ρω² · (b² + a²(1−ν)/(3+ν))',
   inputs: [

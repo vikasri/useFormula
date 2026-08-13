@@ -83,7 +83,7 @@ registerFormula({
     'A short column crushes. A long one goes sideways well before the material is anywhere near giving up, and that sideways load is what this works out. It turns on stiffness and shape alone: a mild steel strut and a high tensile one of the same size buckle at exactly the same load, because E is much the same for both.',
     'The ends matter more than anything else on the form. Fix both instead of pinning them and the load goes up four times; leave one free instead of pinned and it drops to a quarter. All of that is the K factor, and the effective length KL it produces is the length of a pinned-pinned column that would fail at the same load.',
     'A column turns about whichever axis is easiest, so the smaller second moment of area is the one that counts. That is the figure taken here for a rectangle, and it is why a plank on edge is far weaker as a strut than its depth suggests.',
-    'Euler assumes a column straight to begin with and loaded down its axis. Real ones are neither and carry less. Stocky columns yield before they buckle: put a yield strength in the panel and it will say which comes first. There is no factor of safety here and this follows no design code.',
+    'Euler assumes a column straight to begin with, loaded down its axis, and still elastic at the moment it goes. Real ones are neither straight nor loaded that neatly, and carry less. Stocky columns reach yield before they ever buckle, which puts them outside this altogether: put a yield strength in the panel and it will say which comes first. There is no factor of safety here and this follows no design code.',
   ],
   eq: 'Pcr = π²EI / (KL)²',
   inputs: [

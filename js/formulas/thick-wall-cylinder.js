@@ -16,7 +16,7 @@ registerFormula({
   about: [
     'Pressure inside a tube tries to split it around the circumference, and that hoop stress is usually what governs. It is highest at the internal surface and drops towards the outside. Radial stress runs the opposite way, equal to minus the internal pressure at the inside face and zero at the outer one.',
     'Cap the ends and the pressure pushes along the axis as well, adding a stress that is even through the wall and about half the hoop figure. Leave them open, as on a gun barrel or a roller, and there is none. Both are listed because the difference does not go the way people expect: take the axial stress away and the von Mises figure rises.',
-    'These hold well away from the ends, in a plain tube of even wall. Threads, ports, welds and supports concentrate stress locally. Nothing here is a code calculation.',
+    'These hold well away from the ends, in a plain tube of even wall, and only while the material is elastic: past yield the wall starts redistributing stress and these figures read high. Threads, ports, welds and supports concentrate stress locally. Nothing here is a code calculation.',
   ],
   diagram: '/img/thick-wall-cylinder.svg',
   diagramAlt: 'Section across a thick wall cylinder, showing inner radius a, outer radius b, internal and external pressure, and the hoop, radial and axial stresses.',

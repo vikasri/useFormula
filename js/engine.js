@@ -81,7 +81,7 @@ const num   = n => (Math.abs(n) >= 1000 ? n.toLocaleString(undefined, { maximumF
 const kmoney = n => { const a = Math.abs(n); if (a >= 1e6) return '$' + (n / 1e6).toFixed(a >= 1e7 ? 0 : 1) + 'M'; if (a >= 1e3) return '$' + Math.round(n / 1e3) + 'k'; return '$' + Math.round(n); };
 
 // Most-used formulas shown at the top of the home page (by formula id).
-const FEATURED = ['loan-payment', 'compound-interest', 'annuity'];
+const FEATURED = ['loan-payment', 'annuity', 'beam-bending'];
 
 /* The home page's heading and standfirst. tools/build-pages.py reads these
    two lines so the served HTML carries the same words the app renders. */
