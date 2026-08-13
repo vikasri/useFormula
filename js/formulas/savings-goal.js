@@ -18,19 +18,19 @@ registerFormula({
   title: 'Savings Goal Calculator: How Long Until You Reach a Target',
   blurb: 'Say what you have, what you pay in each period, and the return you expect — this gives how long it takes to reach your target, and how much of it is growth.',
   about: [
-    'Every other calculator here is handed a length of time and asked for an amount. This one runs the other way: give it the amount you are aiming at and it returns the time. Enter what you have now, the return you expect each period, and the figure you want to reach.',
+    'Every other calculator here is handed a length of time and asked for an amount. This one runs the other way: give it the amount you are aiming at and it returns the time. Enter what you have now, what you pay in each year, the return you expect, and the figure you want to reach.',
     'It is the compound interest equation rearranged. Where that one asks what P grows to in t years, this asks what t makes P reach A, so the years come out of a logarithm rather than a power: t = ln(A/P) / ln(1+r). With a regular payment in the mix the same rearrangement gives t = ln((A + PMT/r) / (P + PMT/r)) / ln(1+r). Both are solved outright, not searched for, so the answer is exact.',
-    'What you pay in each period is usually the difference between a goal that arrives and one that does not. A sum left alone doubles on a schedule the rate sets, and nothing you do changes it; a payment every period shortens the wait immediately and keeps shortening it. Set it to 0 to see how long the sum takes on its own — Additional Information gives that figure either way.',
-    'The period is whatever you say it is — enter a monthly rate and a monthly payment and the answer comes back in months. Fractions of a period are left in rather than rounded up, so 7.4 means the goal is passed part way through the eighth. It assumes the rate holds for the whole stretch and nothing is withdrawn, and takes no account of tax, fees or inflation: a target set in today’s money will buy less by the time you reach it.',
+    'What you pay in each year is usually the difference between a goal that arrives and one that does not. A sum left alone doubles on a schedule the rate sets, and nothing you do changes it; paying in every year shortens the wait immediately and keeps shortening it. Set it to 0 to see how long the sum takes on its own — Additional Information gives that figure either way.',
+    'The answer is in years, to one decimal, and the fraction is left in rather than rounded up: 23.3 means the target is passed part way through the twenty-fourth year. It assumes the rate holds for the whole stretch, that what you pay in arrives at the end of each year, and that nothing is withdrawn along the way. Tax, fees and inflation are not modelled, so a target set in today’s money will buy less by the time you reach it.',
   ],
   eq: 't = ln( (A + PMT/r) / (P + PMT/r) ) / ln(1 + r)',
   inputs: [
     { key: 'now', label: 'What you have now', unit: '$', hint: 'e.g. 10000' },
     { key: 'goal', label: 'What you are aiming for', unit: '$', hint: 'e.g. 200000' },
-    { key: 'rate', label: 'Return rate per period', unit: '%', hint: 'e.g. 5' },
-    { key: 'pmt', label: 'Paid in each period', unit: '$', hint: '0 if nothing is added' },
+    { key: 'rate', label: 'Annual return rate', unit: '%', hint: 'e.g. 5' },
+    { key: 'pmt', label: 'Paid in each year', unit: '$', hint: '0 if nothing is added' },
   ],
-  output: { label: 'Periods to reach it', unit: '' },
+  output: { label: 'Time to Reach Goal', unit: 'years' },
   compute: v => {
     const n = periodsToGoal(v.now, v.pmt, v.rate / 100, v.goal);
     if (n === null) throw new Error('At this rate, with nothing paid in, that goal is never reached.');
@@ -44,23 +44,17 @@ registerFormula({
     const paidIn = (v.pmt || 0) * n;
     rows.push({ label: 'Of the target, from growth', value: money(v.goal - v.now - paidIn) },
               { label: 'Of the target, paid in', value: money(v.now + paidIn) });
-    rows.push({ label: 'Reached part way through period', detail: true,
-                value: Math.ceil(n) + '' });
     /* Half the wait is a fair sense of progress only when nothing compounds;
        with growth the balance is behind halfway at the halfway mark. */
     const midway = balanceAfter(v.now, v.pmt || 0, r, n / 2);
-    rows.push({ label: 'Halfway through the time, you have', detail: true, value: money(midway) });
-    if (r > 0) {
-      rows.push({ label: 'Waiting one more period would leave you with', wide: true, detail: true,
-                  value: money(balanceAfter(v.now, v.pmt || 0, r, n + 1)) });
-    }
+    rows.push({ label: 'Halfway through, you have', detail: true, value: money(midway) });
     /* What the payments are buying, in time. Held here rather than in a panel
        so it is answered whether or not the reader thought to ask. */
     if (v.pmt > 0) {
       const alone = periodsToGoal(v.now, 0, r, v.goal);
       rows.push({ label: 'Paying in nothing, the same sum would take', wide: true, detail: true,
                   value: alone === null ? 'longer than any term — it never gets there'
-                    : `${alone.toFixed(1)} periods, ${(alone - n).toFixed(1)} more` });
+                    : `${alone.toFixed(1)} years, ${(alone - n).toFixed(1)} more` });
     }
     return rows;
   },
@@ -85,7 +79,7 @@ registerFormula({
     const lines = [{ points: curve(() => v.goal), label: 'The target', cls: 'green' }];
     return {
       title: 'The balance climbing to meet the target',
-      xLabel: 'Periods',
+      xLabel: 'Years',
       points: curve(p => balanceAfter(v.now, v.pmt || 0, r, p)),
       label: 'Balance',
       extra: lines,
