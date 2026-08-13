@@ -65,8 +65,11 @@ function misesState(v) {
      equal stress in every direction, which distorts nothing and so yields
      nothing; only the distance from it counts. */
   const xi = (p1 + p2 + p3) / SQRT3;
-  const a = (2 * p1 - p2 - p3) / SQRT6;
-  const b = (p2 - p3) / Math.SQRT2;
+  /* Across the axis, on the same two directions the drawing sweeps its circle
+     with. The distance out is what it is whichever pair is chosen; these are
+     picked to match the figure. */
+  const a = (p1 - p2) / Math.SQRT2;
+  const b = (p1 + p2 - 2 * p3) / SQRT6;
   return {
     t, vm, p1, p2, p3, xi, a, b,
     rho: Math.hypot(a, b),
@@ -207,92 +210,121 @@ function misesFigureElement(v, u) {
     </g></svg>`;
 }
 
-/* Which space this is. The three principal axes drawn small and to one side:
-   the origin they properly start from is usually far off the drawing, and what
-   the reader needs is their direction, not their position. */
-function axisTriad(x0, y0, ct, st) {
-  const dirs = [
-    ['\u03C3\u2081', 2 / SQRT6, 0],
-    ['\u03C3\u2082', -1 / SQRT6, 1 / Math.SQRT2],
-    ['\u03C3\u2083', -1 / SQRT6, -1 / Math.SQRT2],
-  ];
-  const XI = 1 / SQRT3, LEN = 30;
-  let out = '';
-  for (const [name, a, b] of dirs) {
-    const dx = a, dy = -XI * ct + b * st;
-    const m = Math.hypot(dx, dy);
-    const ex = x0 + dx / m * LEN, ey = y0 + dy / m * LEN;
-    out += `<line x1="${x0}" y1="${y0}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}"
-      stroke="${FIG_GREY}" stroke-width="1.2" marker-end="url(#ax-p)"/>`;
-    out += `<text x="${(x0 + dx / m * (LEN + 11)).toFixed(1)}"
-      y="${(y0 + dy / m * (LEN + 11) + 4).toFixed(1)}" fill="${FIG_GREY}" font-size="11.5"
-      text-anchor="middle" font-style="italic">${name}</text>`;
-  }
-  return out;
-}
+/* The yield surface in three dimensions.
 
-/* The yield surface in three dimensions: a cylinder of radius sqrt(2/3)*sy
-   wrapped around the line of equal stress in every direction. Viewed with that
-   line running up the page and tilted a little towards the reader, so the
-   circular sections read as ellipses rather than as flat lines. */
+   Drawn with an ordinary two-angle camera — swing round 30 degrees, look down
+   20 — rather than by forcing the hydrostatic axis upright. Forcing it upright
+   compresses one direction only, and that squashes sigma-2 and sigma-3 to 29
+   degrees apart on the page, which makes three axes that are exactly
+   perpendicular in space look as though they are not. This view separates them
+   by 101, 121 and 138 degrees, and the hydrostatic axis sits clear of all
+   three. */
+const CAM_AZ = 349 * Math.PI / 180, CAM_EL = 66 * Math.PI / 180;
+const HYD = [1 / SQRT3, 1 / SQRT3, 1 / SQRT3];
+/* Two perpendicular directions across the axis, to sweep the circle with. */
+const PU = [1 / Math.SQRT2, -1 / Math.SQRT2, 0];
+const PV = [1 / SQRT6, 1 / SQRT6, -2 / SQRT6];
+
+function camera(P) {
+  const sa = Math.sin(CAM_AZ), ca = Math.cos(CAM_AZ);
+  const se = Math.sin(CAM_EL), ce = Math.cos(CAM_EL);
+  return [-sa * P[0] + ca * P[1],
+          ca * se * P[0] + sa * se * P[1] - ce * P[2]];
+}
+const along = (v, k) => [v[0] * k, v[1] * k, v[2] * k];
+const plus = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+
 function misesFigure3D(s, u) {
-  const W = 520, H = 330, TILT = 22 * Math.PI / 180;
-  const ct = Math.cos(TILT), st = Math.sin(TILT);
-  const R = s.R;
+  const W = 520, H = 350, R = s.R;
   if (!(R > 0)) return '';
-  /* Drawn at the state's own level on the axis, so the cylinder is always the
-     same readable size. Nothing is lost by it: how far along the axis a state
-     sits has no bearing on whether it yields, which is the point the caption
-     is making, and a strongly hydrostatic state would otherwise stretch this
-     into an unreadable sliver. */
-  const L = 1.35 * R;
-  const yOf = (xi, b) => -xi * ct + b * st;
-  const px = s.a, py = yOf(0, s.b);
-  const halfX = Math.max(R, Math.abs(px)) * 1.16;
-  const halfY = (L * ct + R * st) * 1.06;
-  const k = Math.min((W - 120) / (2 * halfX), (H - 66) / (2 * halfY));
-  const cx = W / 2 - 18, cy = H / 2 + 2;
-  const X = x => (cx + x * k).toFixed(1), Y = y => (cy + y * k).toFixed(1);
-  const rx = (R * k).toFixed(1), ry = (R * st * k).toFixed(1);
+  /* Long enough to hold the state, wherever it sits along the axis. */
+  const L = Math.max(1.7 * R, Math.abs(s.xi) + 0.55 * R);
+  const AX = R * 0.95;                                  // how far to draw the axes
+  const ring = sAx => {
+    const out = [];
+    for (let i = 0; i <= 64; i++) {
+      const t = i / 64 * 2 * Math.PI;
+      out.push(plus(along(HYD, sAx),
+                    plus(along(PU, R * Math.cos(t)), along(PV, R * Math.sin(t)))));
+    }
+    return out;
+  };
+  const far = ring(L), near = ring(-L);
+  const pt = [s.p1, s.p2, s.p3];
+  const foot = along(HYD, s.xi);
+  const axes = [[[AX, 0, 0], '\u03C3\u2081'], [[0, AX, 0], '\u03C3\u2082'], [[0, 0, AX], '\u03C3\u2083']];
+
+  /* Everything that has to be on the page, projected once, then fitted. */
+  const world = far.concat(near, [pt, foot, [0, 0, 0], along(HYD, L * 1.2), along(HYD, -L * 1.2)],
+                           axes.map(a => a[0]));
+  const flat = world.map(camera);
+  const xs = flat.map(q => q[0]), ys = flat.map(q => q[1]);
+  const lo = [Math.min(...xs), Math.min(...ys)], hi = [Math.max(...xs), Math.max(...ys)];
+  const k = Math.min((W - 132) / (hi[0] - lo[0] || 1), (H - 62) / (hi[1] - lo[1] || 1));
+  const ox = (W - (hi[0] - lo[0]) * k) / 2 - lo[0] * k;
+  const oy = (H - (hi[1] - lo[1]) * k) / 2 - lo[1] * k;
+  const S2 = P => { const q = camera(P); return [ox + q[0] * k, oy + q[1] * k]; };
+  const XY = P => { const q = S2(P); return q[0].toFixed(1) + ' ' + q[1].toFixed(1); };
+  const poly = pts => 'M ' + pts.map(XY).join(' L ');
+
+  /* The two silhouette lines: the points on the rim furthest to either side of
+     the axis as the page sees it. */
+  const dAx = camera(HYD);
+  const perp = [-dAx[1], dAx[0]];
+  let iMin = 0, iMax = 0, vMin = Infinity, vMax = -Infinity;
+  far.forEach((P, i) => {
+    const q = camera(P), d = q[0] * perp[0] + q[1] * perp[1];
+    if (d < vMin) { vMin = d; iMin = i; }
+    if (d > vMax) { vMax = d; iMax = i; }
+  });
+
   const inside = s.rho <= R;
   const dot = inside ? FIG_GOOD : FIG_BAD;
-  return `${figOpen(W, H)} aria-label="The von Mises yield surface drawn as a cylinder of radius
-    root two thirds times the yield strength, wrapped around the axis of equal stress in every
-    direction. The stress state is marked ${inside ? 'inside' : 'outside'} it.">
+  const P2 = S2(pt), F2 = S2(foot), O2 = S2([0, 0, 0]);
+  return `${figOpen(W, H)} aria-label="The von Mises yield surface in principal stress space: a
+    cylinder of radius root two thirds times the yield strength, running along the line of equal
+    stress. The stress state is marked ${inside ? 'inside' : 'outside'} it.">
     <defs>
       <marker id="ax-end" viewBox="0 0 8 8" refX="7.5" refY="4" markerWidth="4.5" markerHeight="4.5"
               orient="auto-start-reverse">
-        <path d="M0 0 L8 4 L0 8 Z" fill="${FIG_INK}" fill-opacity="0.5"/></marker>
-      <marker id="ax-p" viewBox="0 0 8 8" refX="7.5" refY="4" markerWidth="4" markerHeight="4" orient="auto">
+        <path d="M0 0 L8 4 L0 8 Z" fill="${FIG_INK}" fill-opacity="0.55"/></marker>
+      <marker id="ax-p" viewBox="0 0 8 8" refX="7.5" refY="4" markerWidth="4.5" markerHeight="4.5" orient="auto">
         <path d="M0 0 L8 4 L0 8 Z" fill="${FIG_GREY}"/></marker>
     </defs>
-    <g font-family="-apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif" font-size="12.5">
-      <ellipse cx="${X(0)}" cy="${Y(yOf(-L, 0))}" rx="${rx}" ry="${ry}"
-               fill="none" stroke="${FIG_BLUE}" stroke-width="1.6" opacity="0.55"/>
-      <line x1="${X(-R)}" y1="${Y(yOf(-L, 0))}" x2="${X(-R)}" y2="${Y(yOf(L, 0))}"
-            stroke="${FIG_BLUE}" stroke-width="1.6" opacity="0.75"/>
-      <line x1="${X(R)}" y1="${Y(yOf(-L, 0))}" x2="${X(R)}" y2="${Y(yOf(L, 0))}"
-            stroke="${FIG_BLUE}" stroke-width="1.6" opacity="0.75"/>
-      <line x1="${X(0)}" y1="${Y(yOf(-L * 1.2, 0))}" x2="${X(0)}" y2="${Y(yOf(L * 1.2, 0))}"
-            stroke="${FIG_INK}" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.5"
+    <g font-family="-apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif" font-size="12">
+      <path d="${poly(far)}" fill="none" stroke="${FIG_BLUE}" stroke-width="1.4"
+            opacity="0.45" stroke-dasharray="5 4"/>
+      <line x1="${XY(far[iMin]).split(' ')[0]}" y1="${XY(far[iMin]).split(' ')[1]}"
+            x2="${XY(near[iMin]).split(' ')[0]}" y2="${XY(near[iMin]).split(' ')[1]}"
+            stroke="${FIG_BLUE}" stroke-width="1.6" opacity="0.8"/>
+      <line x1="${XY(far[iMax]).split(' ')[0]}" y1="${XY(far[iMax]).split(' ')[1]}"
+            x2="${XY(near[iMax]).split(' ')[0]}" y2="${XY(near[iMax]).split(' ')[1]}"
+            stroke="${FIG_BLUE}" stroke-width="1.6" opacity="0.8"/>
+      <line x1="${S2(along(HYD, -L * 1.2))[0].toFixed(1)}" y1="${S2(along(HYD, -L * 1.2))[1].toFixed(1)}"
+            x2="${S2(along(HYD, L * 1.2))[0].toFixed(1)}" y2="${S2(along(HYD, L * 1.2))[1].toFixed(1)}"
+            stroke="${FIG_INK}" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.55"
             marker-start="url(#ax-end)" marker-end="url(#ax-end)"/>
-      <ellipse cx="${X(0)}" cy="${Y(yOf(0, 0))}" rx="${rx}" ry="${ry}"
-               fill="${FIG_BLUE}" fill-opacity="0.09" stroke="${FIG_BLUE}"
-               stroke-width="1.3" stroke-dasharray="4 3" opacity="0.85"/>
-      <ellipse cx="${X(0)}" cy="${Y(yOf(L, 0))}" rx="${rx}" ry="${ry}"
-               fill="none" stroke="${FIG_BLUE}" stroke-width="1.8"/>
-      <line x1="${X(0)}" y1="${Y(yOf(0, 0))}" x2="${X(px)}" y2="${Y(py)}"
-            stroke="${dot}" stroke-width="1.5"/>
-      <circle cx="${X(px)}" cy="${Y(py)}" r="5.5" fill="${dot}"/>
-      <text x="${(+X(px) + 10).toFixed(1)}" y="${(+Y(py) + 4).toFixed(1)}" fill="${dot}"
+      <path d="${poly(near)}" fill="${FIG_BLUE}" fill-opacity="0.07" stroke="${FIG_BLUE}"
+            stroke-width="1.9"/>
+      <g stroke="${FIG_GREY}" stroke-width="1.3" marker-end="url(#ax-p)">
+        ${axes.map(a => `<line x1="${O2[0].toFixed(1)}" y1="${O2[1].toFixed(1)}"
+          x2="${S2(a[0])[0].toFixed(1)}" y2="${S2(a[0])[1].toFixed(1)}"/>`).join('')}
+      </g>
+      <g fill="${FIG_GREY}" font-style="italic">
+        ${axes.map(a => { const q = S2(along(a[0], 1.17));
+          return `<text x="${q[0].toFixed(1)}" y="${(q[1] + 4).toFixed(1)}"
+            text-anchor="middle">${a[1]}</text>`; }).join('')}
+      </g>
+      <circle cx="${O2[0].toFixed(1)}" cy="${O2[1].toFixed(1)}" r="2.6" fill="${FIG_GREY}"/>
+      <line x1="${F2[0].toFixed(1)}" y1="${F2[1].toFixed(1)}" x2="${P2[0].toFixed(1)}"
+            y2="${P2[1].toFixed(1)}" stroke="${dot}" stroke-width="1.6"/>
+      <circle cx="${P2[0].toFixed(1)}" cy="${P2[1].toFixed(1)}" r="5.5" fill="${dot}"/>
+      <text x="${(P2[0] + 9).toFixed(1)}" y="${(P2[1] + 4).toFixed(1)}" fill="${dot}"
             text-anchor="start" font-weight="600">your stress state</text>
-      <text x="${X(0)}" y="${(+Y(yOf(L * 1.12, 0)) - 8).toFixed(1)}" fill="${FIG_GREY}"
-            text-anchor="middle">equal stress in every direction</text>
-      <text x="${(W - 6).toFixed(0)}" y="${(+Y(yOf(-L, 0)) + 20).toFixed(1)}" fill="${FIG_BLUE}"
-            text-anchor="end">radius &#8730;(2/3)&#183;&#963;&#7522; = ${num(+s.R.toFixed(1))} ${u.stress}</text>
-      <text x="${X(0)}" y="${(+Y(yOf(-L * 1.2, 0)) + 22).toFixed(1)}" fill="${FIG_GREY}"
-            text-anchor="middle">no end either way: no pressure yields it</text>
-      ${axisTriad(38, H - 40, ct, st)}
+      <text x="${(W - 6)}" y="${H - 26}" fill="${FIG_BLUE}" text-anchor="end">radius
+        &#8730;(2/3)&#183;&#963;&#7522; = ${num(+s.R.toFixed(1))} ${u.stress}</text>
+      <text x="${(W - 6)}" y="${H - 9}" fill="${FIG_GREY}" text-anchor="end">the axis
+        &#963;&#8321; = &#963;&#8322; = &#963;&#8323; runs on without end</text>
     </g></svg>`;
 }
 
@@ -479,11 +511,13 @@ registerFormula({
           + 'symmetric, and why six numbers describe it rather than nine.' },
       { svg: misesFigure3D(s, u),
         title: 'The yield surface, and where this state sits in it',
-        caption: 'Drawn in principal stress space — the three axes are σ₁, σ₂ and σ₃, and the '
-          + 'triad shows which way they run. The surface is a cylinder, not a closed shape: '
-          + 'sliding along the line of equal stress changes the size of a part, not its shape, so '
-          + 'it never causes yield however far you go. Only the distance out from that line '
-          + 'counts, which is why the radius is the only scale that matters here.' },
+        caption: 'Principal stress space. σ₁, σ₂ and σ₃ are at right angles to each other, as '
+          + 'they always are — any flat drawing of three-dimensional axes changes the angles '
+          + 'between them, and this view is chosen to keep all three apart. The dashed line '
+          + 'through the middle is where all three are equal. The surface is a cylinder rather '
+          + 'than a closed shape, so sliding along that line never brings on yield however far '
+          + 'you go; only the distance out from it counts, which is why the radius is the one '
+          + 'scale that matters here.' },
       { svg: misesFigureSections(s, u),
         title: 'The same surface, cut three ways — one for each pair',
         caption: 'Each panel takes two principal stresses and holds the third at the value it '
