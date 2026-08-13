@@ -49,23 +49,9 @@ registerFormula({
     const now = +document.getElementById('in_sys').value;
     if (now === diskSystem) return;
     const toEnglish = now === 1;
-    /* Converting the rounded figure on screen loses a little each way: 500 mm
-       becomes 19.685 in, and back again 499.999. So when a field still holds
-       exactly what the last switch wrote, put back the number it came from. */
-    const move = (k, factor) => {
-      const el = document.getElementById('in_' + k);
-      const n = el ? parseFloat(el.value) : NaN;
-      if (!isFinite(n)) return;
-      const was = el.value;
-      el.value = (el.dataset.wrote === was && el.dataset.from !== undefined)
-        ? el.dataset.from
-        : +(n * factor).toPrecision(6);
-      el.dataset.from = was;
-      el.dataset.wrote = el.value;
-    };
-    move('do', toEnglish ? 1 / MM_PER_IN : MM_PER_IN);
-    move('di', toEnglish ? 1 / MM_PER_IN : MM_PER_IN);
-    move('rho', toEnglish ? 1 / KGM3_PER_LBIN3 : KGM3_PER_LBIN3);
+    convertField('do', toEnglish ? 1 / MM_PER_IN : MM_PER_IN);
+    convertField('di', toEnglish ? 1 / MM_PER_IN : MM_PER_IN);
+    convertField('rho', toEnglish ? 1 / KGM3_PER_LBIN3 : KGM3_PER_LBIN3);
     diskSystem = now;
   },
 

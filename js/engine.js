@@ -15,10 +15,14 @@
      diagram  : optional path to an svg defining the problem, drawn under the
                   equation. diagramAlt carries its alt text. Kept as a file
                   rather than inline markup so the served page has it too.
-     inputs   : [{ key, label, unit, hint, optional, advanced, full, options }]
+     inputs   : [{ key, label, unit, hint, optional, advanced, full, options,
+                   showIf }]
                   advanced inputs move to a collapsed panel by the chart
                   full    : the field spans the whole row
                   options : [{ value, label }] renders a select, not a number
+                  showIf  : function(v) -> bool, whether the field belongs on
+                            the form at all given the other answers. A hidden
+                            field is not a missing one.
      onFieldChange : optional function(key) called when a field changes,
                   before the recalculation, for rewriting sibling fields
      unitsFor : optional function(v) -> { inputKey: 'unit', … }
@@ -82,7 +86,7 @@ const FEATURED = ['loan-payment', 'compound-interest', 'annuity'];
    two lines so the served HTML carries the same words the app renders. */
 const HOME_TITLE = 'Free calculators for everyday formulas';
 const HOME_INTRO = 'Loan payments, compound interest, annuities, savings goals, ' +
-  'pressure vessels and rotating disks. Fill in what you know and read off the answer.';
+  'pressure vessels, rotating disks and column buckling. Fill in what you know and read off the answer.';
 
 /* Favourites live in this browser only: no account, no server, nothing leaves
    the machine. Cleared if the visitor clears site data. */
@@ -330,7 +334,7 @@ function formulaBoxHTML(f) {
         `${dflt[inp.key] != null ? ` value="${dflt[inp.key]}"` : ''}` +
         `${f.series ? ` onchange="onField('${f.id}','${inp.key}')"` : ''}>`;
     return `
-    <div class="field${inp.optional ? ' optional' : ''}${inp.full ? ' full' : ''}">
+    <div class="field${inp.optional ? ' optional' : ''}${inp.full ? ' full' : ''}" id="f_${inp.key}">
       <label>${esc(inp.label)}${unit}</label>
       ${control}
     </div>`;
@@ -413,10 +417,37 @@ function renderFormula(key) {
       <a href="${topicURL(topic.id)}">${esc(topic.name)}</a> ›
       ${esc(f.name)}
     </div>` + formulaBoxHTML(f) + aboutFormulaHTML(f) + relatedHTML(f);
+  applyFieldVisibility(f);
   (f.sliders || []).forEach(s => paintSlider(document.getElementById('sl_' + s.key)));
   /* Anything arriving with its fields filled in should arrive with its answer
      too — a form showing numbers and a blank result reads as broken. */
   if (f.series || f.defaults) doCalc(f.id);
+}
+
+/* Whatever is on the form right now. Blank fields are left out rather than
+   set to zero, so the caller can tell "nothing entered" from "entered 0". */
+function readFields(f) {
+  const v = {};
+  for (const inp of f.inputs) {
+    const el = document.getElementById('in_' + inp.key);
+    const raw = el ? el.value.trim() : '';
+    if (raw !== '') v[inp.key] = parseFloat(raw);
+  }
+  return v;
+}
+
+function fieldShown(inp, v) { return !inp.showIf || inp.showIf(v); }
+
+/* Fields that depend on another answer: a round bar has no wall thickness, so
+   the form should not be asking for one. Hidden rather than disabled, since a
+   greyed-out field still reads as something you have failed to fill in. */
+function applyFieldVisibility(f) {
+  if (!f.inputs.some(i => i.showIf)) return;
+  const v = readFields(f);
+  for (const inp of f.inputs) {
+    const el = document.getElementById('f_' + inp.key);
+    if (el) el.classList.toggle('hide', !fieldShown(inp, v));
+  }
 }
 
 function doCalc(id) {
@@ -424,16 +455,14 @@ function doCalc(id) {
   const box = document.getElementById('result');
   const valEl = document.getElementById('result-value');
   const labEl = document.getElementById('result-label');
-  const v = {};
+  const v = readFields(f);
   let missing = [];
   for (const inp of f.inputs) {
-    const raw = document.getElementById('in_' + inp.key).value.trim();
-    if (raw === '') {
-      if (inp.optional) { v[inp.key] = 0; continue; }
-      missing.push(inp.label);
-      continue;
-    }
-    v[inp.key] = parseFloat(raw);
+    if (v[inp.key] != null) continue;
+    /* A field nobody can see cannot be filled in, so it is not held against
+       the visitor either. */
+    if (inp.optional || !fieldShown(inp, v)) { v[inp.key] = 0; continue; }
+    missing.push(inp.label);
   }
   /* Relabel before anything else, so switching unit system takes effect even
      when a field is still empty and the calculation cannot run. */
@@ -561,6 +590,10 @@ function recenterSlider(s, val) {
   const rng = sliderRange(s, val);
   sl.min = rng.min;
   sl.max = rng.max;
+  /* The step goes back on too. A formula that rewrites its slider for a change
+     of unit changes the step with it, and a stale one snaps the handle to the
+     wrong number the moment the range moves under it. */
+  sl.step = s.step;
   sl.value = val;
 }
 
@@ -571,6 +604,7 @@ function onField(id, key) {
   /* One field can change what the others mean. A unit-system selector has to
      carry the numbers across with it, or kg/m³ silently becomes lb/in³. */
   if (f.onFieldChange) f.onFieldChange(key);
+  applyFieldVisibility(f);
   const s = (f.sliders || []).find(sl => sl.key === key);
   if (s) {
     const val = parseFloat(document.getElementById('in_' + key).value);

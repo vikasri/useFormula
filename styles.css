@@ -234,6 +234,8 @@ h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.5px; }
 /* A choice, not a quantity: same box as the number fields so the form reads
    as one row of controls, but in the text colour rather than the number blue. */
 .field.full { grid-column: 1 / -1; }
+/* A field ruled out by another answer, e.g. wall thickness on a solid bar. */
+.field.hide { display: none; }
 .field select {
   width: 100%; padding: 12px 14px; font-size: 17.5px;
   background: var(--bg); border: 1.5px solid var(--border);

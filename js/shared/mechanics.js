@@ -89,5 +89,22 @@ function diskUnitsFor(v) {
   return { do: u.length, di: u.length, rho: u.density };
 }
 
-/* 1 in = 25.4 mm exactly; 1 lb/in³ = 27679.905 kg/m³. */
-const MM_PER_IN = 25.4, KGM3_PER_LBIN3 = 27679.905;
+/* 1 in = 25.4 mm exactly; 1 lb/in³ = 27679.905 kg/m³; 1 MPa = 145.0377 psi. */
+const MM_PER_IN = 25.4, KGM3_PER_LBIN3 = 27679.905, PSI_PER_MPA = 145.0377377;
+
+/* Rewrite one field when the unit system changes.
+
+   Converting the rounded figure on screen loses a little each way: 500 mm
+   becomes 19.685 in, and back again 499.999. So when a field still holds
+   exactly what the last switch wrote, put back the number it came from. */
+function convertField(key, factor) {
+  const el = document.getElementById('in_' + key);
+  const n = el ? parseFloat(el.value) : NaN;
+  if (!isFinite(n)) return;
+  const was = el.value;
+  el.value = (el.dataset.wrote === was && el.dataset.from !== undefined)
+    ? el.dataset.from
+    : +(n * factor).toPrecision(6);
+  el.dataset.from = was;
+  el.dataset.wrote = el.value;
+}

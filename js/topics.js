@@ -6,5 +6,5 @@
    the root, and tools/build-pages.py refuses an id that clashes with a slug. */
 registerTopics([
   { id: 'finance',     icon: '💰', name: 'Finance',              desc: 'Loans, annuities, growing income' },
-  { id: 'mechanics',   icon: '⚙️', name: 'Engineering Mechanics', desc: 'Stress in pressure vessels and rotating disks' },
+  { id: 'mechanics',   icon: '⚙️', name: 'Engineering Mechanics', desc: 'Stress in pressure vessels, rotating disks and columns' },
 ]);
