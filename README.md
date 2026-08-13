@@ -12,6 +12,7 @@ or search by name/keyword, enter your known values, and get the answer.
 ```
 index.html      – home page, and the shell every other page is built from
 styles.css      – all styling
+favicon.svg     – tab icon
 js/settings.js  – on/off switches for site features
 js/engine.js    – rendering, routing, calculation, sliders, charts (no data)
 js/topics.js    – the broad topics (Finance, Mechanics, …)
@@ -26,7 +27,9 @@ about/, 404.html, sitemap.xml, robots.txt – generated, do not edit
 ```
 
 Generated files carry a marker comment on line 1. The script only ever rewrites or
-deletes files carrying that marker, so a hand-written file cannot be clobbered.
+deletes files carrying that marker, so a hand-written file cannot be clobbered. Two
+runs in a row produce byte-identical output, so a rebuild never shows up as a diff
+unless something really changed.
 
 ## Addresses
 
@@ -50,13 +53,25 @@ shorter address — `loan-payment` has `slug: 'loan'` and answers at `/loan/`.
 The older `#formula/<id>` addresses still resolve, so links shared before this change
 keep working.
 
+Each generated page carries its own `<title>`, meta description, canonical URL, Open
+Graph tags and a `BreadcrumbList` in JSON-LD, plus the heading, equation and input
+names as real text — so a crawler sees the calculator without running any JavaScript.
+`sitemap.xml` takes each page's `lastmod` from the source file it was built from, not
+from the day the build ran, so rebuilding does not claim unchanged pages are new.
+
+Every calculator also lists the others in its topic at the foot of the page. That is
+the main thing keeping new formulas reachable as the site grows: the home page only
+has room for a handful.
+
 ## Editing
 
 - **Add a topic** → add an entry to `js/topics.js`, create `js/<topic>.js` with its
-  formulas, and add a `<script src="js/<topic>.js">` line to `index.html`.
+  formulas, add a `<script src="/js/<topic>.js">` line to `index.html`, then run
+  `python3 tools/build-pages.py`.
 - **Add a formula** → add an object to the relevant `js/<topic>.js` via
   `registerFormulas([...])` (id, topic, name, desc, keywords, eq, inputs, output,
-  compute; optional format, defaults, sliders, series).
+  compute; optional format, defaults, sliders, series, slug), then run
+  `python3 tools/build-pages.py` to give it a page.
 - **Hide a what-if input from the main form** → mark it `advanced: true` and give the
   formula an `advanced: { summary, intro, note }`. It renders in a collapsed panel above
   the chart, so the basic path stays short.

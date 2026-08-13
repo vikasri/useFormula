@@ -130,18 +130,23 @@ function formulaCardHTML(f, showTopic) {
     </a>`;
 }
 
-/* Category links for the site header. Dormant: index.html carries no
-   <nav id="topnav"> at the moment, so this is a no-op until that is added back. */
-function renderNav() {
-  const el = document.getElementById('topnav');
-  if (!el) return;
-  const here = currentRoute();
-  el.innerHTML = TOPICS.map(t =>
-    `<a class="navlink${here.page === 'topic' && here.arg === t.id ? ' on' : ''}"
-        href="${topicURL(t.id)}">${t.icon} ${esc(t.name)}</a>`).join('');
-}
-
 function byId(ids) { return ids.map(id => FORMULAS.find(f => f.id === id)).filter(Boolean); }
+
+/* Sideways links to the rest of the topic, under every calculator. Gives a
+   visitor somewhere to go once they have their answer, and gives each page
+   more than one way in for a crawler — which matters more with every formula
+   added, since the home page only has room for a handful. */
+function relatedHTML(f) {
+  const topic = TOPICS.find(t => t.id === f.topic) || {};
+  const others = FORMULAS.filter(x => x.topic === f.topic && x.id !== f.id);
+  if (!others.length) return '';
+  return `
+    <nav class="related">
+      <h2>More ${esc(topic.name || '')} calculators</h2>
+      <ul>${others.map(o => `<li><a href="${formulaURL(o)}">${esc(shortName(o))}</a>
+        <span>${esc(o.desc)}</span></li>`).join('')}</ul>
+    </nav>`;
+}
 
 function renderHome() {
   const cards = TOPICS.map(t => `<a class="card" href="${topicURL(t.id)}">
@@ -248,10 +253,8 @@ function doTopicSearch(topicId, q) {
   box.innerHTML = `<p class="results-head">${matches.length} of ${list.length} shown</p><div class="grid">${topicCardsHTML(matches)}</div>`;
 }
 
-/* The calculator itself: title, inputs, answer, breakdown, chart, sliders.
-   Shared by the formula page and the flagship calculator on the home page. */
-function formulaBoxHTML(f, opts) {
-  opts = opts || {};
+/* The calculator itself: title, inputs, answer, breakdown, chart, sliders. */
+function formulaBoxHTML(f) {
   const dflt = f.defaults || {};
   const fieldHTML = inp => `
     <div class="field${inp.optional ? ' optional' : ''}">
@@ -286,16 +289,10 @@ function formulaBoxHTML(f, opts) {
     </div>`;
   }).join('');
 
-  /* On the home page the section label above already names the calculator, so
-     the box shows only its description and a link to its own page. */
-  const heading = opts.asFlagship
-    ? `<a class="open-page" href="${formulaURL(f)}">Open its own page →</a>`
-    : `<h1>${esc(f.name)}</h1>`;
-
   return `
     <div class="formula-box">
       <div class="formula-head">
-        <div class="formula-title">${heading}</div>
+        <div class="formula-title"><h1>${esc(f.name)}</h1></div>
         ${heartHTML(f.id)}
       </div>
       <p class="sub">${esc(f.desc)}</p>
@@ -335,7 +332,7 @@ function renderFormula(key) {
       <a href="/">Home</a> ›
       <a href="${topicURL(topic.id)}">${esc(topic.name)}</a> ›
       ${esc(f.name)}
-    </div>` + formulaBoxHTML(f);
+    </div>` + formulaBoxHTML(f) + relatedHTML(f);
   (f.sliders || []).forEach(s => paintSlider(document.getElementById('sl_' + s.key)));
   if (f.series) doCalc(f.id);
 }
@@ -597,6 +594,5 @@ function route() {
   else if (r.page === 'formula') renderFormula(r.arg);
   else if (r.page === 'about') renderAbout();
   else renderHome();
-  renderNav();
   window.scrollTo(0, 0);
 }
