@@ -222,7 +222,7 @@ function renderHome() {
     </div>
     <div id="searchResults"></div>
     <div id="belowSearch">
-      <div class="section-label">Popular calculators</div>
+      <div class="section-label">📊 Popular calculators</div>
       <div class="grid featured-grid">${featured}</div>
       <div class="section-label next">❤️ Your favorites ${favNote}</div>
       <div class="grid featured-grid">${favCards}</div>
