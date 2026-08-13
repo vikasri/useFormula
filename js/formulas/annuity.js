@@ -8,7 +8,7 @@
 registerFormula({
   id: 'annuity',
   topic: 'finance',
-  name: 'Annuity Calculator',
+  name: 'Annuity Value',
   short: 'Annuity',
   desc: 'What regular payments add up to by a future date',
   keywords: 'annuity future value regular payments deposits sip savings recurring contributions retirement pension growing graduated escalating income stream level ordinary compounding',
