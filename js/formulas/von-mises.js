@@ -89,6 +89,124 @@ function figOpen(w, h) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" class="figure" role="img"`;
 }
 
+/* The stress element: a cube with its faces square to the 1, 2, 3 axes,
+   carrying the six components as they were typed. Drawn in cabinet projection
+   — the 3 axis at 30 degrees and half length — which is the arrangement a
+   mechanics textbook uses, and the one that leaves all three visible faces
+   distinguishable.
+
+   Sign is shown by direction rather than by a minus sign in a label: an arrow
+   pointing out of a face is tension, one pointing into it is compression. That
+   is the convention the reader already has in their head from the page above
+   the form. */
+function misesFigureElement(v, u) {
+  const W = 520, H = 350, S = 86, OX = 118, OY = 228;
+  const AX = 0.433, AY = 0.25;                       // where the 3 axis goes
+  const P = (x, y, z) => [OX + (x + AX * z) * S, OY + (-y - AY * z) * S];
+  const at = p => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`;
+  const poly = pts => pts.map(c => P(...c)).map(at).join(' L ');
+  const zero = n => !n || Math.abs(n) < 1e-12;
+  /* Signed, as it was typed. The arrow already says which way it acts, but a
+     reader who entered -60 should see -60 and not have to trust the drawing. */
+  const fmt = n => num(+(+n).toPrecision(4));
+
+  /* Out of the face for tension, into it for compression. */
+  const arrow = (from, to, col, w) => {
+    const A = P(...from), B = P(...to);
+    return `<line x1="${A[0].toFixed(1)}" y1="${A[1].toFixed(1)}" x2="${B[0].toFixed(1)}"
+      y2="${B[1].toFixed(1)}" stroke="${col}" stroke-width="${w}" marker-end="url(#se-${col === FIG_BLUE ? 'n' : 's'})"/>`;
+  };
+  /* Labels are collected rather than drawn, so they can be moved apart before
+     anything is written. Six components on three visible faces will collide in
+     some combination whatever fixed offsets are chosen, and a state with every
+     component filled in is a state someone will enter. */
+  const marks = [];
+  const label = (p, dx, dy, text, col, anchor) => {
+    const A = P(...p);
+    marks.push({ x: A[0] + dx, y: A[1] + dy, text, col, anchor });
+  };
+  const drawLabels = () => {
+    const done = [];
+    for (const m of marks.slice().sort((a, b) => a.y - b.y)) {
+      /* Push down until clear of everything already placed. */
+      while (done.some(d => Math.abs(d.y - m.y) < 15 &&
+                            Math.abs(d.x - m.x) < 96 && d.anchor === m.anchor)) {
+        m.y += 15;
+      }
+      done.push(m);
+    }
+    return done.map(m => `<text x="${m.x.toFixed(1)}" y="${m.y.toFixed(1)}" fill="${m.col}"
+      text-anchor="${m.anchor}" font-weight="600">${m.text}</text>`).join('');
+  };
+
+  let g = '';
+  /* Direct stress, one arrow per visible face, along that face's own axis. */
+  const direct = [
+    ['s11', [1, 0.5, 0.5], [1, 0, 0], 0.62, '\u03C3\u2081\u2081', 10, 4, 'start'],
+    ['s22', [0.5, 1, 0.5], [0, 1, 0], 0.62, '\u03C3\u2082\u2082', 0, -10, 'middle'],
+    ['s33', [0.5, 0.5, 1], [0, 0, 1], 1.15, '\u03C3\u2083\u2083', 8, -6, 'start'],
+  ];
+  for (const [k, c, d, len, name, dx, dy, anchor] of direct) {
+    const val = v[k] || 0;
+    if (zero(val)) continue;
+    const out = [c[0] + d[0] * len, c[1] + d[1] * len, c[2] + d[2] * len];
+    g += val > 0 ? arrow(c, out, FIG_BLUE, 2) : arrow(out, c, FIG_BLUE, 2);
+    g += label(out, dx, dy, `${name} = ${fmt(val)}`, FIG_BLUE, anchor);
+  }
+
+  /* Shear in complementary pairs: a component on one face is matched by an
+     equal one on the face it shares an edge with, which is why the tensor is
+     symmetric and why only six numbers are asked for. */
+  const shear = [
+    ['s12', '\u03C3\u2081\u2082', [[1, 0.16, 0.3], [1, 0.84, 0.3]],
+      [[0.16, 1, 0.7], [0.84, 1, 0.7]], 12, -4],
+    ['s13', '\u03C3\u2081\u2083', [[1, 0.72, 0.14], [1, 0.72, 0.86]],
+      [[0.14, 0.28, 1], [0.86, 0.28, 1]], 12, 14],
+    ['s23', '\u03C3\u2082\u2083', [[0.3, 1, 0.14], [0.3, 1, 0.86]],
+      [[0.72, 0.14, 1], [0.72, 0.86, 1]], -10, -8],
+  ];
+  for (const [k, name, pairA, pairB, dx, dy] of shear) {
+    const val = v[k] || 0;
+    if (zero(val)) continue;
+    for (const [a, b] of [pairA, pairB]) {
+      g += val > 0 ? arrow(a, b, FIG_WARM, 1.8) : arrow(b, a, FIG_WARM, 1.8);
+    }
+    g += label(val > 0 ? pairA[1] : pairA[0], dx, dy,
+               `${name} = ${fmt(val)}`, FIG_WARM, dx < 0 ? 'end' : 'start');
+  }
+
+  return `${figOpen(W, H)} aria-label="A stress element: a cube with the six stress components
+    drawn on its faces as they were entered.">
+    <defs>
+      <marker id="se-n" viewBox="0 0 8 8" refX="7.5" refY="4" markerWidth="5" markerHeight="5" orient="auto">
+        <path d="M0 0 L8 4 L0 8 Z" fill="${FIG_BLUE}"/></marker>
+      <marker id="se-s" viewBox="0 0 8 8" refX="7.5" refY="4" markerWidth="5" markerHeight="5" orient="auto">
+        <path d="M0 0 L8 4 L0 8 Z" fill="${FIG_WARM}"/></marker>
+      <marker id="se-a" viewBox="0 0 8 8" refX="7.5" refY="4" markerWidth="4" markerHeight="4" orient="auto">
+        <path d="M0 0 L8 4 L0 8 Z" fill="${FIG_GREY}"/></marker>
+    </defs>
+    <g font-family="-apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif" font-size="12.5">
+      <path d="M ${poly([[0, 0, 1], [1, 0, 1], [1, 1, 1], [0, 1, 1]])} Z"
+            fill="#ffffff" stroke="${FIG_INK}" stroke-width="1.5"/>
+      <path d="M ${poly([[1, 0, 0], [1, 1, 0], [1, 1, 1], [1, 0, 1]])} Z"
+            fill="#fbece6" fill-opacity="0.55" stroke="${FIG_INK}" stroke-width="1.5"/>
+      <path d="M ${poly([[0, 1, 0], [1, 1, 0], [1, 1, 1], [0, 1, 1]])} Z"
+            fill="#fbece6" fill-opacity="0.3" stroke="${FIG_INK}" stroke-width="1.5"/>
+      ${g}
+      ${drawLabels()}
+      <g stroke="${FIG_GREY}" stroke-width="1.2" marker-end="url(#se-a)" opacity="0.9">
+        <line x1="34" y1="${H - 30}" x2="70" y2="${H - 30}"/>
+        <line x1="34" y1="${H - 30}" x2="34" y2="${H - 66}"/>
+        <line x1="34" y1="${H - 30}" x2="${(34 + 36 * AX / 0.5).toFixed(1)}" y2="${(H - 30 - 36 * AY / 0.5).toFixed(1)}"/>
+      </g>
+      <g fill="${FIG_GREY}" font-size="11.5" font-style="italic">
+        <text x="75" y="${H - 26}">1</text>
+        <text x="30" y="${H - 70}">2</text>
+        <text x="${(34 + 36 * AX / 0.5 + 5).toFixed(1)}" y="${(H - 30 - 36 * AY / 0.5 - 3).toFixed(1)}">3</text>
+      </g>
+    </g></svg>`;
+}
+
 /* The yield surface in three dimensions: a cylinder of radius sqrt(2/3)*sy
    wrapped around the line of equal stress in every direction. Viewed with that
    line running up the page and tilted a little towards the reader, so the
@@ -304,6 +422,12 @@ registerFormula({
     if (!(v.sy > 0)) return [];
     const s = misesState(v), u = misesUnits(v);
     return [
+      { svg: misesFigureElement(v, u),
+        title: 'The stress state you entered, on a stress element',
+        caption: 'Blue is direct stress and orange is shear. An arrow pointing out of a face is '
+          + 'tension, one pointing into it is compression. Shear comes in pairs because a '
+          + 'component on one face is matched on the face beside it — which is why the tensor is '
+          + 'symmetric, and why six numbers describe it rather than nine.' },
       { svg: misesFigure3D(s, u),
         title: 'The yield surface, and where this state sits in it',
         caption: 'A cylinder around the line of equal stress in every direction. Sliding along '
