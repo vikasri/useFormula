@@ -5,11 +5,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Compound Interest Calculator: What a Lump Sum Grows To</title>
-  <meta name="description" content="See what a sum grows to when its interest earns interest too. Yearly by default, or set how often it compounds and watch the effective rate move.">
+  <meta name="description" content="See what a sum grows to when its interest earns interest too. Enter what you start with, the rate per period, and how many periods.">
   <link rel="canonical" href="https://useformula.com/compound/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Compound Interest Calculator: What a Lump Sum Grows To">
-  <meta property="og:description" content="See what a sum grows to when its interest earns interest too. Yearly by default, or set how often it compounds and watch the effective rate move.">
+  <meta property="og:description" content="See what a sum grows to when its interest earns interest too. Enter what you start with, the rate per period, and how many periods.">
   <meta property="og:url" content="https://useformula.com/compound/">
   <script type="application/ld+json">
   {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://useformula.com/"}, {"@type": "ListItem", "position": 2, "name": "Finance", "item": "https://useformula.com/topics/finance/"}, {"@type": "ListItem", "position": 3, "name": "Compound Interest Calculator", "item": "https://useformula.com/compound/"}]}
@@ -30,15 +30,14 @@
     <div class="formula-box">
       <div class="formula-head"><div class="formula-title"><h1>Compound Interest Calculator</h1></div></div>
       <p class="sub">What a lump sum grows to when the interest earns interest</p>
-      <div class="eq">A = P · (1 + r/m)^(m·t)</div>
-      <p class="notes">Enter principal, annual interest rate, time and compounds per year to work out the what a lump sum grows to when the interest earns interest.</p>
+      <div class="eq">A = P · (1 + r)ⁿ</div>
+      <p class="notes">Enter principal, interest rate per period and number of periods to work out the what a lump sum grows to when the interest earns interest.</p>
     </div>
     <section class="explainer">
       <h2>About Compound Interest</h2>
-      <p>Leave a sum alone at a fixed rate and each year it earns interest on the interest already added, not just on what you started with. That is the whole of it, and it is why the line on the chart bends upward instead of running straight: the amount earning is bigger every year.</p>
-      <p>The equation above is the general one. Leave the panel alone and m is 1 — interest added once a year — and it reduces to A = P · (1 + r)ᵗ. The rate is the annual one however often it compounds, so 5% compounded monthly means twelve additions of about 0.4167% rather than twelve of 5%.</p>
-      <p>Adding it more often earns a little more, because each addition starts earning immediately, but the gain is smaller than people expect and it has a ceiling: compounding continuously rather than daily is worth almost nothing. The effective annual rate under Additional Information is what the quoted rate actually comes to once the frequency is taken into account, and it is the number to compare two accounts on.</p>
-      <p>This is a lump sum left to itself. It assumes the rate never changes and that nothing is paid in or taken out along the way — for regular deposits, the Annuity Value calculator is the one you want. Tax, fees and inflation are not modelled, so the answer is in the money of the final year rather than in what that money will buy.</p>
+      <p>Leave a sum alone at a fixed rate and each period it earns interest on the interest already added, not just on what you started with. That is the whole of it, and it is why the line on the chart bends upward instead of running straight: the amount earning is bigger every period.</p>
+      <p>The rate and the period have to describe the same stretch of time. A monthly rate with a number of months gives an answer in months; a yearly rate with a number of years gives one in years. 6% a year is roughly 0.5% a month, not 6%.</p>
+      <p>This is a lump sum left to itself. It assumes the rate never changes and that nothing is paid in or taken out along the way — for regular deposits, the Annuity Value calculator is the one you want, and to find how long a target takes rather than what a sum reaches, Savings Goal. Tax, fees and inflation are not modelled.</p>
     </section>
     <nav class="related">
       <h2>More Finance calculators</h2>
@@ -66,9 +65,9 @@
 <script src="/js/settings.js?v=d7a72c88"></script>
 <script src="/js/engine.js?v=97dfbab6"></script>
 <script src="/js/topics.js?v=1f0f03e5"></script>
-<script src="/js/index.js?v=bd0eb9fb"></script>
-<script src="/js/shared/finance.js?v=84fc7d3c"></script>
-<script src="/js/formulas/compound-interest.js?v=64c1732a"></script>
+<script src="/js/index.js?v=c0521558"></script>
+<script src="/js/shared/finance.js?v=39391546"></script>
+<script src="/js/formulas/compound-interest.js?v=d2c4b44f"></script>
 <script src="/js/boot.js?v=e66f6931"></script>
 </body>
 </html>
