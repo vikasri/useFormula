@@ -32,6 +32,10 @@
    keeps the warm --bg, which is the ground its white card sits on while the
    work happens. */
 body.landing { background: #ffffff; }
+/* The disclaimer belongs with the figures it qualifies. A page that shows no
+   result does not need it, and About carries the full version in its own
+   text, so repeating it in the footer there says the same thing twice. */
+body.nocalc footer .disclaimer { display: none; }
 * { box-sizing: border-box; }
 body {
   margin: 0;

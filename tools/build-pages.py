@@ -427,7 +427,7 @@ def main():
             '%s/topics/%s/' % (SITE, t['id']),
             topic_prerender(t, mine),
             trail=[('Home', '/'), (t['name'], '/topics/%s/' % t['id'])],
-            body_class='landing'))
+            body_class='landing nocalc'))
         written.add(rel)
         urls.append(('%s/topics/%s/' % (SITE, t['id']),
                      changed('js/topics.js', *('js/' + f['file'] for f in mine))))
@@ -442,7 +442,7 @@ def main():
         # drawn from there, so there is never a second copy to keep in step.
         '    <div class="crumbs"><a href="/">Home</a> › About</div>\n'
         '    <div class="prose"><h1>About useFormula</h1></div>',
-        trail=[('Home', '/'), ('About', '/about/')]))
+        trail=[('Home', '/'), ('About', '/about/')], body_class='nocalc'))
     written.add(rel)
     urls.append(('%s/about/' % SITE, changed('js/engine.js')))
 
@@ -455,7 +455,7 @@ def main():
         '    <h1>%s</h1>\n    <p class="sub">%s</p>\n%s'
         % (html.escape(read_const('HOME_TITLE')), html.escape(read_const('HOME_INTRO')),
            home_links(formulas)),
-        website=True, body_class='landing'))
+        website=True, body_class='landing nocalc'))
 
     write(ROOT / '404.html', page(
         template,
@@ -464,7 +464,8 @@ def main():
         '%s/404.html' % SITE,
         '    <div class="prose"><h1>Page not found</h1>\n'
         '      <p>That address does not match any calculator. '
-        '<a href="/">Start from the home page</a>.</p></div>'))
+        '<a href="/">Start from the home page</a>.</p></div>',
+        body_class='nocalc'))
 
     write(ROOT / 'sitemap.xml', '\n'.join(
         ['<?xml version="1.0" encoding="UTF-8"?>',
