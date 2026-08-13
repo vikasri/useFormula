@@ -89,8 +89,10 @@ function diskUnitsFor(v) {
   return { do: u.length, di: u.length, rho: u.density };
 }
 
-/* 1 in = 25.4 mm exactly; 1 lb/in³ = 27679.905 kg/m³; 1 MPa = 145.0377 psi. */
-const MM_PER_IN = 25.4, KGM3_PER_LBIN3 = 27679.905, PSI_PER_MPA = 145.0377377;
+/* 1 in = 25.4 mm exactly; 1 lb/in³ = 27679.905 kg/m³; 1 MPa = 145.0377 psi;
+   1 lbf = 4.4482216 N. */
+const MM_PER_IN = 25.4, KGM3_PER_LBIN3 = 27679.905, PSI_PER_MPA = 145.0377377,
+      N_PER_LBF = 4.4482216152605;
 
 /* Rewrite one field when the unit system changes.
 

@@ -86,7 +86,7 @@ const FEATURED = ['loan-payment', 'compound-interest', 'annuity'];
    two lines so the served HTML carries the same words the app renders. */
 const HOME_TITLE = 'Free calculators for everyday formulas';
 const HOME_INTRO = 'Loan payments, compound interest, annuities, savings goals, ' +
-  'pressure vessels, rotating disks and column buckling. Fill in what you know and read off the answer.';
+  'beam bending, pressure vessels, rotating disks and column buckling. Fill in what you know and read off the answer.';
 
 /* Favourites live in this browser only: no account, no server, nothing leaves
    the machine. Cleared if the visitor clears site data. */
@@ -635,7 +635,12 @@ function renderChartSVG(series) {
   const scalePts = pts.concat(...extra.map(s => s.points));   // every line shares one y-scale
   const xs = scalePts.map(p => p.x), ys = scalePts.map(p => p.y);
   const xMin = Math.min(...xs), xMax = Math.max(...xs);
-  const yMin = Math.min(0, ...ys), yMax = Math.max(...ys) || 1;
+  /* Zero is always on the scale. A series that never rises above it — a beam
+     deflecting downward — tops out at exactly 0, so the height has to be
+     guarded rather than defaulted, or the whole curve lands in a corner. */
+  const yMin = Math.min(0, ...ys);
+  let yMax = Math.max(...ys);
+  if (!(yMax > yMin)) yMax = yMin + 1;
   const sx = x => padL + (xMax === xMin ? 0 : (x - xMin) / (xMax - xMin)) * (W - padL - padR);
   const sy = y => (H - padB) - (yMax === yMin ? 0 : (y - yMin) / (yMax - yMin)) * (H - padT - padB);
   const yfmt = series.yTickFmt || (v => Math.round(v));
