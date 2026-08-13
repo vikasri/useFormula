@@ -30,14 +30,14 @@
     <div class="formula-box">
       <div class="formula-head"><div class="formula-title"><h1>Annuity Calculator</h1></div></div>
       <p class="sub">What regular payments add up to by a future date</p>
-      <div class="eq">FV = PMT · ((1+r)ⁿ − 1) / r</div>
+      <div class="eq">FV = PMT · ((1+r)ⁿ − (1+g)ⁿ) / (r − g)</div>
       <p class="notes">Enter payment per period, return rate per period, number of periods and payment growth per period to work out the what regular payments add up to by a future date.</p>
     </div>
     <section class="explainer">
       <h2>About the Annuity</h2>
       <p>Pay in the same amount every period, earn a return on what has built up, and this is what you end up with. Give it the payment, the return rate and the number of periods. Each payment earns for however long it has left to run, so the first one does the most work and the last one does almost none — which is why the total is so much larger than the sum of the payments.</p>
       <p>The rate and the period have to describe the same stretch of time. Monthly payments want a monthly rate: 6% a year is roughly 0.5% a month, not 6%. Putting an annual rate against monthly payments is the usual way to get an answer that is out by an order of magnitude.</p>
-      <p>Open &quot;What if the payments grow?&quot; to raise each payment above the one before it, which is what a salary-linked pension contribution or an inflation-linked income actually does. That turns the ordinary annuity, FV = PMT · ((1+r)ⁿ − 1) / r, into the growing annuity, FV = PMT · ((1+r)ⁿ − (1+g)ⁿ) / (r − g). When the two rates are equal that fraction would divide by zero, and the calculator uses the limit it approaches, PMT · n · (1+r)ⁿ⁻¹.</p>
+      <p>The equation above is the general one, where g is the rate the payments themselves grow at. Leave growth blank and g is zero, which collapses it to the ordinary annuity, FV = PMT · ((1+r)ⁿ − 1) / r. Open &quot;What if the payments grow?&quot; to raise each payment above the one before it, the way a contribution tied to a salary rises each year. When r and g are equal the fraction would divide by zero, and the calculator uses the limit it approaches instead, PMT · n · (1+r)ⁿ⁻¹.</p>
       <p>It assumes each payment lands at the end of its period, the rate never changes, and nothing is taken out along the way. Fees, tax and inflation are not modelled, so the answer is in the money of the final period rather than in what that money will buy.</p>
     </section>
     <nav class="related">

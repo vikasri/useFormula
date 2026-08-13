@@ -17,10 +17,10 @@ registerFormula({
   about: [
     'Pay in the same amount every period, earn a return on what has built up, and this is what you end up with. Give it the payment, the return rate and the number of periods. Each payment earns for however long it has left to run, so the first one does the most work and the last one does almost none — which is why the total is so much larger than the sum of the payments.',
     'The rate and the period have to describe the same stretch of time. Monthly payments want a monthly rate: 6% a year is roughly 0.5% a month, not 6%. Putting an annual rate against monthly payments is the usual way to get an answer that is out by an order of magnitude.',
-    'Open "What if the payments grow?" to raise each payment above the one before it, which is what a salary-linked pension contribution or an inflation-linked income actually does. That turns the ordinary annuity, FV = PMT · ((1+r)ⁿ − 1) / r, into the growing annuity, FV = PMT · ((1+r)ⁿ − (1+g)ⁿ) / (r − g). When the two rates are equal that fraction would divide by zero, and the calculator uses the limit it approaches, PMT · n · (1+r)ⁿ⁻¹.',
+    'The equation above is the general one, where g is the rate the payments themselves grow at. Leave growth blank and g is zero, which collapses it to the ordinary annuity, FV = PMT · ((1+r)ⁿ − 1) / r. Open "What if the payments grow?" to raise each payment above the one before it, the way a contribution tied to a salary rises each year. When r and g are equal the fraction would divide by zero, and the calculator uses the limit it approaches instead, PMT · n · (1+r)ⁿ⁻¹.',
     'It assumes each payment lands at the end of its period, the rate never changes, and nothing is taken out along the way. Fees, tax and inflation are not modelled, so the answer is in the money of the final period rather than in what that money will buy.',
   ],
-  eq: 'FV = PMT · ((1+r)ⁿ − 1) / r',
+  eq: 'FV = PMT · ((1+r)ⁿ − (1+g)ⁿ) / (r − g)',
   inputs: [
     { key: 'PMT', label: 'Payment per period', unit: '$', hint: 'e.g. 5000' },
     { key: 'rate', label: 'Return rate per period', unit: '%', hint: 'e.g. 6' },
@@ -59,7 +59,7 @@ registerFormula({
      it needs filling in. */
   advanced: {
     summary: 'What if the payments grow?',
-    intro: 'Leave this blank and every payment is the same size. Enter a growth rate and each payment is that much larger than the one before, the way a contribution tied to a salary rises each year. The dotted line on the chart shows what level payments would have come to.',
+    intro: 'Leave this blank and every payment is the same size. Enter a growth rate and each payment is that much larger than the one before, the way a contribution tied to a salary rises each year. The chart then draws the growing plan as dotted lines beside the level ones, for both what you pay in and what it is worth.',
     note: (v, out) => {
       if (!v.growth) return '';
       const n = Math.max(0, Math.round(v.n));
@@ -84,17 +84,24 @@ registerFormula({
       for (let i = 0; i <= N; i++) { const j = Math.round(i / N * n); out.push({ x: j, y: fn(j) }); }
       return out;
     };
-    const lines = [{ points: curve(j => annuityPaidIn(v.PMT, g, j)), label: 'Paid in', cls: 'green' }];
-    /* Growth adds a dotted line beside the original rather than replacing it,
-       so the two plans can be compared directly. */
+    /* Solid is the level plan, dotted the growing one, in matching colours:
+       blue for what it is worth, green for what was handed over. Growth adds
+       its two lines beside the originals rather than replacing them, so the
+       gap each one opens is there to be read off. */
+    const lines = [];
     if (g !== 0) {
-      lines.push({ points: curve(j => annuityFV(v.PMT, r, 0, j)),
-                   label: 'If payments stayed level', dash: true });
+      lines.push({ points: curve(j => annuityFV(v.PMT, r, g, j)),
+                   label: 'Value (with growth)', dash: true });
+    }
+    lines.push({ points: curve(j => annuityPaidIn(v.PMT, 0, j)), label: 'Paid in', cls: 'green' });
+    if (g !== 0) {
+      lines.push({ points: curve(j => annuityPaidIn(v.PMT, g, j)),
+                   label: 'Paid in (with growth)', cls: 'green', dash: true });
     }
     return {
       title: 'What it adds up to, and how much of that you paid in',
       xLabel: 'Periods',
-      points: curve(j => annuityFV(v.PMT, r, g, j)),
+      points: curve(j => annuityFV(v.PMT, r, 0, j)),
       label: 'Value',
       extra: lines,
       yTickFmt: kmoney,
