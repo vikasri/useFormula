@@ -270,12 +270,6 @@ registerFormula({
       { label: 'Where the deflection is worst', detail: true, value: X(p.xD) },
       { label: 'Deflection under the load', detail: true, value: D(p.atLoad) },
     ];
-    /* Span over deflection is how a beam is actually judged for serviceability,
-       and it is the figure a limit is quoted against. */
-    if (Math.abs(p.defl) > 0) {
-      rows.push({ label: 'Span ÷ deflection', detail: true,
-                  value: 'span ÷ ' + num(Math.round(p.L / Math.abs(p.defl))) });
-    }
     /* A moment at an end means that end is holding the beam against turning,
        which only a fixed end does. */
     if (Math.abs(p.M0) > 1e-9) rows.push({ label: 'Moment at the left end', detail: true, value: M(p.M0) });
@@ -310,20 +304,40 @@ registerFormula({
   series: v => {
     let p;
     try { p = beamPeaks(v); } catch (e) { return { points: [] }; }
-    const N = 60, pts = [];
-    for (let i = 0; i <= N; i++) {
-      const x = p.L * i / N;
-      pts.push({ x, y: beamDefl(p.spans, p.EI, p.mirror ? p.L - x : x) });
-    }
-    const u = beamUnits(v);
-    return {
+    /* Both curves turn a corner under the load, and the stress diagram peaks
+       there. An even spread would cut that corner off unless it happened to
+       land on it, so the load position is a point in its own right. */
+    const N = 60, xs = [v.a];
+    for (let i = 0; i <= N; i++) xs.push(p.L * i / N);
+    xs.sort((m, n) => m - n);
+    const pts = xs.map(x => ({ x, y: beamDefl(p.spans, p.EI, p.mirror ? p.L - x : x) }));
+    /* A held end comes out of the arithmetic as 1e-17 rather than 0, which is
+       zero for every purpose except the axis label printed beside it. */
+    const big = Math.max(...pts.map(q => Math.abs(q.y)));
+    for (const q of pts) if (Math.abs(q.y) < big * 1e-9) q.y = 0;
+    /* Bending stress at the outer fibre, the figure the headline answer is the
+       peak of. It follows the moment, so it is negative where the beam hogs —
+       over a built-in end the top face is the one in tension. */
+    const sig = pts.map(q => ({
+      x: q.x,
+      y: p.at(p.mirror ? p.L - q.x : q.x) * p.sec.c / p.sec.I,
+    }));
+    const u = beamUnits(v), x = n => +n.toFixed(0);
+    return [{
       title: 'How the beam sits under the load',
       xLabel: 'Distance from the left end (' + u.length + ')',
       yLabel: 'Deflection (' + u.length + ')',
       points: pts, label: 'Deflection',
       yTickFmt: n => +n.toPrecision(3),
-      xTickFmt: n => +n.toFixed(0),
-    };
+      xTickFmt: x,
+    }, {
+      title: 'Bending stress along the beam',
+      xLabel: 'Distance from the left end (' + u.length + ')',
+      yLabel: 'Stress (' + u.stress + ')',
+      points: sig, label: 'Stress',
+      yTickFmt: n => +n.toPrecision(3),
+      xTickFmt: x,
+    }];
   },
 });
 

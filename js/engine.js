@@ -34,7 +34,8 @@
      format   : optional function(n) -> string  (defaults to num)
      defaults : optional {key: value}   pre-filled values
      sliders  : optional [{ key, span, floor, ceil, step }]
-     series   : optional function(v) -> { points, xLabel, yLabel, title, yTickFmt,
+     series   : optional function(v) -> chart, or a list of them, one drawn
+                  under the next. chart = { points, xLabel, yLabel, title, yTickFmt,
                   label, extra: [{ points, label, cls }] }   extra = more lines
      extras   : optional function(v, answer) -> [{ label, value, wide, detail }]
                   listed under the answer, two per row; detail rows go
@@ -500,7 +501,14 @@ function doCalc(id) {
     });
     if (f.series) {
       const wrap = document.getElementById('chartWrap');
-      if (wrap) wrap.innerHTML = renderChartSVG(f.series(v));
+      /* A formula may hand back one chart or a list of them. A beam wants
+         two: how it deflects, and the stress along it. They carry different
+         units, so they get an axis each rather than sharing one. */
+      if (wrap) {
+        const spec = f.series(v);
+        wrap.innerHTML = (Array.isArray(spec) ? spec : [spec])
+          .map(one => renderChartSVG(one)).join('');
+      }
     }
     renderExtras(f, v, out);
     renderAdvancedNote(f, v, out);

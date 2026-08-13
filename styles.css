@@ -360,6 +360,8 @@ button.calc:active { transform: translateY(1px); }
 }
 .slider input[type=range]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px var(--accent-soft); }
 .chart-wrap { margin-top: 22px; }
+/* A second chart under the first keeps its distance from it. */
+.chart-wrap .chart + .chart-title { margin-top: 24px; }
 .chart-title { font-size: 14px; font-weight: 600; color: var(--muted); margin-bottom: 10px; }
 .chart { width: 100%; max-width: 500px; height: auto; display: block; overflow: visible; }
 .chart .grid { stroke: var(--border); stroke-width: 1; }
