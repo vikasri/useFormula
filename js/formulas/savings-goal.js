@@ -83,10 +83,6 @@ registerFormula({
     /* The goal drawn flat across is what the balance is climbing to meet; where
        they cross is the answer, which is the whole point of the picture. */
     const lines = [{ points: curve(() => v.goal), label: 'The target', cls: 'green' }];
-    if (v.pmt > 0) {
-      lines.push({ points: curve(p => balanceAfter(v.now, 0, r, p)),
-                   label: 'Balance without paying in', dash: true });
-    }
     return {
       title: 'The balance climbing to meet the target',
       xLabel: 'Periods',
