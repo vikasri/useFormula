@@ -40,7 +40,8 @@
      series   : optional function(v) -> chart, or a list of them, one drawn
                   under the next. chart = { points, xLabel, yLabel, title, yTickFmt,
                   label, extra: [{ points, label, cls }] }   extra = more lines
-     extras   : optional function(v, answer) -> [{ label, value, wide, detail }]
+     extras   : optional function(v, answer) -> [{ label, value, wide, detail,
+                  note }]  note is a quiet line under the value
                   listed under the answer, two per row; detail rows go
                   below the chart under "Additional Information"
      advanced : optional { summary, intro, note(v, answer) -> string }
@@ -564,7 +565,11 @@ function renderExtras(f, v, out) {
   /* Two per row. A row marked wide keeps the full width, for values too long
      to read in half of a phone screen. */
   const cell = r =>
-    `<div class="extra${r.wide ? ' wide' : ''}"><span class="k">${esc(r.label)}</span><span class="v">${esc(r.value)}</span></div>`;
+    `<div class="extra${r.wide ? ' wide' : ''}"><span class="k">${esc(r.label)}</span>` +
+    `<span class="v">${esc(r.value)}</span>` +
+    /* A caution about the value belongs under it, quieter than it, not
+       welded onto the end of the number where it reads as part of it. */
+    (r.note ? `<span class="n">${esc(r.note)}</span>` : '') + `</div>`;
   const main = rows.filter(r => !r.detail);
   const detail = rows.filter(r => r.detail);
 

@@ -272,9 +272,9 @@ registerFormula({
        a beam slender enough for this page it stays far below. */
     const sigma = Math.abs(p.M) * p.sec.c / p.sec.I;
     const rows = [
-      { label: MISES_LABEL, wide: true,
+      { label: MISES_LABEL, wide: true, note: MISES_NOTE,
         value: `${num(+sigma.toFixed(sigma < 100 ? 3 : 1))} ${u.stress}, the bending stress `
-             + `itself at the outer fibre — ${MISES_NOTE}` },
+             + `itself at the outer fibre` },
       { label: 'Maximum deflection', value: D(p.defl) },
       { label: 'Maximum bending moment', value: M(p.M) },
       { label: 'Where the stress is worst', detail: true, value: X(p.xM) },

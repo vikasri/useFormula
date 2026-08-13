@@ -74,7 +74,7 @@ registerFormula({
        principal is zero. */
     const vmMax = peakMises(a, b, r => { const s = at(r); return [s.hoop, s.radial, 0]; });
     const rows = [
-      { label: MISES_LABEL, wide: true, value: `${S(vmMax)} — ${MISES_NOTE}` },
+      { label: MISES_LABEL, wide: true, note: MISES_NOTE, value: S(vmMax) },
       { label: 'Hoop stress at the rim', value: S(at(b).hoop) },
       /* Radial stress is zero at both faces and peaks between them. */
       { label: 'Peak radial stress', value: S(at(Math.sqrt(a * b)).radial) },

@@ -52,7 +52,7 @@ registerFormula({
        are equal and this collapses to the hoop-radial difference. */
     const vmMax = peakMises(a, b, r => { const s = at(r); return [s.hoop, s.hoop, s.radial]; });
     const rows = [
-      { label: MISES_LABEL, wide: true, value: `${S(vmMax)} — ${MISES_NOTE}` },
+      { label: MISES_LABEL, wide: true, note: MISES_NOTE, value: S(vmMax) },
       { label: 'Radial stress at the internal surface', value: S(bore.radial) },
       { label: 'Outer diameter', value: num(+(v.di + 2 * v.t).toFixed(3)) + ' ' + u.length },
       { label: 'Hoop stress at the outer surface', detail: true, value: S(out.hoop) },

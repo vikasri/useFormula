@@ -53,7 +53,7 @@ function vonMises(s1, s2, s3) {
    a yield strength one at a time; von Mises is what reduces them to one number
    that can be. */
 const MISES_LABEL = 'Highest equivalent (von Mises) stress';
-const MISES_NOTE = "keep this below the material's yield strength";
+const MISES_NOTE = "(this should be below the material's yield strength)";
 
 /* The worst von Mises anywhere between two radii. Sampled rather than taken at
    the inner surface: that is where it sits in the ordinary case, but external

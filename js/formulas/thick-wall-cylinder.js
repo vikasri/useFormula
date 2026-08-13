@@ -58,8 +58,8 @@ registerFormula({
     const vmOpen = peakMises(a, b, r => { const s = at(r); return [s.hoop, 0, s.radial]; });
     const vmCap = peakMises(a, b, r => { const s = at(r); return [s.hoop, s.axial, s.radial]; });
     const rows = [
-      { label: MISES_LABEL, wide: true,
-        value: `${S(vmOpen)} with open ends, ${S(vmCap)} capped — ${MISES_NOTE}` },
+      { label: MISES_LABEL, wide: true, note: MISES_NOTE,
+        value: `${S(vmOpen)} with open ends, ${S(vmCap)} capped` },
       { label: 'Radial stress at the internal surface', value: S(bore.radial) },
       { label: 'Hoop stress at the outer surface', value: S(out.hoop) },
       { label: 'Axial stress, open ends', value: S(0) },
