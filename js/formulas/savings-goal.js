@@ -3,8 +3,10 @@
 
    The one calculator here that runs backwards: every other finance formula is
    given a term and returns an amount, this is given the amount and returns the
-   term. The main form is a sum left to grow on its own; paying in regularly is
-   the panel, because it is the second question, not the first. */
+   term. Paying in regularly sits in the main form rather than behind a panel:
+   for a goal it is the question, not a variation on it. Someone saving towards
+   a figure is nearly always adding to it, and hiding that field would hide the
+   thing that decides whether the goal arrives at all. */
 registerFormula({
   id: 'savings-goal',
   slug: 'goal',
@@ -14,11 +16,11 @@ registerFormula({
   desc: 'How long until your savings reach a target',
   keywords: 'savings goal target how long time to reach years to save deposit house down payment emergency fund retirement million back calculate solve for time when will i have',
   title: 'Savings Goal Calculator: How Long Until You Reach a Target',
-  blurb: 'Say what you have, what you want, and the return you expect — this gives the years it takes. Add a regular payment to see how much sooner it arrives.',
+  blurb: 'Say what you have, what you pay in each period, and the return you expect — this gives how long it takes to reach your target, and how much of it is growth.',
   about: [
     'Every other calculator here is handed a length of time and asked for an amount. This one runs the other way: give it the amount you are aiming at and it returns the time. Enter what you have now, the return you expect each period, and the figure you want to reach.',
     'It is the compound interest equation rearranged. Where that one asks what P grows to in t years, this asks what t makes P reach A, so the years come out of a logarithm rather than a power: t = ln(A/P) / ln(1+r). With a regular payment in the mix the same rearrangement gives t = ln((A + PMT/r) / (P + PMT/r)) / ln(1+r). Both are solved outright, not searched for, so the answer is exact.',
-    'Open "What if you also pay in regularly?" to add a fixed amount each period. This is usually the difference between a goal that arrives and one that does not: a sum left alone doubles on a schedule the rate sets and nothing you do changes it, while a payment every period shortens the wait immediately and keeps shortening it.',
+    'What you pay in each period is usually the difference between a goal that arrives and one that does not. A sum left alone doubles on a schedule the rate sets, and nothing you do changes it; a payment every period shortens the wait immediately and keeps shortening it. Set it to 0 to see how long the sum takes on its own — Additional Information gives that figure either way.',
     'The period is whatever you say it is — enter a monthly rate and a monthly payment and the answer comes back in months. Fractions of a period are left in rather than rounded up, so 7.4 means the goal is passed part way through the eighth. It assumes the rate holds for the whole stretch and nothing is withdrawn, and takes no account of tax, fees or inflation: a target set in today’s money will buy less by the time you reach it.',
   ],
   eq: 't = ln( (A + PMT/r) / (P + PMT/r) ) / ln(1 + r)',
@@ -26,8 +28,7 @@ registerFormula({
     { key: 'now', label: 'What you have now', unit: '$', hint: 'e.g. 20000' },
     { key: 'goal', label: 'What you are aiming for', unit: '$', hint: 'e.g. 100000' },
     { key: 'rate', label: 'Return rate per period', unit: '%', hint: 'e.g. 6' },
-    { key: 'pmt', label: 'Paid in each period', unit: '$', hint: 'blank = nothing added',
-      optional: true, advanced: true },
+    { key: 'pmt', label: 'Paid in each period', unit: '$', hint: '0 if nothing is added' },
   ],
   output: { label: 'Periods to reach it', unit: '' },
   compute: v => {
@@ -53,28 +54,18 @@ registerFormula({
       rows.push({ label: 'Waiting one more period would leave you with', wide: true, detail: true,
                   value: money(balanceAfter(v.now, v.pmt || 0, r, n + 1)) });
     }
+    /* What the payments are buying, in time. Held here rather than in a panel
+       so it is answered whether or not the reader thought to ask. */
+    if (v.pmt > 0) {
+      const alone = periodsToGoal(v.now, 0, r, v.goal);
+      rows.push({ label: 'Paying in nothing, the same sum would take', wide: true, detail: true,
+                  value: alone === null ? 'longer than any term — it never gets there'
+                    : `${alone.toFixed(1)} periods, ${(alone - n).toFixed(1)} more` });
+    }
     return rows;
   },
 
-  /* Kept out of the main form: the question arrives as "how long will what I
-     have take", and the answer to that is worth seeing before the field that
-     changes it. */
-  advanced: {
-    summary: 'What if you also pay in regularly?',
-    intro: 'Left blank, the sum grows on its own and nothing is added. Enter an amount to pay in at the end of every period and the goal arrives sooner — the dotted line on the chart is the balance without it, for comparison.',
-    note: (v, n) => {
-      if (!(v.pmt > 0) || !(n > 0)) return '';
-      const alone = periodsToGoal(v.now, 0, v.rate / 100, v.goal);
-      if (alone === null) {
-        return `Paying in ${money(v.pmt)} a period reaches it in ${n.toFixed(1)}. `
-          + `Left alone, at this rate it never gets there at all.`;
-      }
-      return `Paying in ${money(v.pmt)} a period reaches it in ${n.toFixed(1)} periods `
-        + `instead of ${alone.toFixed(1)} — ${(alone - n).toFixed(1)} sooner, `
-        + `for ${money(v.pmt * n)} paid in along the way.`;
-    },
-  },
-  defaults: { now: 20000, goal: 100000, rate: 6 },
+  defaults: { now: 20000, goal: 100000, rate: 6, pmt: 500 },
   sliders: [
     { key: 'rate', span: 5, floor: 0.1, step: 0.1 },
     { key: 'goal', span: 80000, floor: 1000, step: 1000 },

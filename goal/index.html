@@ -5,17 +5,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Savings Goal Calculator: How Long Until You Reach a Target</title>
-  <meta name="description" content="Say what you have, what you want, and the return you expect — this gives the years it takes. Add a regular payment to see how much sooner it arrives.">
+  <meta name="description" content="Say what you have, what you pay in each period, and the return you expect — this gives how long it takes to reach your target, and how much of it is growth.">
   <link rel="canonical" href="https://useformula.com/goal/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Savings Goal Calculator: How Long Until You Reach a Target">
-  <meta property="og:description" content="Say what you have, what you want, and the return you expect — this gives the years it takes. Add a regular payment to see how much sooner it arrives.">
+  <meta property="og:description" content="Say what you have, what you pay in each period, and the return you expect — this gives how long it takes to reach your target, and how much of it is growth.">
   <meta property="og:url" content="https://useformula.com/goal/">
   <script type="application/ld+json">
   {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://useformula.com/"}, {"@type": "ListItem", "position": 2, "name": "Finance", "item": "https://useformula.com/topics/finance/"}, {"@type": "ListItem", "position": 3, "name": "Savings Goal Calculator", "item": "https://useformula.com/goal/"}]}
   </script>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/styles.css?v=32f89f7a">
+<link rel="stylesheet" href="/styles.css?v=0fec05f8">
 </head>
 <body>
 <div class="wrap">
@@ -37,7 +37,7 @@
       <h2>About Savings Goal</h2>
       <p>Every other calculator here is handed a length of time and asked for an amount. This one runs the other way: give it the amount you are aiming at and it returns the time. Enter what you have now, the return you expect each period, and the figure you want to reach.</p>
       <p>It is the compound interest equation rearranged. Where that one asks what P grows to in t years, this asks what t makes P reach A, so the years come out of a logarithm rather than a power: t = ln(A/P) / ln(1+r). With a regular payment in the mix the same rearrangement gives t = ln((A + PMT/r) / (P + PMT/r)) / ln(1+r). Both are solved outright, not searched for, so the answer is exact.</p>
-      <p>Open &quot;What if you also pay in regularly?&quot; to add a fixed amount each period. This is usually the difference between a goal that arrives and one that does not: a sum left alone doubles on a schedule the rate sets and nothing you do changes it, while a payment every period shortens the wait immediately and keeps shortening it.</p>
+      <p>What you pay in each period is usually the difference between a goal that arrives and one that does not. A sum left alone doubles on a schedule the rate sets, and nothing you do changes it; a payment every period shortens the wait immediately and keeps shortening it. Set it to 0 to see how long the sum takes on its own — Additional Information gives that figure either way.</p>
       <p>The period is whatever you say it is — enter a monthly rate and a monthly payment and the answer comes back in months. Fractions of a period are left in rather than rounded up, so 7.4 means the goal is passed part way through the eighth. It assumes the rate holds for the whole stretch and nothing is withdrawn, and takes no account of tax, fees or inflation: a target set in today’s money will buy less by the time you reach it.</p>
     </section>
     <nav class="related">
@@ -68,7 +68,7 @@
 <script src="/js/topics.js?v=1f0f03e5"></script>
 <script src="/js/index.js?v=c0521558"></script>
 <script src="/js/shared/finance.js?v=39391546"></script>
-<script src="/js/formulas/savings-goal.js?v=7f2f9018"></script>
+<script src="/js/formulas/savings-goal.js?v=f89755a7"></script>
 <script src="/js/boot.js?v=e66f6931"></script>
 </body>
 </html>

@@ -229,7 +229,7 @@ def script_tags(f=None):
 
 
 def page(template, title, description, canonical, prerender,
-         trail=None, formula=None, website=False):
+         trail=None, formula=None, website=False, body_class=''):
     """The shell from index.html with this page's head and body dropped in."""
     out, n = re.subn(
         r'  <!-- page-head.*?  <!-- /page-head -->',
@@ -249,6 +249,10 @@ def page(template, title, description, canonical, prerender,
                      lambda _: 'href="%s"' % stamp('styles.css'), out)
     if n != 1:
         die('tools/shell.html has no <link href="/styles.css"> to stamp')
+    if body_class:
+        out, n = re.subn(r'<body>', '<body class="%s">' % body_class, out)
+        if n != 1:
+            die('tools/shell.html has no plain <body> to put a class on')
     return MARKER + '\n' + out
 
 
@@ -448,7 +452,7 @@ def main():
         '    <h1>%s</h1>\n    <p class="sub">%s</p>\n%s'
         % (html.escape(read_const('HOME_TITLE')), html.escape(read_const('HOME_INTRO')),
            home_links(formulas)),
-        website=True))
+        website=True, body_class='home'))
 
     write(ROOT / '404.html', page(
         template,
