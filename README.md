@@ -14,6 +14,9 @@ tools/shell.html – the page shell every page is built from (hand-edited)
 index.html      – generated home page, do not edit
 styles.css      – all styling
 favicon.svg     – tab icon
+googlec1002dac1a6bd1f0.html – Google Search Console verification. Hand-placed,
+                  must stay at the root and keep its exact contents, or the
+                  property is unverified and the sitemap stops being read.
 js/settings.js  – on/off switches for site features
 js/engine.js    – rendering, routing, calculation, sliders, charts (no data)
 js/topics.js    – the broad topics (Finance, Mechanics, …)
