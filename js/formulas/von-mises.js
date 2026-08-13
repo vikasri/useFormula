@@ -207,6 +207,30 @@ function misesFigureElement(v, u) {
     </g></svg>`;
 }
 
+/* Which space this is. The three principal axes drawn small and to one side:
+   the origin they properly start from is usually far off the drawing, and what
+   the reader needs is their direction, not their position. */
+function axisTriad(x0, y0, ct, st) {
+  const dirs = [
+    ['\u03C3\u2081', 2 / SQRT6, 0],
+    ['\u03C3\u2082', -1 / SQRT6, 1 / Math.SQRT2],
+    ['\u03C3\u2083', -1 / SQRT6, -1 / Math.SQRT2],
+  ];
+  const XI = 1 / SQRT3, LEN = 30;
+  let out = '';
+  for (const [name, a, b] of dirs) {
+    const dx = a, dy = -XI * ct + b * st;
+    const m = Math.hypot(dx, dy);
+    const ex = x0 + dx / m * LEN, ey = y0 + dy / m * LEN;
+    out += `<line x1="${x0}" y1="${y0}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}"
+      stroke="${FIG_GREY}" stroke-width="1.2" marker-end="url(#ax-p)"/>`;
+    out += `<text x="${(x0 + dx / m * (LEN + 11)).toFixed(1)}"
+      y="${(y0 + dy / m * (LEN + 11) + 4).toFixed(1)}" fill="${FIG_GREY}" font-size="11.5"
+      text-anchor="middle" font-style="italic">${name}</text>`;
+  }
+  return out;
+}
+
 /* The yield surface in three dimensions: a cylinder of radius sqrt(2/3)*sy
    wrapped around the line of equal stress in every direction. Viewed with that
    line running up the page and tilted a little towards the reader, so the
@@ -235,6 +259,13 @@ function misesFigure3D(s, u) {
   return `${figOpen(W, H)} aria-label="The von Mises yield surface drawn as a cylinder of radius
     root two thirds times the yield strength, wrapped around the axis of equal stress in every
     direction. The stress state is marked ${inside ? 'inside' : 'outside'} it.">
+    <defs>
+      <marker id="ax-end" viewBox="0 0 8 8" refX="7.5" refY="4" markerWidth="4.5" markerHeight="4.5"
+              orient="auto-start-reverse">
+        <path d="M0 0 L8 4 L0 8 Z" fill="${FIG_INK}" fill-opacity="0.5"/></marker>
+      <marker id="ax-p" viewBox="0 0 8 8" refX="7.5" refY="4" markerWidth="4" markerHeight="4" orient="auto">
+        <path d="M0 0 L8 4 L0 8 Z" fill="${FIG_GREY}"/></marker>
+    </defs>
     <g font-family="-apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif" font-size="12.5">
       <ellipse cx="${X(0)}" cy="${Y(yOf(-L, 0))}" rx="${rx}" ry="${ry}"
                fill="none" stroke="${FIG_BLUE}" stroke-width="1.6" opacity="0.55"/>
@@ -242,8 +273,9 @@ function misesFigure3D(s, u) {
             stroke="${FIG_BLUE}" stroke-width="1.6" opacity="0.75"/>
       <line x1="${X(R)}" y1="${Y(yOf(-L, 0))}" x2="${X(R)}" y2="${Y(yOf(L, 0))}"
             stroke="${FIG_BLUE}" stroke-width="1.6" opacity="0.75"/>
-      <line x1="${X(0)}" y1="${Y(yOf(-L * 1.12, 0))}" x2="${X(0)}" y2="${Y(yOf(L * 1.12, 0))}"
-            stroke="${FIG_INK}" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.5"/>
+      <line x1="${X(0)}" y1="${Y(yOf(-L * 1.2, 0))}" x2="${X(0)}" y2="${Y(yOf(L * 1.2, 0))}"
+            stroke="${FIG_INK}" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.5"
+            marker-start="url(#ax-end)" marker-end="url(#ax-end)"/>
       <ellipse cx="${X(0)}" cy="${Y(yOf(0, 0))}" rx="${rx}" ry="${ry}"
                fill="${FIG_BLUE}" fill-opacity="0.09" stroke="${FIG_BLUE}"
                stroke-width="1.3" stroke-dasharray="4 3" opacity="0.85"/>
@@ -258,6 +290,9 @@ function misesFigure3D(s, u) {
             text-anchor="middle">equal stress in every direction</text>
       <text x="${(W - 6).toFixed(0)}" y="${(+Y(yOf(-L, 0)) + 20).toFixed(1)}" fill="${FIG_BLUE}"
             text-anchor="end">radius &#8730;(2/3)&#183;&#963;&#7522; = ${num(+s.R.toFixed(1))} ${u.stress}</text>
+      <text x="${X(0)}" y="${(+Y(yOf(-L * 1.2, 0)) + 22).toFixed(1)}" fill="${FIG_GREY}"
+            text-anchor="middle">no end either way: no pressure yields it</text>
+      ${axisTriad(38, H - 40, ct, st)}
     </g></svg>`;
 }
 
@@ -339,7 +374,9 @@ registerFormula({
     + "For a ductile material, yielding is predicted when the equivalent stress reaches the material's yield strength.",
   about: [
     'A point in a loaded part is rarely pulled in one direction only. It is stretched one way, squeezed another and sheared at the same time, which is six numbers, and a material data sheet gives you one: the yield strength, measured by pulling a bar. Von Mises is how the six are reduced to something that can be compared with the one.',
-    'What it measures is distortion — change of shape, not change of size. Squeeze something equally hard from every direction and it gets smaller without changing shape, and a ductile metal will take enormous pressure that way without yielding. That is why the yield surface is a cylinder rather than a closed shape: it runs on forever along the line of equal stress in every direction, and only distance away from that line counts.',
+    'What it measures is distortion — change of shape, not change of size. Squeeze something equally hard from every direction and it gets smaller without changing shape, and a ductile metal will take enormous pressure that way without yielding.',
+    'That is why the surface is a cylinder and not a closed shape like an ellipsoid. Add the same stress to all three principal stresses and every difference in the equation is unchanged, so the answer does not move: a point on the surface stays on it however far you slide along the line of equal stress. A closed surface would have to yield at some pressure, and metals do not. Criteria that do close, like Drucker-Prager, are for soil and concrete, where pressure genuinely matters.',
+    'The ellipse in the second drawing is that same cylinder, cut. The plane of constant σ₃ meets the axis at 35.3°, and an angled cut through a round cylinder is an ellipse — one whose short radius is exactly the cylinder\'s radius and whose long one is √3 times it. Straight across the cylinder instead, square to its axis, the cut is a circle.',
     'Tresca is drawn alongside because it answers the same question differently, using the largest shear stress rather than the distortion energy. Its hexagon sits inside the ellipse and touches it at six points, so Tresca never permits more than von Mises and sometimes permits about 15% less. Codes often prefer it for exactly that reason.',
     'This is a criterion for ductile materials that yield, not for brittle ones that crack, and it says nothing about fatigue, fracture, buckling or creep. The stresses are taken as given and elastic. There is no factor of safety built in beyond the one reported, and this follows no design code.',
   ],
@@ -430,9 +467,11 @@ registerFormula({
           + 'symmetric, and why six numbers describe it rather than nine.' },
       { svg: misesFigure3D(s, u),
         title: 'The yield surface, and where this state sits in it',
-        caption: 'A cylinder around the line of equal stress in every direction. Sliding along '
-          + 'that line changes the size of a part, not its shape, so it never causes yield — only '
-          + 'the distance out from it does. Yield begins where the state reaches the wall.' },
+        caption: 'Drawn in principal stress space — the three axes are σ₁, σ₂ and σ₃, and the '
+          + 'triad shows which way they run. The surface is a cylinder, not a closed shape: '
+          + 'sliding along the line of equal stress changes the size of a part, not its shape, so '
+          + 'it never causes yield however far you go. Only the distance out from that line '
+          + 'counts, which is why the radius is the only scale that matters here.' },
       { svg: misesFigure2D(s, u),
         title: 'The same surface, cut through σ₃',
         caption: 'Inside the ellipse the material is elastic; on it, yielding starts. Tresca’s '
