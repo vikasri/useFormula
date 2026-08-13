@@ -20,7 +20,7 @@ registerFormula({
   ],
   diagram: '/img/thick-wall-cylinder.svg',
   diagramAlt: 'Section across a thick wall cylinder, showing inner radius a, outer radius b, internal and external pressure, and the hoop, radial and axial stresses.',
-  eq: 'σθ,max = (pᵢ(a² + b²) − 2pₒb²) / (b² − a²)',
+  eq: 'σθ(a) = (pᵢ(a² + b²) − 2pₒb²) / (b² − a²)',
   inputs: [
     { key: 'sys', label: 'Units', full: true,
       options: [{ value: 0, label: 'SI (MPa, mm)' },
@@ -54,7 +54,10 @@ registerFormula({
       { label: 'Hoop stress at the outer surface', value: S(out.hoop) },
       { label: 'Axial stress, open ends', value: S(0) },
       { label: 'Axial stress, capped ends', value: S(bore.axial) },
-      { label: 'Maximum shear at the internal surface', detail: true, value: S((bore.hoop - bore.radial) / 2) },
+      /* A magnitude, so unsigned — and hoop against radial is the in-plane
+         pair, which is the whole story only while axial sits between them. */
+      { label: 'Maximum in-plane shear at the internal surface', detail: true,
+        value: S(Math.abs(bore.hoop - bore.radial) / 2) },
       { label: 'Outer diameter', detail: true,
         value: num(+(v.di + 2 * v.t).toFixed(3)) + ' ' + u.length },
       { label: 'Von Mises at the internal surface, open ends then capped', wide: true, detail: true,
@@ -62,12 +65,17 @@ registerFormula({
              + `then ${S(vonMises(bore.hoop, bore.axial, bore.radial))}` },
     ];
     /* Thin-wall is pd/2t for a cylinder — twice the sphere's, for the same
-       reason a sphere is the stronger shape. */
-    const thin = v.p * v.di / (2 * v.t);
-    rows.push({ label: 'Thin-wall estimate pd/2t, against the figure above',
+       reason a sphere is the stronger shape. What drives it is the pressure
+       difference across the wall: equal pressure inside and out puts no hoop
+       stress anywhere, whatever the two figures are. */
+    const dp = v.p - (v.po || 0);
+    const thin = dp * v.di / (2 * v.t);
+    rows.push({ label: `Thin-wall estimate ${v.po > 0 ? '(pᵢ−pₒ)' : 'p'}d/2t, d the inner diameter`,
                 wide: true, detail: true,
+                /* Both are the same sign, so the comparison is of magnitudes:
+                   under external pressure both go negative together. */
                 value: `${S(thin)}, ${Math.abs((thin / hoop - 1) * 100).toFixed(1)}% `
-                     + `${thin < hoop ? 'under' : 'over'}` });
+                     + `${Math.abs(thin) < Math.abs(hoop) ? 'under' : 'over'} the figure above` });
     rows.push({ label: 'Wall ratio b/a', detail: true, value: (b / a).toFixed(3) });
     return rows;
   },
@@ -80,8 +88,15 @@ registerFormula({
       const a = v.di / 2, b = a + v.t;
       const alone = cylinderStresses(v.p, 0, a, b, a).hoop;
       const u = vesselUnits(v);
+      const outer = cylinderStresses(v.p, v.po, a, b, b).hoop;
+      /* Nearly always the internal surface is the worse of the two, but with
+         pressure outside it need not be, and the headline names a surface
+         rather than claiming to be the larger. */
+      const swap = Math.abs(outer) > Math.abs(hoop)
+        ? ` Here the outer surface carries more than the inner: ${num(+outer.toFixed(3))} ${u.pressure} against ${num(+hoop.toFixed(3))}.`
+        : '';
       return `${num(+v.po.toFixed(3))} ${u.pressure} outside brings the hoop stress at the internal surface to `
-        + `${num(+hoop.toFixed(3))} ${u.pressure}, from ${num(+alone.toFixed(3))} with nothing outside.`;
+        + `${num(+hoop.toFixed(3))} ${u.pressure}, from ${num(+alone.toFixed(3))} with nothing outside.` + swap;
     },
   },
   defaults: { sys: 0, p: 10, di: 200, t: 20 },

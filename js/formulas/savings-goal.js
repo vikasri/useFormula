@@ -20,9 +20,9 @@ registerFormula({
   about: [
     'Most calculators here take a term and give you an amount. This one goes the other way. You give it the figure you want and it returns the years, worked out directly rather than by trial.',
     'What you put in each year usually decides whether the target is reachable at all. Set it to zero to see how long the starting sum needs on its own, which is normally a very long time.',
-    'The answer is not rounded up: 23.3 years means you cross the line during the twenty-fourth. Payments are taken at each year end, the rate is held flat, and nothing comes out along the way. No tax, no fees, no inflation.',
+    'The answer is not rounded up: 23.4 years means you cross the line partway through the twenty-fourth, on growth alone. Payments land at each year end and are counted whole — a target reached before the next one is due is reached by the balance growing, not by part of a payment arriving early. The rate is held flat, nothing comes out along the way, and there is no tax, no fees and no inflation.',
   ],
-  eq: 't = ln( (A + PMT/r) / (P + PMT/r) ) / ln(1 + r)',
+  eq: 'A = P(1 + r)ᵗ + PMT · ((1 + r)ᵗ − 1) / r,  solved for t',
   inputs: [
     { key: 'now', label: 'What you have now', unit: '$', hint: 'e.g. 10000' },
     { key: 'goal', label: 'What you are aiming for', unit: '$', hint: 'e.g. 200000' },
@@ -40,9 +40,18 @@ registerFormula({
     const r = v.rate / 100;
     const rows = [];
     if (!(n > 0)) return rows;
-    const paidIn = (v.pmt || 0) * n;
-    rows.push({ label: 'Of the target, from growth', value: money(v.goal - v.now - paidIn) },
-              { label: 'Of the target, paid in', value: money(v.now + paidIn) });
+    /* Whole payments only. The fraction of a period at the end is growth
+       after the last one, not part of another. */
+    const paidIn = (v.pmt || 0) * Math.floor(n);
+    /* Split what is actually in the account, not the target. A payment that
+       takes the balance past the goal overshoots it, and charging that
+       overshoot against growth would make growth come out negative. */
+    const final = balanceAfter(v.now, v.pmt || 0, r, n);
+    rows.push({ label: 'What growth added', value: money(final - v.now - paidIn) },
+              { label: 'What you put in', value: money(v.now + paidIn) });
+    if (final > v.goal * 1.005) {
+      rows.push({ label: 'Balance when you get there', detail: true, value: money(final) });
+    }
     /* Half the wait is a fair sense of progress only when nothing compounds;
        with growth the balance is behind halfway at the halfway mark. */
     const midway = balanceAfter(v.now, v.pmt || 0, r, n / 2);
@@ -67,12 +76,14 @@ registerFormula({
     const r = v.rate / 100;
     const n = periodsToGoal(v.now, v.pmt, r, v.goal);
     if (n === null || !(n > 0)) return { points: [] };
-    const span = n * 1.15, N = Math.min(Math.max(8, Math.round(span)), 60);
-    const curve = fn => {
-      const out = [];
-      for (let i = 0; i <= N; i++) { const p = i / N * span; out.push({ x: p, y: fn(p) }); }
-      return out;
-    };
+    /* Sampled at year ends, where the balance is actually defined, plus the
+       answer itself so the crossing lands where it is claimed to. */
+    const span = Math.ceil(n * 1.15), step = Math.max(1, Math.ceil(span / 60));
+    const at = [];
+    for (let y = 0; y <= span; y += step) at.push(y);
+    at.push(n);
+    at.sort((i, j) => i - j);
+    const curve = fn => at.map(p => ({ x: p, y: fn(p) }));
     /* The goal drawn flat across is what the balance is climbing to meet; where
        they cross is the answer, which is the whole point of the picture. */
     const lines = [{ points: curve(() => v.goal), label: 'The target', cls: 'green' }];

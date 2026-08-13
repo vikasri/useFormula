@@ -30,14 +30,14 @@
     <div class="formula-box">
       <div class="formula-head"><div class="formula-title"><h1>Savings Goal Calculator</h1></div></div>
       <p class="sub">How long until your savings reach a target</p>
-      <div class="eq">t = ln( (A + PMT/r) / (P + PMT/r) ) / ln(1 + r)</div>
+      <div class="eq">A = P(1 + r)ᵗ + PMT · ((1 + r)ᵗ − 1) / r,  solved for t</div>
       <p class="notes">Enter what you have now, what you are aiming for, annual return rate and paid in each year to work out the how long until your savings reach a target.</p>
     </div>
     <section class="explainer">
       <h2>About Savings Goal</h2>
       <p>Most calculators here take a term and give you an amount. This one goes the other way. You give it the figure you want and it returns the years, worked out directly rather than by trial.</p>
       <p>What you put in each year usually decides whether the target is reachable at all. Set it to zero to see how long the starting sum needs on its own, which is normally a very long time.</p>
-      <p>The answer is not rounded up: 23.3 years means you cross the line during the twenty-fourth. Payments are taken at each year end, the rate is held flat, and nothing comes out along the way. No tax, no fees, no inflation.</p>
+      <p>The answer is not rounded up: 23.4 years means you cross the line partway through the twenty-fourth, on growth alone. Payments land at each year end and are counted whole — a target reached before the next one is due is reached by the balance growing, not by part of a payment arriving early. The rate is held flat, nothing comes out along the way, and there is no tax, no fees and no inflation.</p>
     </section>
     <nav class="related">
       <h2>More Finance calculators</h2>
@@ -68,8 +68,8 @@
 <script src="/js/engine.js?v=5a94408d"></script>
 <script src="/js/topics.js?v=8f2de21a"></script>
 <script src="/js/index.js?v=4224d327"></script>
-<script src="/js/shared/finance.js?v=39391546"></script>
-<script src="/js/formulas/savings-goal.js?v=ce20ebc7"></script>
+<script src="/js/shared/finance.js?v=8f0c2661"></script>
+<script src="/js/formulas/savings-goal.js?v=8c3522f2"></script>
 <script src="/js/boot.js?v=e66f6931"></script>
 </body>
 </html>

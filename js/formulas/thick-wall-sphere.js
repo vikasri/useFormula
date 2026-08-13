@@ -20,7 +20,7 @@ registerFormula({
   ],
   diagram: '/img/thick-wall-sphere.svg',
   diagramAlt: 'Section through a thick wall sphere, showing inner radius a, outer radius b, internal and external pressure, and the hoop and radial stresses.',
-  eq: 'σθ,max = (pᵢ(2a³ + b³) − 3pₒb³) / (2(b³ − a³))',
+  eq: 'σθ(a) = (pᵢ(2a³ + b³) − 3pₒb³) / (2(b³ − a³))',
   inputs: [
     { key: 'sys', label: 'Units', full: true,
       options: [{ value: 0, label: 'SI (MPa, mm)' },
@@ -49,19 +49,25 @@ registerFormula({
       { label: 'Radial stress at the internal surface', value: S(bore.radial) },
       { label: 'Outer diameter', value: num(+(v.di + 2 * v.t).toFixed(3)) + ' ' + u.length },
       { label: 'Hoop stress at the outer surface', detail: true, value: S(out.hoop) },
-      { label: 'Maximum shear at the internal surface', detail: true, value: S((bore.hoop - bore.radial) / 2) },
+      /* A magnitude, so unsigned. Hoop acts equally in two directions, so
+         this pair is the largest of the three and there is no in-plane
+         qualifier to make. */
+      { label: 'Maximum shear at the internal surface', detail: true,
+        value: S(Math.abs(bore.hoop - bore.radial) / 2) },
       /* Hoop acts in both surface directions, so two of the three principals
          are equal and von Mises collapses to the hoop-radial difference. */
       { label: 'Von Mises at the internal surface', detail: true,
         value: S(vonMises(bore.hoop, bore.hoop, bore.radial)) },
     ];
     /* Thin-wall is pd/4t for a sphere. How far it is out is the answer to
-       "did I need the thick-wall equations at all". */
-    const thin = v.p * v.di / (4 * v.t);
-    rows.push({ label: 'Thin-wall estimate pd/4t, against the figure above',
+       "did I need the thick-wall equations at all". What drives it is the
+       pressure difference across the wall, not the figure inside on its own. */
+    const dp = v.p - (v.po || 0);
+    const thin = dp * v.di / (4 * v.t);
+    rows.push({ label: `Thin-wall estimate ${v.po > 0 ? '(pᵢ−pₒ)' : 'p'}d/4t, d the inner diameter`,
                 wide: true, detail: true,
                 value: `${S(thin)}, ${Math.abs((thin / hoop - 1) * 100).toFixed(1)}% `
-                     + `${thin < hoop ? 'under' : 'over'}` });
+                     + `${Math.abs(thin) < Math.abs(hoop) ? 'under' : 'over'} the figure above` });
     rows.push({ label: 'Wall ratio b/a', detail: true, value: (b / a).toFixed(3) });
     return rows;
   },
@@ -76,8 +82,15 @@ registerFormula({
       const a = v.di / 2, b = a + v.t;
       const alone = sphereStresses(v.p, 0, a, b, a).hoop;
       const u = vesselUnits(v);
+      const outer = sphereStresses(v.p, v.po, a, b, b).hoop;
+      /* Nearly always the internal surface is the worse of the two, but with
+         pressure outside it need not be, and the headline names a surface
+         rather than claiming to be the larger. */
+      const swap = Math.abs(outer) > Math.abs(hoop)
+        ? ` Here the outer surface carries more than the inner: ${num(+outer.toFixed(3))} ${u.pressure} against ${num(+hoop.toFixed(3))}.`
+        : '';
       return `${num(+v.po.toFixed(3))} ${u.pressure} outside brings the hoop stress at the internal surface to `
-        + `${num(+hoop.toFixed(3))} ${u.pressure}, from ${num(+alone.toFixed(3))} with nothing outside.`;
+        + `${num(+hoop.toFixed(3))} ${u.pressure}, from ${num(+alone.toFixed(3))} with nothing outside.` + swap;
     },
   },
   defaults: { sys: 0, p: 10, di: 200, t: 20 },

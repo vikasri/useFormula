@@ -72,30 +72,50 @@ function annuityPaidIn(PMT, g, n) {
 }
 
 /* Periods needed to get from `now` to `goal`, earning r per period and paying
-   in PMT at the end of each one. Rearranged from the balance after n periods,
+   in PMT at the end of each one.
 
-     A = P(1+r)ⁿ + PMT · ((1+r)ⁿ − 1) / r
-       = (1+r)ⁿ · (P + PMT/r) − PMT/r
-
-   which solves exactly, no searching:
+   Rearranging the balance equation gives a closed form,
 
      n = ln( (A + PMT/r) / (P + PMT/r) ) / ln(1+r)
 
-   Returns null when the goal is out of reach — no growth and nothing paid in,
-   or a balance the payments can never lift because they only replace what the
-   negative rate takes. */
+   but read literally it answers a different question. A fractional n carries a
+   fractional payment with it, and the payments are not fractional: nothing is
+   paid in until the period ends. Someone with nothing saved, putting away
+   4,000 a year against a 2,000 goal, gets 0.51 periods out of that formula
+   while their balance is still zero — the first payment has not happened.
+
+   So the periods are counted one at a time. Within a period only growth moves
+   the balance, and the fraction returned is the point during it where growth
+   alone crosses the goal. Whole numbers still mean a payment landing exactly
+   on the target.
+
+   Returns null when the goal is out of reach: nothing to grow and nothing paid
+   in, or a balance the payments can never lift because they only replace what
+   a negative rate takes. */
 function periodsToGoal(now, pmt, r, goal) {
   if (goal <= now) return 0;
-  if (r === 0) return pmt > 0 ? (goal - now) / pmt : null;
-  const base = pmt / r;
-  if (now + base <= 0 || goal + base <= 0) return null;
-  const n = Math.log((goal + base) / (now + base)) / Math.log(1 + r);
-  return isFinite(n) && n > 0 ? n : null;
+  let bal = now;
+  /* Far longer than any answer worth printing, and the loop cannot run away. */
+  for (let n = 0; n < 2000; n++) {
+    const grown = r === 0 ? bal : bal * (1 + r);
+    /* Reached partway through, on growth alone, before the next payment. */
+    if (grown >= goal && bal > 0 && r > 0) {
+      return n + Math.log(goal / bal) / Math.log(1 + r);
+    }
+    const next = grown + pmt;
+    if (!(next > bal)) return null;         // going nowhere: it never arrives
+    bal = next;
+    if (bal >= goal) return n + 1;          // the payment itself takes it over
+  }
+  return null;
 }
 
-/* Balance after n periods, same convention: payment at the end of each. */
+/* Balance at time n, on the same convention: payments land at the end of each
+   whole period and only growth moves it in between. */
 function balanceAfter(now, pmt, r, n) {
   if (n <= 0) return now;
-  if (r === 0) return now + pmt * n;
-  return now * Math.pow(1 + r, n) + pmt * (Math.pow(1 + r, n) - 1) / r;
+  const whole = Math.floor(n), part = n - whole;
+  const paid = r === 0 ? now + pmt * whole
+    : now * Math.pow(1 + r, whole) + pmt * (Math.pow(1 + r, whole) - 1) / r;
+  return part > 0 ? paid * Math.pow(1 + r, part) : paid;
 }
