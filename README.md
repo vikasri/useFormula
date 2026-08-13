@@ -73,8 +73,16 @@ Skipping it leaves the new formula reachable in the app but with no page of its 
 and missing from `sitemap.xml` and the home page. The script fails loudly rather than writing a half-built
 site: an unknown topic, a duplicate id or two formulas wanting the same address all stop it.
 
-A formula sits at its `id` unless it sets `slug`, which puts a much-used calculator on a
-shorter address — `loan-payment` has `slug: 'loan'` and answers at `/loan/`.
+A formula sits at its `id` unless it sets `slug`. Addresses are **one word wherever the
+word is free** — `/loan/`, `/annuity/`, `/compound/`, `/force/`, `/kinetic/`, `/work/` —
+and only take a hyphen when one word will not do the job: `/growing-annuity/` because
+`/annuity/` is the plain annuity, `/present-value/` because no single word says it.
+Keep to that when adding formulas; the build refuses two formulas wanting the same
+address, or a slug that would shadow a file at the site root.
+
+Changing a slug is free today because nothing is indexed yet. Once Google has a page,
+changing its address loses whatever standing it had — GitHub Pages cannot issue a
+redirect, so the old URL would just 404. Pick the address when you add the formula.
 
 The older `#formula/<id>` addresses still resolve, so links shared before this change
 keep working.

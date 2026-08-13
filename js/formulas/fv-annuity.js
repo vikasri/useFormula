@@ -1,6 +1,7 @@
 /* fv-annuity. `money`, `num`, `kmoney` come from engine.js; loan helpers from js/shared/finance.js. */
 registerFormula({
   id: 'fv-annuity',
+  slug: 'annuity',
   topic: 'finance',
   name: 'Future Value of an Annuity',
   short: 'Value of Annuity',

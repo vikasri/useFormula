@@ -1,6 +1,7 @@
 /* compound-interest. `money`, `num`, `kmoney` come from engine.js; loan helpers from js/shared/finance.js. */
 registerFormula({
   id: 'compound-interest',
+  slug: 'compound',
   topic: 'finance',
   name: 'Compound Interest (Future Value)',
   short: 'Compound Interest',

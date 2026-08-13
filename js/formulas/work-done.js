@@ -1,6 +1,7 @@
 /* work-done. `num` comes from engine.js. */
 registerFormula({
   id: 'work-done',
+  slug: 'work',
   topic: 'mechanics',
   name: 'Work Done',
   desc: 'Work from a force acting over a distance',

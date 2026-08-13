@@ -1,6 +1,7 @@
 /* kinetic-energy. `num` comes from engine.js. */
 registerFormula({
   id: 'kinetic-energy',
+  slug: 'kinetic',
   topic: 'mechanics',
   name: 'Kinetic Energy',
   desc: 'Energy of a moving object',

@@ -1,6 +1,7 @@
 /* potential-energy. `num` comes from engine.js. */
 registerFormula({
   id: 'potential-energy',
+  slug: 'potential',
   topic: 'mechanics',
   name: 'Gravitational Potential Energy',
   short: 'Potential Energy',

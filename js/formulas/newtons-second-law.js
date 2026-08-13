@@ -1,6 +1,7 @@
 /* newtons-second-law. `num` comes from engine.js. */
 registerFormula({
   id: 'newtons-second-law',
+  slug: 'force',
   topic: 'mechanics',
   name: "Newton's Second Law (Force)",
   short: 'Force (F = ma)',

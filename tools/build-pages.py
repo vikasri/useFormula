@@ -358,8 +358,13 @@ def main():
     slugs = [f.get('slug') or f['id'] for f in formulas]
     if len(set(slugs)) != len(slugs):
         die('two formulas want the same address: ' + ', '.join(sorted(slugs)))
+    # A slug becomes a directory at the site root, so it must not shadow a
+    # file already sitting there (styles.css, sitemap.xml, CNAME, …) or one of
+    # the directories the site reserves.
+    reserved = {'topics', 'about', 'js', 'tools'}
+    reserved |= {item.name for item in ROOT.iterdir() if item.is_file()}
     for s in slugs:
-        if s in ('topics', 'about', 'js', 'tools', 'index.html'):
+        if s in reserved:
             die('slug %r collides with a path the site already uses' % s)
 
     write(ROOT / 'js' / 'index.js', index_js(formulas))
