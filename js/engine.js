@@ -21,8 +21,8 @@
      series   : optional function(v) -> { points, xLabel, title, yTickFmt,
                   label, extra: [{ points, label, cls }] }   extra = more lines
      extras   : optional function(v, answer) -> [{ label, value, wide, detail }]
-                  listed under the answer, two per row; detail rows are
-                  tucked behind a "Show detailed breakdown" toggle
+                  listed under the answer, two per row; detail rows go
+                  below the chart under "Additional Information"
      advanced : optional { summary, intro, note(v, answer) -> string }
                   the panel holding the advanced inputs
      short    : optional shorter name for cards and shortcuts
@@ -311,6 +311,7 @@ function renderFormula(id) {
       <a onclick="location.hash='topic/${topic.id}'">${esc(topic.name)}</a> ›
       ${esc(f.name)}
     </div>` + formulaBoxHTML(f);
+  (f.sliders || []).forEach(s => paintSlider(document.getElementById('sl_' + s.key)));
   if (f.series) doCalc(f.id);
 }
 
@@ -352,6 +353,7 @@ function doCalc(id) {
         if (sl) sl.value = v[s.key];
         if (sv) sv.textContent = v[s.key] + (inp.unit === '%' ? '%' : '');
       }
+      paintSlider(sl);
     });
     if (f.series) {
       const wrap = document.getElementById('chartWrap');
@@ -411,20 +413,16 @@ function renderExtras(f, v, out) {
   el.innerHTML = `<div class="extra-grid">${main.map(cell).join('')}</div>`;
   el.classList.toggle('show', main.length > 0);
 
-  /* The rest of the numbers live below the chart, behind a toggle. It is
-     rebuilt on every calculation, so remember whether it was open. */
+  /* The rest of the numbers live below the chart. A formula has a page to
+     itself, so there is room to show them outright. */
   const box = document.getElementById('extrasDetail');
   if (!box) return;
-  const was = box.querySelector('details.breakdown');
-  const wasOpen = was ? was.open : false;
   box.innerHTML = detail.length ? `
-    <details class="breakdown">
-      <summary>More details</summary>
+    <section class="breakdown">
+      <h2>Additional Information</h2>
       <div class="extra-grid">${detail.map(cell).join('')}</div>
-    </details>` : '';
+    </section>` : '';
   box.classList.toggle('show', detail.length > 0);
-  const now = box.querySelector('details.breakdown');
-  if (now) now.open = wasOpen;
 }
 
 function sliderRange(s, val) {
@@ -432,6 +430,15 @@ function sliderRange(s, val) {
   if (s.floor != null && min < s.floor) min = s.floor;
   if (s.ceil != null && max > s.ceil) max = s.ceil;
   return { min: +min.toFixed(4), max: +max.toFixed(4) };
+}
+
+/* Fills the track up to the handle. WebKit has no pseudo-element for the
+   filled part, so the share is handed to CSS as --pct. */
+function paintSlider(sl) {
+  if (!sl) return;
+  const min = parseFloat(sl.min), max = parseFloat(sl.max), val = parseFloat(sl.value);
+  const pct = max > min ? ((val - min) / (max - min)) * 100 : 0;
+  sl.style.setProperty('--pct', Math.max(0, Math.min(100, pct)) + '%');
 }
 
 function recenterSlider(s, val) {
@@ -458,7 +465,8 @@ function onField(id, key) {
 function onSlider(id, key, val) {
   const input = document.getElementById('in_' + key);
   if (input) input.value = val;
-  doCalc(id);
+  paintSlider(document.getElementById('sl_' + key));   // keep the fill under the
+  doCalc(id);                                          // handle even if the calc fails
 }
 
 /* series.points is the main line (drawn with a filled area under it).
@@ -531,19 +539,10 @@ function renderAbout() {
       browser data removes it, and favorites do not follow you to another device.</p>
 
       <h2>Disclaimer</h2>
-      <p>useFormula is for general information and education only. It is not
-      professional advice of any kind, including financial, investment, tax, legal,
-      accounting or engineering advice.</p>
-      <p>Every result is an estimate produced by a standard formula from the numbers
-      you enter. Real outcomes depend on details these calculators do not model. A
-      loan payment, for example, assumes a fixed interest rate and equal monthly
-      payments, and leaves out fees, taxes, insurance and early-repayment charges.</p>
-      <p>Check any result with additional professional resources before you act on
-      it. Do not rely on useFormula alone for a decision that matters.</p>
-      <p>This site is provided as is, without warranty of any kind, express or
-      implied. To the fullest extent permitted by law, useFormula and its authors
-      accept no liability for any loss or damage arising from use of this site or
-      from reliance on its results. You use it entirely at your own risk.</p>
+      <p>Results are estimates for general informational purposes only and are not
+      professional advice. Verify all results with qualified professionals and
+      authoritative sources before relying on them. useFormula disclaims any
+      liability to the fullest extent permitted by law.</p>
     </div>`;
 }
 
