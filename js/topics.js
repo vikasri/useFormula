@@ -5,5 +5,5 @@
    changes, so a renamed topic does not throw away the page it already had. */
 registerTopics([
   { id: 'finance',     icon: '💰', name: 'Finance',              desc: 'Loans, annuities, growing income' },
-  { id: 'mechanics',   icon: '⚙️', name: 'Engineering Mechanics', desc: 'Work done by a force' },
+  { id: 'mechanics',   icon: '⚙️', name: 'Engineering Mechanics', desc: 'Pressure vessels, work and energy' },
 ]);

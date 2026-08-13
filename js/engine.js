@@ -12,8 +12,14 @@
    Each formula:
      id, topic, name, desc, keywords
      eq       : human-readable equation string (display only)
-     inputs   : [{ key, label, unit, hint, optional, advanced }]
+     inputs   : [{ key, label, unit, hint, optional, advanced, full, options }]
                   advanced inputs move to a collapsed panel by the chart
+                  full    : the field spans the whole row
+                  options : [{ value, label }] renders a select, not a number
+     unitsFor : optional function(v) -> { inputKey: 'unit', … }
+                  relabels the units after every calculation, for a formula
+                  carrying a unit-system selector. output.unit may be a
+                  function(v) too.
      output   : { label, unit }
      compute  : function(v) -> number   (v = {key: value})
      format   : optional function(n) -> string  (defaults to num)
@@ -304,11 +310,26 @@ function doTopicSearch(topicId, q) {
 /* The calculator itself: title, inputs, answer, breakdown, chart, sliders. */
 function formulaBoxHTML(f) {
   const dflt = f.defaults || {};
-  const fieldHTML = inp => `
-    <div class="field${inp.optional ? ' optional' : ''}">
-      <label>${esc(inp.label)}${inp.unit ? ` <span class="unit">(${esc(inp.unit)})</span>` : ''}</label>
-      <input type="number" step="any" id="in_${inp.key}" placeholder="${esc(inp.hint || '')}"${dflt[inp.key] != null ? ` value="${dflt[inp.key]}"` : ''}${f.series ? ` onchange="onField('${f.id}','${inp.key}')"` : ''}>
+  const fieldHTML = inp => {
+    /* The unit span carries an id so a formula with a unit-system selector can
+       relabel it without redrawing the form and losing what was typed. */
+    const unit = inp.unit ? ` <span class="unit" id="u_${inp.key}">(${esc(inp.unit)})</span>` : '';
+    /* `options` makes the field a choice rather than a quantity. Always wired
+       to recalculate: picking one can change what every other field means. */
+    const control = inp.options
+      ? `<select id="in_${inp.key}" onchange="onField('${f.id}','${inp.key}')">` +
+        inp.options.map(o =>
+          `<option value="${o.value}"${dflt[inp.key] == o.value ? ' selected' : ''}>${esc(o.label)}</option>`
+        ).join('') + `</select>`
+      : `<input type="number" step="any" id="in_${inp.key}" placeholder="${esc(inp.hint || '')}"` +
+        `${dflt[inp.key] != null ? ` value="${dflt[inp.key]}"` : ''}` +
+        `${f.series ? ` onchange="onField('${f.id}','${inp.key}')"` : ''}>`;
+    return `
+    <div class="field${inp.optional ? ' optional' : ''}${inp.full ? ' full' : ''}">
+      <label>${esc(inp.label)}${unit}</label>
+      ${control}
     </div>`;
+  };
 
   /* Inputs marked advanced do not change the headline answer, so they are kept
      out of the main form and tucked into a panel next to the chart. */
@@ -408,6 +429,15 @@ function doCalc(id) {
     }
     v[inp.key] = parseFloat(raw);
   }
+  /* Relabel before anything else, so switching unit system takes effect even
+     when a field is still empty and the calculation cannot run. */
+  if (f.unitsFor) {
+    const u = f.unitsFor(v) || {};
+    Object.keys(u).forEach(k => {
+      const el = document.getElementById('u_' + k);
+      if (el) el.textContent = '(' + u[k] + ')';
+    });
+  }
   box.classList.add('show');
   if (missing.length) {
     box.classList.add('error');
@@ -421,7 +451,8 @@ function doCalc(id) {
     box.classList.remove('error');
     labEl.textContent = f.output.label;
     const shown = (f.format || num)(out);
-    valEl.innerHTML = esc(shown) + (f.output.unit ? ` <span class="u">${esc(f.output.unit)}</span>` : '');
+    const outUnit = typeof f.output.unit === 'function' ? f.output.unit(v) : f.output.unit;
+    valEl.innerHTML = esc(shown) + (outUnit ? ` <span class="u">${esc(outUnit)}</span>` : '');
     (f.sliders || []).forEach(s => {
       const sl = document.getElementById('sl_' + s.key);
       const sv = document.getElementById('sv_' + s.key);

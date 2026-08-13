@@ -189,6 +189,18 @@ h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.5px; }
   outline: none;
   transition: background .12s ease, border-color .12s ease, box-shadow .12s ease;
 }
+/* A choice, not a quantity: same box as the number fields so the form reads
+   as one row of controls, but in the text colour rather than the number blue. */
+.field.full { grid-column: 1 / -1; }
+.field select {
+  width: 100%; padding: 12px 14px; font-size: 17.5px;
+  background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: var(--field-radius); color: var(--text);
+  font-weight: 600; outline: none; cursor: pointer;
+  transition: background .12s ease, border-color .12s ease, box-shadow .12s ease;
+}
+.field select:hover { border-color: var(--muted); }
+.field select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .field input:hover { border-color: var(--muted); }
 .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .field input::placeholder { color: var(--muted); opacity: .7; }
