@@ -14,6 +14,6 @@ const SETTINGS = {
 
   /* A line shown at the bottom of every calculator.
      Set it to '' to remove it everywhere. */
-  missionLine: 'Our goal is to make financial knowledge and tools available for every consumer',
+  missionLine: 'Our goal is to make useful knowledge and tools available to everyone',
 
 };

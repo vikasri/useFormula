@@ -117,6 +117,7 @@ h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.5px; }
   background: transparent; border: 1.5px dashed var(--border);
   box-shadow: none; color: var(--muted); font-size: 12.5px; cursor: default;
 }
+.card.slot.wide-slot { grid-column: 1 / -1; min-height: 40px; }
 .featured-grid .card.slot:hover {
   transform: none; background: transparent; border-color: var(--border); box-shadow: none;
 }
@@ -371,8 +372,19 @@ footer a:hover { color: var(--accent); }
   .featured-grid .card .topic-tag { display: none; }   /* no room for it beside the name */
   .featured-grid .heart { top: 2px; right: 1px; font-size: 14px; padding: 2px 3px; }
   .card.slot, .featured-grid .card.slot { font-size: 11px; min-height: 46px; padding: 8px 6px; }
+  .card.slot.wide-slot { font-size: 12.5px; min-height: 38px; }
+  /* Topic tiles: the icon was taking a fifth of the tile on a phone */
+  .card { padding: 13px 14px; }
+  .card .icon { font-size: 20px; margin-bottom: 4px; }
+  .card .title { font-size: 18px; }
+  .card .desc { font-size: 14.5px; }
+  .card .count { font-size: 15px; margin-top: 7px; }
   .field input, .search input { font-size: 17px; }   /* 16px avoids iOS focus-zoom */
-  .fields { gap: 12px 8px; }
+  /* One field per row on a phone. Two columns leaves about 160px for a label,
+     and "Return rate per period (%)" does not fit, so the unit was orphaning
+     onto a line of its own on nearly every calculator. Full width also gives a
+     bigger tap target. */
+  .fields { grid-template-columns: 1fr; gap: 11px; }
   .field label { font-size: 14.5px; margin-bottom: 4px; }
   .field .unit { margin-left: 3px; font-size: 12.5px; }
   .field input { padding: 11px 10px; }

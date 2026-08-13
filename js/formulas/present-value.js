@@ -1,10 +1,19 @@
-/* present-value. `money`, `num`, `kmoney` come from engine.js; loan helpers from js/shared/finance.js. */
+/* present-value. `money` comes from engine.js. Compound interest run
+   backwards: what a future amount is worth if you had it today. */
 registerFormula({
   id: 'present-value',
   topic: 'finance',
-  name: 'Present Value',
+  name: 'Present Value Calculator',
+  short: 'Present Value',
   desc: "Today's worth of a future amount",
-  keywords: 'present value discount pv discounting time value of money today worth npv',
+  keywords: 'present value pv discount rate discounting time value of money today worth future amount lump sum npv discounted cash flow settlement payout inheritance',
+  title: 'Present Value Calculator: What Future Money Is Worth Today',
+  blurb: 'What a sum arriving in the future is worth today, once the return you could have earned in the meantime is discounted out.',
+  about: [
+    'Money later is worth less than money now, because money now can be earning. This asks how much you would need today to end up with the future amount, at the return you expect — the same compounding as growth, run backwards.',
+    'The discount rate is the return you could get on the money instead, so it is a judgement rather than a lookup. A higher rate means waiting costs more, and a longer wait costs more again: at 7%, $20,000 in ten years is worth about half that today.',
+    'The rate and the period must describe the same stretch of time, and the amount is assumed to be certain. A payment that might not arrive is worth less again than this gives.',
+  ],
   eq: 'PV = FV / (1 + r)ⁿ',
   inputs: [
     { key: 'FV', label: 'Future amount', unit: '$', hint: 'e.g. 20000' },
@@ -14,4 +23,32 @@ registerFormula({
   output: { label: 'Present value', unit: '' },
   compute: v => v.FV / Math.pow(1 + v.rate / 100, v.n),
   format: money,
+  defaults: { FV: 20000, rate: 7, n: 10 },
+  sliders: [
+    { key: 'rate', span: 5, floor: 0, step: 0.1 },
+    { key: 'n', span: 15, floor: 1, step: 1 },
+  ],
+  extras: (v, pv) => {
+    const rows = [{ label: 'Given up by waiting', value: money(v.FV - pv) }];
+    if (!(v.FV > 0) || !(pv > 0)) return rows;
+    rows.push({ label: 'Each future $1 is worth', value: '$' + (pv / v.FV).toFixed(2) });
+    rows.push({ label: 'Waiting one more period would make it', detail: true,
+                value: money(pv / (1 + v.rate / 100)) });
+    return rows;
+  },
+  series: v => {
+    if (!(v.FV > 0)) return { points: [] };
+    const n = Math.max(1, v.n), N = Math.min(Math.max(4, Math.round(n * 4)), 60), points = [];
+    for (let i = 0; i <= N; i++) {
+      const p = i / N * n;
+      points.push({ x: p, y: v.FV / Math.pow(1 + v.rate / 100, p) });
+    }
+    /* Falls away fastest at the start: the first years of waiting cost the most. */
+    return {
+      title: 'What the amount is worth today, the longer the wait',
+      xLabel: 'Periods until it arrives',
+      points, label: 'Worth today',
+      yTickFmt: kmoney,
+    };
+  },
 });

@@ -8,12 +8,11 @@ registerFormula({
   desc: 'Monthly payment for a fixed-rate loan or mortgage',
   keywords: 'mortgage loan emi installment repayment amortization amortisation home house car auto personal borrow monthly payment principal interest downpayment down payment debt fixed rate term extra payment payoff',
   title: 'Loan Payment Calculator: Monthly Mortgage & Car Payments',
-  blurb: 'Work out the monthly payment on a fixed-rate loan or mortgage. See the total interest, how the balance falls year by year, and what an extra payment a year would save.',
+  blurb: 'The monthly payment on a fixed-rate loan or mortgage, with the total interest, how the balance falls, and what one extra payment a year saves.',
   about: [
-    'This calculator answers one question: on a loan at a fixed interest rate, repaid in equal instalments, what is the monthly payment? Give it the amount you need, the downpayment as a percentage, the annual interest rate and the term in years. It works out the amount actually borrowed, then the payment that clears it over the term.',
-    'The rate you enter is annual; the formula divides it by twelve for the monthly rate and multiplies the years by twelve for the number of payments. Every payment is the same size, but its split is not: early on most of it goes to interest, and the share going to principal grows each month. The chart plots the balance falling and the interest and principal adding up, so that shift is visible rather than described.',
-    'What the payment does not include: property tax, homeowners or mortgage insurance, PMI, HOA dues, origination or closing fees. On a house these can add a large amount to what actually leaves your account each month, so treat the figure here as principal and interest only. It also assumes the rate never changes, which is not true of a variable-rate loan.',
-    'Open "What if you paid extra?" to add a lump sum or a regular overpayment. Because the extra comes off the principal, it saves every future month of interest on the amount paid off, which is why a modest overpayment can shorten the term by years.',
+    'A fixed-rate loan repaid in equal instalments. Give it the amount you need, the downpayment as a percentage, the annual rate and the term; it works out what is actually borrowed and the payment that clears it.',
+    'Every payment is the same size, but its split is not. Early on most of it is interest, and the share going to principal grows each month — which is why the halfway point in the debt arrives well past the halfway point in time.',
+    'The figure is principal and interest only. Property tax, insurance, PMI, HOA dues and fees are not in it, and on a house those can add a lot to what actually leaves your account. It also assumes the rate never changes.',
   ],
   eq: 'M = P · r(1+r)ⁿ / ((1+r)ⁿ − 1)',
   inputs: [
@@ -62,7 +61,7 @@ registerFormula({
     const half = asIs && asIs.rows.find(row => row.balance <= P / 2);
     if (half && half.month > 0) {
       rows.push({
-        label: 'Half of the principal amount of the loan paid off in',
+        label: 'Half the loan paid off after',
         detail: true, wide: true,
         value: `${(half.month / 12).toFixed(1)} years`,
       });
@@ -90,7 +89,7 @@ registerFormula({
      would only mislead. */
   advanced: {
     summary: 'What if you paid extra?',
-    intro: 'A one-off extra payment does not change your monthly payment. It shortens the loan and cuts the total interest. Enter an amount to see by how much, and watch the curves on the chart.',
+    intro: 'A one-off extra payment leaves the monthly payment alone — it shortens the loan and cuts the interest instead. Enter an amount to see by how much.',
     note: (v, M) => {
       if (!(v.extra > 0)) return '';
       const P = loanPrincipal(v);

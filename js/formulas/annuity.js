@@ -15,10 +15,9 @@ registerFormula({
   title: 'Annuity Calculator: Future Value of Regular Payments',
   blurb: 'Work out what regular payments add up to by a future date. Level payments by default, or set a growth rate if each payment is larger than the last.',
   about: [
-    'Pay in the same amount every period, earn a return on what has built up, and this is what you end up with. Give it the payment, the return rate and the number of periods. Each payment earns for however long it has left to run, so the first one does the most work and the last one does almost none — which is why the total is so much larger than the sum of the payments.',
-    'The rate and the period have to describe the same stretch of time. Monthly payments want a monthly rate: 6% a year is roughly 0.5% a month, not 6%. Putting an annual rate against monthly payments is the usual way to get an answer that is out by an order of magnitude.',
-    'The equation above is the general one, where g is the rate the payments themselves grow at. Leave growth blank and g is zero, which collapses it to the ordinary annuity, FV = PMT · ((1+r)ⁿ − 1) / r. Open "What if the payments grow?" to raise each payment above the one before it, the way a contribution tied to a salary rises each year. When r and g are equal the fraction would divide by zero, and the calculator uses the limit it approaches instead, PMT · n · (1+r)ⁿ⁻¹.',
-    'It assumes each payment lands at the end of its period, the rate never changes, and nothing is taken out along the way. Fees, tax and inflation are not modelled, so the answer is in the money of the final period rather than in what that money will buy.',
+    'Pay in the same amount every period and this is what it comes to. Each payment earns for however long it has left, so the first does the most work and the last almost none — which is why the total runs well above the sum of the payments.',
+    'The rate and the period must describe the same stretch of time. Monthly payments want a monthly rate: 6% a year is roughly 0.5% a month, not 6%.',
+    'Growth is 0 by default, the ordinary annuity. Set it and each payment is that much larger than the one before, the way a contribution tied to a salary rises. Payments are assumed to land at the end of each period, at a rate that never changes, with nothing withdrawn.',
   ],
   eq: 'FV = PMT · ((1+r)ⁿ − (1+g)ⁿ) / (r − g)',
   inputs: [
@@ -59,7 +58,7 @@ registerFormula({
      it needs filling in. */
   advanced: {
     summary: 'What if the payments grow?',
-    intro: 'Leave this blank and every payment is the same size. Enter a growth rate and each payment is that much larger than the one before, the way a contribution tied to a salary rises each year. The chart then draws the growing plan as dotted lines beside the level ones, for both what you pay in and what it is worth.',
+    intro: 'Blank means every payment is the same size. Enter a growth rate and each is that much larger than the one before, the way a contribution tied to a salary rises. The chart draws both plans so the gap shows.',
     note: (v, out) => {
       if (!v.growth) return '';
       const n = Math.max(0, Math.round(v.n));

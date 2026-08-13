@@ -70,8 +70,8 @@ const FEATURED = ['loan-payment', 'compound-interest', 'annuity'];
 /* The home page's heading and standfirst. tools/build-pages.py reads these
    two lines so the served HTML carries the same words the app renders. */
 const HOME_TITLE = 'Free calculators for everyday formulas';
-const HOME_INTRO = 'Loan payments, compound interest, annuities, physics and engineering. ' +
-  'Enter what you know and get the answer. No account, nothing to install, no charge.';
+const HOME_INTRO = 'Loan payments, compound interest, annuities, savings goals and ' +
+  'engineering formulas. Enter what you know and get the answer — free, no sign-up.';
 
 /* Favourites live in this browser only: no account, no server, nothing leaves
    the machine. Cleared if the visitor clears site data. */
@@ -202,9 +202,13 @@ function renderHome() {
   const favIds = getFavs();
   const shown = byId(favIds.slice(0, ROW_SLOTS));
   const empty = ROW_SLOTS - shown.length;
-  const favCards = shown.map(f => formulaCardHTML(f)).join('') +
-    Array.from({ length: empty }, (_, i) =>
-      `<div class="card slot">${i === 0 ? 'Tap ♡ to save' : '♡'}</div>`).join('');
+  /* With nothing saved, three empty boxes are three times the clutter for one
+     piece of information. One strip says it once and takes a third of the room,
+     which matters most on a phone. */
+  const favCards = shown.length
+    ? shown.map(f => formulaCardHTML(f)).join('') +
+      Array.from({ length: empty }, () => `<div class="card slot">♡</div>`).join('')
+    : `<div class="card slot wide-slot">Tap ♡ on any calculator to save it here</div>`;
   const favNote = favIds.length > ROW_SLOTS
     ? `<span class="label-note">newest ${ROW_SLOTS} of ${favIds.length}</span>` : '';
 

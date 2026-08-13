@@ -16,12 +16,11 @@ registerFormula({
   desc: 'How long until your savings reach a target',
   keywords: 'savings goal target how long time to reach years to save deposit house down payment emergency fund retirement million back calculate solve for time when will i have',
   title: 'Savings Goal Calculator: How Long Until You Reach a Target',
-  blurb: 'Say what you have, what you pay in each period, and the return you expect — this gives how long it takes to reach your target, and how much of it is growth.',
+  blurb: 'Say what you have, what you pay in each year and the return you expect — this gives the years to reach your target, and how much of that is growth.',
   about: [
-    'Every other calculator here is handed a length of time and asked for an amount. This one runs the other way: give it the amount you are aiming at and it returns the time. Enter what you have now, what you pay in each year, the return you expect, and the figure you want to reach.',
-    'It is the compound interest equation rearranged. Where that one asks what P grows to in t years, this asks what t makes P reach A, so the years come out of a logarithm rather than a power: t = ln(A/P) / ln(1+r). With a regular payment in the mix the same rearrangement gives t = ln((A + PMT/r) / (P + PMT/r)) / ln(1+r). Both are solved outright, not searched for, so the answer is exact.',
-    'What you pay in each year is usually the difference between a goal that arrives and one that does not. A sum left alone doubles on a schedule the rate sets, and nothing you do changes it; paying in every year shortens the wait immediately and keeps shortening it. Set it to 0 to see how long the sum takes on its own — Additional Information gives that figure either way.',
-    'The answer is in years, to one decimal, and the fraction is left in rather than rounded up: 23.3 means the target is passed part way through the twenty-fourth year. It assumes the rate holds for the whole stretch, that what you pay in arrives at the end of each year, and that nothing is withdrawn along the way. Tax, fees and inflation are not modelled, so a target set in today’s money will buy less by the time you reach it.',
+    'Every other calculator here is given a length of time and asked for an amount. This one runs the other way: give it the figure you are aiming at and it returns the years, solved outright rather than searched for.',
+    'What you pay in each year is usually the difference between a goal that arrives and one that does not. Set it to 0 to see how long the sum takes on its own — Additional Information gives that figure either way.',
+    'The answer keeps its fraction rather than rounding up, so 23.3 means the target is passed part way through the twenty-fourth year. It assumes the rate holds throughout, that payments arrive at each year end, and that nothing is withdrawn. Tax, fees and inflation are not modelled.',
   ],
   eq: 't = ln( (A + PMT/r) / (P + PMT/r) ) / ln(1 + r)',
   inputs: [
