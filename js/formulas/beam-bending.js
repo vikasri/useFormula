@@ -189,7 +189,7 @@ registerFormula({
   about: [
     'A beam carries a load across a gap by bending. One face stretches, the other squashes, and the further those faces sit from the middle the less stress it takes to hold the load — which is the whole reason a joist is stood on edge rather than laid flat.',
     'The ends decide most of the answer. A cantilever holding a load at its tip bends sixteen times as far as the same beam simply supported; building both ends in instead quarters it. Each end here is pinned, fixed or free, and the combinations that would let the beam turn and fall are refused rather than answered.',
-    'Stress and deflection rarely peak in the same place and neither stands in for the other. A beam can sit well below its yield stress and still sag more than anyone will put up with, which is why floors are held to a fraction of the span rather than to a stress. That check is in the panel.',
+    'Stress and deflection rarely peak in the same place and neither stands in for the other. A beam can sit well below its yield stress and still sag more than anyone will put up with, which is why both are on the page.',
     'One point load, constant section, small deflections, and the material still elastic — below the stress at which it would take a permanent set. It also takes the beam as slender, spanning at least ten times its own depth. A short deep one picks up shear deflection that is not counted here, and sags more than this says. Self weight is not included either. There is no factor of safety here and this follows no design code.',
   ],
   eq: 'σmax = Mmax·c / I',
@@ -226,8 +226,6 @@ registerFormula({
     { key: 'P', label: 'Load', unit: 'N', hint: 'e.g. 10000' },
     { key: 'a', label: 'Load position, from the left end', unit: 'mm', hint: 'e.g. 1000' },
     { key: 'E', label: 'Modulus of elasticity', unit: 'MPa', hint: '200000 for steel' },
-    { key: 'lim', label: 'Deflection limit, span ÷', unit: '', hint: 'e.g. 360',
-      optional: true, advanced: true },
   ],
   output: { label: 'Maximum bending stress', unit: v => beamUnits(v).stress },
   unitsFor: beamUnitsFor,
@@ -282,20 +280,6 @@ registerFormula({
     return rows;
   },
 
-  advanced: {
-    summary: 'Does it pass a deflection limit?',
-    intro: 'Beams are usually held to a fraction of their span rather than to a stress. Floors are commonly span ÷ 360, roofs ÷ 240, and something you only have to walk on ÷ 180. Put the denominator in and it will say whether this one clears it.',
-    note: v => {
-      if (!(v.lim > 0)) return '';
-      let p;
-      try { p = beamPeaks(v); } catch (e) { return ''; }
-      const u = beamUnits(v), allowed = p.L / v.lim, got = Math.abs(p.defl);
-      const n = x => num(+x.toFixed(x < 10 ? 4 : 2)) + ' ' + u.length;
-      return got <= allowed
-        ? `Span ÷ ${+v.lim} allows ${n(allowed)} and this beam moves ${n(got)}, so it clears it with ${((1 - got / allowed) * 100).toFixed(0)}% to spare.`
-        : `Span ÷ ${+v.lim} allows ${n(allowed)} and this beam moves ${n(got)} — over by ${((got / allowed - 1) * 100).toFixed(0)}%.`;
-    },
-  },
   defaults: { sys: 0, sec: SEC_RECT, endL: END_PIN, endR: END_PIN,
               w: 50, h: 100, len: 2000, P: 10000, a: 1000, E: 200000 },
   sliders: [
