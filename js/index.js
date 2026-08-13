@@ -9,6 +9,5 @@ registerIndex([
   {"id": "newtons-second-law", "slug": "force", "topic": "mechanics", "name": "Newton's Second Law (Force)", "short": "Force (F = ma)", "desc": "Force from mass and acceleration", "keywords": "newton second law force mass acceleration f=ma dynamics push"},
   {"id": "potential-energy", "slug": "potential", "topic": "mechanics", "name": "Gravitational Potential Energy", "short": "Potential Energy", "desc": "Energy stored due to height", "keywords": "gravitational potential energy height gravity stored mgh pe"},
   {"id": "present-value", "topic": "finance", "name": "Present Value", "desc": "Today's worth of a future amount", "keywords": "present value discount pv discounting time value of money today worth npv"},
-  {"id": "roi", "topic": "finance", "name": "Return on Investment (ROI)", "short": "ROI", "desc": "Total percentage return, including income received", "keywords": "roi return on investment profit gain loss percentage yield performance dividends interest income rent total return"},
   {"id": "work-done", "slug": "work", "topic": "mechanics", "name": "Work Done", "desc": "Work from a force acting over a distance", "keywords": "work done force distance joules energy displacement"}
 ]);
