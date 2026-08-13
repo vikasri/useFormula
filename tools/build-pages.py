@@ -444,9 +444,10 @@ def main():
 
     write(ROOT / 'index.html', page(
         template,
-        'Free Loan, Savings & Physics Calculators — useFormula',
+        'Free Loan, Savings & Engineering Calculators — useFormula',
         'Free online calculators for loan and mortgage payments, compound interest, '
-        'annuities and physics formulas. Enter what you know, get the answer. '
+        'annuities, stress, circuits and engineering mechanics. Enter what you know, '
+        'get the answer. '
         'No account, nothing to install.',
         '%s/' % SITE,
         '    <h1>%s</h1>\n    <p class="sub">%s</p>\n%s'

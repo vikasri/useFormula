@@ -70,7 +70,7 @@ const FEATURED = ['loan-payment', 'compound-interest', 'annuity'];
 /* The home page's heading and standfirst. tools/build-pages.py reads these
    two lines so the served HTML carries the same words the app renders. */
 const HOME_TITLE = 'Free calculators for everyday formulas';
-const HOME_INTRO = 'Loan payments, compound interest, annuities and physics. ' +
+const HOME_INTRO = 'Loan payments, compound interest, annuities, physics and engineering. ' +
   'Enter what you know and get the answer. No account, nothing to install, no charge.';
 
 /* Favourites live in this browser only: no account, no server, nothing leaves
@@ -383,7 +383,9 @@ function renderFormula(key) {
       ${esc(f.name)}
     </div>` + formulaBoxHTML(f) + aboutFormulaHTML(f) + relatedHTML(f);
   (f.sliders || []).forEach(s => paintSlider(document.getElementById('sl_' + s.key)));
-  if (f.series) doCalc(f.id);
+  /* Anything arriving with its fields filled in should arrive with its answer
+     too — a form showing numbers and a blank result reads as broken. */
+  if (f.series || f.defaults) doCalc(f.id);
 }
 
 function doCalc(id) {
