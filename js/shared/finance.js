@@ -70,3 +70,15 @@ function annuityPaidIn(PMT, g, n) {
   if (!(n > 0)) return 0;
   return g === 0 ? PMT * n : PMT * (Math.pow(1 + g, n) - 1) / g;
 }
+
+/* Compounds per year. Blank in the panel means the plain yearly case, and the
+   engine hands a blank optional input over as 0 — which would divide by zero
+   in r/m — so anything not positive is read as once a year. */
+function compoundsPerYear(v) { return v.m > 0 ? v.m : 1; }
+
+/* Says the frequency the way a person would, for chart legends and notes. */
+function compoundingName(m) {
+  const named = { 1: 'yearly', 2: 'twice a year', 4: 'quarterly', 12: 'monthly',
+                  26: 'fortnightly', 52: 'weekly', 365: 'daily' };
+  return named[m] || (+m.toFixed(2)) + ' times a year';
+}

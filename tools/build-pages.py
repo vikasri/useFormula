@@ -267,7 +267,7 @@ def formula_prerender(f, topic, siblings, show_eq):
     bits.append('    </div>')
     if f.get('about'):
         bits += ['    <section class="explainer">',
-                 '      <h2>About the %s</h2>' % e(f.get('short') or f['name'])]
+                 '      <h2>About %s</h2>' % e(f.get('short') or f['name'])]
         bits += ['      <p>%s</p>' % e(par) for par in f['about']]
         bits.append('    </section>')
     return '\n'.join(bits + related_list(f, siblings))

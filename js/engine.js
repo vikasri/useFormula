@@ -170,7 +170,7 @@ function aboutFormulaHTML(f) {
   if (!f.about || !f.about.length) return '';
   return `
     <section class="explainer">
-      <h2>About the ${esc(shortName(f))}</h2>
+      <h2>About ${esc(shortName(f))}</h2>
       ${f.about.map(p => `<p>${esc(p)}</p>`).join('\n      ')}
     </section>`;
 }
