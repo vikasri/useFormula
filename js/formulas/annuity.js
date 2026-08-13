@@ -91,12 +91,12 @@ registerFormula({
     const lines = [];
     if (g !== 0) {
       lines.push({ points: curve(j => annuityFV(v.PMT, r, g, j)),
-                   label: 'Value (with growth)', dash: true });
+                   label: 'Value (with payment growth)', dash: true });
     }
     lines.push({ points: curve(j => annuityPaidIn(v.PMT, 0, j)), label: 'Paid in', cls: 'green' });
     if (g !== 0) {
       lines.push({ points: curve(j => annuityPaidIn(v.PMT, g, j)),
-                   label: 'Paid in (with growth)', cls: 'green', dash: true });
+                   label: 'Paid in (with payment growth)', cls: 'green', dash: true });
     }
     return {
       title: 'What it adds up to, and how much of that you paid in',
