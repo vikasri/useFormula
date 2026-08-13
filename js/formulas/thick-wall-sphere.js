@@ -14,7 +14,7 @@ registerFormula({
   title: 'Thick Wall Sphere Calculator: Hoop and Radial Stress',
   blurb: 'Stress through the wall of a thick wall pressurised sphere, from the Lamé equations. Hoop, radial, shear and von Mises, in SI or English units.',
   about: [
-    'A sphere under pressure is stretched around every direction at once, so the hoop stress is the same whichever way you cut it. It is largest at the bore and falls towards the outside, while the radial stress runs the other way: equal to minus the internal pressure at the bore, and zero at the outer surface if nothing presses on it.',
+    'A sphere under pressure is stretched around every direction at once, so the hoop stress is the same whichever way you cut it. It is largest at the internal surface and falls towards the outside, while the radial stress runs the other way: equal to minus the pressure there, and zero at the external surface if nothing presses on it.',
     'A sphere carries roughly half the hoop stress of a cylinder of the same diameter and wall, which is why pressure vessels are domed at the ends and why a spherical tank holds more for the same steel.',
     'Elastic, isotropic material and a wall of even thickness are assumed. Nozzles, welds, supports and openings concentrate stress well above these figures, and none of this is a code calculation — for a vessel that has to be certified, the governing code sets the allowable stress and the safety factors.',
   ],
@@ -29,7 +29,7 @@ registerFormula({
     { key: 'po', label: 'External pressure', unit: 'MPa', hint: 'blank = none',
       optional: true, advanced: true },
   ],
-  output: { label: 'Hoop stress at the bore', unit: v => vesselUnits(v).pressure },
+  output: { label: 'Hoop stress at the internal surface', unit: v => vesselUnits(v).pressure },
   unitsFor: vesselUnitsFor,
   compute: v => {
     const a = v.di / 2, b = a + v.t;
@@ -44,13 +44,13 @@ registerFormula({
     const bore = at(a), out = at(b);
     const S = n => num(+n.toFixed(3)) + ' ' + u.pressure;
     const rows = [
-      { label: 'Radial stress at the bore', value: S(bore.radial) },
+      { label: 'Radial stress at the internal surface', value: S(bore.radial) },
       { label: 'Outer diameter', value: num(+(v.di + 2 * v.t).toFixed(3)) + ' ' + u.length },
-      { label: 'Hoop stress at the outer wall', detail: true, value: S(out.hoop) },
-      { label: 'Maximum shear at the bore', detail: true, value: S((bore.hoop - bore.radial) / 2) },
+      { label: 'Hoop stress at the external surface', detail: true, value: S(out.hoop) },
+      { label: 'Maximum shear at the internal surface', detail: true, value: S((bore.hoop - bore.radial) / 2) },
       /* Hoop acts in both surface directions, so two of the three principals
          are equal and von Mises collapses to the hoop-radial difference. */
-      { label: 'Von Mises at the bore', detail: true,
+      { label: 'Von Mises at the internal surface', detail: true,
         value: S(vonMises(bore.hoop, bore.hoop, bore.radial)) },
     ];
     /* Thin-wall is pd/4t for a sphere. How far it is out is the answer to
@@ -74,7 +74,7 @@ registerFormula({
       const a = v.di / 2, b = a + v.t;
       const alone = sphereStresses(v.p, 0, a, b, a).hoop;
       const u = vesselUnits(v);
-      return `${num(+v.po.toFixed(3))} ${u.pressure} outside brings the bore hoop stress to `
+      return `${num(+v.po.toFixed(3))} ${u.pressure} outside brings the hoop stress at the internal surface to `
         + `${num(+hoop.toFixed(3))} ${u.pressure}, from ${num(+alone.toFixed(3))} with nothing outside.`;
     },
   },
@@ -93,10 +93,10 @@ registerFormula({
       hoop.push({ x: r, y: s.hoop });
       radial.push({ x: r, y: s.radial });
     }
-    /* Both plotted against radius, so the bore is at the left and the outer
-       surface at the right — the wall read left to right. */
+    /* Both plotted against radius, so the internal surface is at the left and
+       the external surface at the right — the wall read left to right. */
     return {
-      title: 'Stress through the wall, bore to outer surface',
+      title: 'Stress through the wall, inside to outside',
       xLabel: 'Radius (' + vesselUnits(v).length + ')',
       points: hoop, label: 'Hoop',
       extra: [{ points: radial, label: 'Radial', cls: 'red' }],
