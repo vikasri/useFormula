@@ -90,7 +90,7 @@ registerFormula({
      would only mislead. */
   advanced: {
     summary: 'What if you paid extra?',
-    intro: 'A one-off extra payment does not change your monthly payment. It shortens the loan and cuts the total interest. Enter an amount to see by how much, and watch the curves below.',
+    intro: 'A one-off extra payment does not change your monthly payment. It shortens the loan and cuts the total interest. Enter an amount to see by how much, and watch the curves on the chart.',
     note: (v, M) => {
       if (!(v.extra > 0)) return '';
       const P = loanPrincipal(v);

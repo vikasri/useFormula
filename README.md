@@ -75,8 +75,8 @@ site: an unknown topic, a duplicate id or two formulas wanting the same address 
 
 A formula sits at its `id` unless it sets `slug`. Addresses are **one word wherever the
 word is free** — `/loan/`, `/annuity/`, `/compound/`, `/force/`, `/kinetic/`, `/work/` —
-and only take a hyphen when one word will not do the job: `/growing-annuity/` because
-`/annuity/` is the plain annuity, `/present-value/` because no single word says it.
+and only take a hyphen when one word will not do the job — `/present-value/`, because no
+single word says it.
 Keep to that when adding formulas; the build refuses two formulas wanting the same
 address, or a slug that would shadow a file at the site root.
 
@@ -96,6 +96,23 @@ from the day the build ran, so rebuilding does not claim unchanged pages are new
 Every calculator also lists the others in its topic at the foot of the page. That is
 the main thing keeping new formulas reachable as the site grows: the home page only
 has room for a handful.
+
+## Simple first, complications next
+
+A calculator opens on the plain case, with only the fields that case needs. Anything
+that generalises it goes in the `advanced` panel, blank or zero by default, so the page
+answers the common question immediately and the fuller one on request.
+
+That is why there is one annuity and not two: the ordinary annuity is the growing
+annuity with growth 0, so `/annuity/` opens level and the panel turns on growth. The
+same shape as `/loan/`, where the payment is the answer and the extra payment is the
+panel. Prefer generalising an existing formula this way over adding a near-duplicate —
+one page collects the search traffic for both, and there is only one piece of maths to
+keep right.
+
+Give the panel an `intro` saying what it is for and a `note(v, answer)` reporting what
+it did, and have `series` add a dashed line for the base case so the difference is
+visible rather than asserted.
 
 ## Being found
 

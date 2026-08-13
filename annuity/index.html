@@ -4,15 +4,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Future Value of an Annuity — useFormula</title>
-  <meta name="description" content="Value of equal recurring deposits. Free online calculator: enter your values and get the answer.">
+  <title>Annuity Calculator: Future Value of Regular Payments</title>
+  <meta name="description" content="Work out what regular payments add up to by a future date. Level payments by default, or set a growth rate if each payment is larger than the last.">
   <link rel="canonical" href="https://useformula.com/annuity/">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Future Value of an Annuity — useFormula">
-  <meta property="og:description" content="Value of equal recurring deposits. Free online calculator: enter your values and get the answer.">
+  <meta property="og:title" content="Annuity Calculator: Future Value of Regular Payments">
+  <meta property="og:description" content="Work out what regular payments add up to by a future date. Level payments by default, or set a growth rate if each payment is larger than the last.">
   <meta property="og:url" content="https://useformula.com/annuity/">
   <script type="application/ld+json">
-  {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://useformula.com/"}, {"@type": "ListItem", "position": 2, "name": "Finance", "item": "https://useformula.com/topics/finance/"}, {"@type": "ListItem", "position": 3, "name": "Future Value of an Annuity", "item": "https://useformula.com/annuity/"}]}
+  {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://useformula.com/"}, {"@type": "ListItem", "position": 2, "name": "Finance", "item": "https://useformula.com/topics/finance/"}, {"@type": "ListItem", "position": 3, "name": "Annuity Calculator", "item": "https://useformula.com/annuity/"}]}
   </script>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/styles.css">
@@ -26,20 +26,25 @@
     </a>
   </header>
   <div id="app">
-    <div class="crumbs"><a href="/">Home</a> › <a href="/topics/finance/">Finance</a> › Future Value of an Annuity</div>
+    <div class="crumbs"><a href="/">Home</a> › <a href="/topics/finance/">Finance</a> › Annuity Calculator</div>
     <div class="formula-box">
-      <div class="formula-head"><div class="formula-title"><h1>Future Value of an Annuity</h1></div></div>
-      <p class="sub">Value of equal recurring deposits</p>
+      <div class="formula-head"><div class="formula-title"><h1>Annuity Calculator</h1></div></div>
+      <p class="sub">What regular payments add up to by a future date</p>
       <div class="eq">FV = PMT · ((1+r)ⁿ − 1) / r</div>
-      <p class="notes">Enter payment per period, return rate per period and number of periods to work out the value of equal recurring deposits.</p>
+      <p class="notes">Enter payment per period, return rate per period, number of periods and payment growth per period to work out the what regular payments add up to by a future date.</p>
     </div>
+    <section class="explainer">
+      <h2>About the Annuity</h2>
+      <p>Pay in the same amount every period, earn a return on what has built up, and this is what you end up with. Give it the payment, the return rate and the number of periods. Each payment earns for however long it has left to run, so the first one does the most work and the last one does almost none — which is why the total is so much larger than the sum of the payments.</p>
+      <p>The rate and the period have to describe the same stretch of time. Monthly payments want a monthly rate: 6% a year is roughly 0.5% a month, not 6%. Putting an annual rate against monthly payments is the usual way to get an answer that is out by an order of magnitude.</p>
+      <p>Open &quot;What if the payments grow?&quot; to raise each payment above the one before it, which is what a salary-linked pension contribution or an inflation-linked income actually does. That turns the ordinary annuity, FV = PMT · ((1+r)ⁿ − 1) / r, into the growing annuity, FV = PMT · ((1+r)ⁿ − (1+g)ⁿ) / (r − g). When the two rates are equal that fraction would divide by zero, and the calculator uses the limit it approaches, PMT · n · (1+r)ⁿ⁻¹.</p>
+      <p>It assumes each payment lands at the end of its period, the rate never changes, and nothing is taken out along the way. Fees, tax and inflation are not modelled, so the answer is in the money of the final period rather than in what that money will buy.</p>
+    </section>
     <nav class="related">
       <h2>More Finance calculators</h2>
       <ul>
         <li><a href="/compound/">Compound Interest</a>
         <span>What a lump sum grows to with compounding</span></li>
-        <li><a href="/growing-annuity/">Growing Annuity</a>
-        <span>Recurring income growing at a constant rate, valued at a future point</span></li>
         <li><a href="/loan/">Loan Calculator</a>
         <span>Monthly payment for a fixed-rate loan or mortgage</span></li>
         <li><a href="/present-value/">Present Value</a>
@@ -63,7 +68,7 @@
 <script src="/js/topics.js"></script>
 <script src="/js/index.js"></script>
 <script src="/js/shared/finance.js"></script>
-<script src="/js/formulas/fv-annuity.js"></script>
+<script src="/js/formulas/annuity.js"></script>
 <script src="/js/boot.js"></script>
 </body>
 </html>

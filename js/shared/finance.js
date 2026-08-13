@@ -53,3 +53,20 @@ function extraPaymentMonth(v) {
   const year = v.extraAt > 0 ? v.extraAt : v.years / 2;
   return Math.max(1, Math.round(year * 12));
 }
+
+/* Future value of n payments of PMT, earning r per period, each payment g
+   larger than the one before. g = 0 is the ordinary annuity. Equal rates
+   would divide by zero in the general form, so that case uses the limit it
+   approaches, PMT · n · (1+r)ⁿ⁻¹, which also covers r = g = 0. */
+function annuityFV(PMT, r, g, n) {
+  if (!(n > 0)) return 0;
+  if (Math.abs(r - g) < 1e-9) return PMT * n * Math.pow(1 + r, n - 1);
+  return PMT * (Math.pow(1 + r, n) - Math.pow(1 + g, n)) / (r - g);
+}
+
+/* What was handed over, before any return on it: n payments starting at PMT
+   and growing g each period. */
+function annuityPaidIn(PMT, g, n) {
+  if (!(n > 0)) return 0;
+  return g === 0 ? PMT * n : PMT * (Math.pow(1 + g, n) - 1) / g;
+}
