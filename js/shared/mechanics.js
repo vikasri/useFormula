@@ -44,3 +44,26 @@ function cylinderStresses(p, po, a, b, r) {
 function vonMises(s1, s2, s3) {
   return Math.sqrt(0.5 * ((s1 - s2) ** 2 + (s2 - s3) ** 2 + (s3 - s1) ** 2));
 }
+
+/* A disk of uniform thickness spinning about its centre, plane stress. Radii
+   in mm, density in kg/m³, ω in rad/s; the answer comes back in MPa.
+
+     σr(r) = k(a² + b² − a²b²/r² − r²)
+     σθ(r) = k(a² + b² + a²b²/r² − r²(1+3ν)/(3+ν))     k = (3+ν)ρω²/8
+
+   Nothing presses on either face, so σr is zero at both and peaks in between,
+   at r = √(ab). σθ is largest at the bore. */
+function diskStresses(rho, omega, nu, a, b, r) {
+  const k = (3 + nu) * rho * omega * omega / 8 / 1e12;   // mm and kg/m³ into MPa
+  const aa = a * a, bb = b * b, rr = r * r;
+  return {
+    radial: k * (aa + bb - aa * bb / rr - rr),
+    hoop: k * (aa + bb + aa * bb / rr - rr * (1 + 3 * nu) / (3 + nu)),
+  };
+}
+
+/* Poisson's ratio, 0.3 unless the panel says otherwise. Blank arrives as 0. */
+function diskPoisson(v) { return v.nu > 0 ? v.nu : 0.3; }
+
+/* rev/min to rad/s. */
+function rpmToRad(rpm) { return rpm * 2 * Math.PI / 60; }

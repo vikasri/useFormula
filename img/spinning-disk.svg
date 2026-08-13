@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 228" role="img" aria-label="A hollow disk of uniform thickness spinning about its centre: bore radius a, outer radius b, rotation arrow, and the hoop and radial stresses raised in the material by its own mass.">
+  <defs>
+    <marker id="o" viewBox="0 0 8 8" refX="7.5" refY="4" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M0 0 L8 4 L0 8 Z" fill="#e76f51"/></marker>
+    <marker id="b" viewBox="0 0 8 8" refX="7.5" refY="4" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M0 0 L8 4 L0 8 Z" fill="#2f6bff"/></marker>
+    <marker id="d" viewBox="0 0 8 8" refX="7.5" refY="4" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M0 0 L8 4 L0 8 Z" fill="#263238"/></marker>
+  </defs>
+  <g font-family="-apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif" font-size="13">
+    <circle cx="128" cy="100" r="62" fill="#fbece6" stroke="#263238" stroke-width="1.6"/>
+    <circle cx="128" cy="100" r="34" fill="#ffffff" stroke="#263238" stroke-width="1.6"/>
+    <circle cx="128" cy="100" r="2.2" fill="#263238"/>
+    <path d="M 74.8 43.0 A 78 78 0 0 1 181.2 43.0" fill="none" stroke="#263238" stroke-width="1.4" marker-end="url(#d)"/>
+    <text x="128" y="26" fill="#263238" text-anchor="middle" font-style="italic">&#969;</text>
+    <line x1="128" y1="100" x2="162" y2="100" stroke="#2f6bff" stroke-width="1.4" marker-end="url(#b)"/>
+    <text x="145" y="93" fill="#2f6bff" text-anchor="middle" font-style="italic">a</text>
+    <line x1="128" y1="100" x2="171.8" y2="143.8" stroke="#2f6bff" stroke-width="1.4" marker-end="url(#b)"/>
+    <text x="159" y="122" fill="#2f6bff" font-style="italic">b</text>
+    <line x1="94.2" y1="112.3" x2="71.6" y2="120.5" stroke="#e76f51" stroke-width="1.5" marker-end="url(#o)"/>
+    <text x="52" y="134" fill="#e76f51">&#963;&#7523;</text>
+    <path d="M 155.5 60.7 A 48 48 0 0 1 174.4 87.6" fill="none" stroke="#e76f51" stroke-width="1.5" marker-end="url(#o)"/>
+    <text x="182" y="68" fill="#e76f51">&#963;&#952;</text>
+    <text x="150" y="202" fill="#5f6e75" text-anchor="middle" font-size="11.5">Uniform thickness, spinning about its centre.</text>
+    <text x="150" y="217" fill="#5f6e75" text-anchor="middle" font-size="11.5">Nothing presses on it; its own mass pulls it outward.</text>
+  </g>
+</svg>
