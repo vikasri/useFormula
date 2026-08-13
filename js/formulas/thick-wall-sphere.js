@@ -14,7 +14,7 @@ registerFormula({
   title: 'Thick Wall Sphere Calculator: Hoop and Radial Stress',
   blurb: 'Stress through the wall of a thick wall pressurised sphere, from the Lamé equations. Hoop, radial, shear and von Mises, in SI or English units.',
   about: [
-    'A sphere under pressure is stretched around every direction at once, so the hoop stress is the same whichever way you cut it. It is largest at the internal surface and falls towards the outside, while the radial stress runs the other way: equal to minus the pressure there, and zero at the external surface if nothing presses on it.',
+    'A sphere under pressure is stretched around every direction at once, so the hoop stress is the same whichever way you cut it. It is largest at the internal surface and falls towards the outside, while the radial stress runs the other way: equal to minus the pressure there, and zero at the outer surface if nothing presses on it.',
     'A sphere carries roughly half the hoop stress of a cylinder of the same diameter and wall, which is why pressure vessels are domed at the ends and why a spherical tank holds more for the same steel.',
     'Elastic, isotropic material and a wall of even thickness are assumed. Nozzles, welds, supports and openings concentrate stress well above these figures, and none of this is a code calculation — for a vessel that has to be certified, the governing code sets the allowable stress and the safety factors.',
   ],
@@ -46,7 +46,7 @@ registerFormula({
     const rows = [
       { label: 'Radial stress at the internal surface', value: S(bore.radial) },
       { label: 'Outer diameter', value: num(+(v.di + 2 * v.t).toFixed(3)) + ' ' + u.length },
-      { label: 'Hoop stress at the external surface', detail: true, value: S(out.hoop) },
+      { label: 'Hoop stress at the outer surface', detail: true, value: S(out.hoop) },
       { label: 'Maximum shear at the internal surface', detail: true, value: S((bore.hoop - bore.radial) / 2) },
       /* Hoop acts in both surface directions, so two of the three principals
          are equal and von Mises collapses to the hoop-radial difference. */
@@ -94,7 +94,7 @@ registerFormula({
       radial.push({ x: r, y: s.radial });
     }
     /* Both plotted against radius, so the internal surface is at the left and
-       the external surface at the right — the wall read left to right. */
+       the outer surface at the right — the wall read left to right. */
     return {
       title: 'Stress through the wall, inside to outside',
       xLabel: 'Radius (' + vesselUnits(v).length + ')',

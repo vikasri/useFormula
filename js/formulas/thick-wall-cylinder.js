@@ -14,7 +14,7 @@ registerFormula({
   title: 'Thick Wall Cylinder Calculator: Hoop, Radial, Axial Stress',
   blurb: 'Stress through the wall of a thick wall pressurised cylinder, from the Lamé equations. Hoop, radial, axial, shear and von Mises, in SI or English units.',
   about: [
-    'Pressure inside a cylinder stretches it around the circumference, and that hoop stress is the one that governs. It is largest at the internal surface and falls towards the outside, while the radial stress runs the other way: minus the pressure there, and zero at the external surface if nothing presses on it.',
+    'Pressure inside a cylinder stretches it around the circumference, and that hoop stress is the one that governs. It is largest at the internal surface and falls towards the outside, while the radial stress runs the other way: minus the pressure there, and zero at the outer surface if nothing presses on it.',
     'Capped ends add an axial stress along the tube, uniform through the wall and about half the hoop stress at the internal surface. An open end — a gun barrel, a roller, a tube in a fitting that takes the thrust elsewhere — carries none, so both are given. The choice matters more than it looks: the open case has no axial stress to sit between the hoop and the radial, so its von Mises comes out higher, not lower.',
     'Elastic, isotropic material and an even wall are assumed, well away from the ends. Nozzles, welds, threads and supports concentrate stress above these figures, and none of this is a code calculation — for a vessel that must be certified, the governing code sets the allowable stress and the safety factors.',
   ],
@@ -49,7 +49,7 @@ registerFormula({
        expect: an open end is the worse of the two here. */
     const rows = [
       { label: 'Radial stress at the internal surface', value: S(bore.radial) },
-      { label: 'Hoop stress at the external surface', value: S(out.hoop) },
+      { label: 'Hoop stress at the outer surface', value: S(out.hoop) },
       { label: 'Axial stress, open ends', value: S(0) },
       { label: 'Axial stress, capped ends', value: S(bore.axial) },
       { label: 'Maximum shear at the internal surface', detail: true, value: S((bore.hoop - bore.radial) / 2) },
