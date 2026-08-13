@@ -12,6 +12,9 @@
    Each formula:
      id, topic, name, desc, keywords
      eq       : human-readable equation string (display only)
+     diagram  : optional path to an svg defining the problem, drawn under the
+                  equation. diagramAlt carries its alt text. Kept as a file
+                  rather than inline markup so the served page has it too.
      inputs   : [{ key, label, unit, hint, optional, advanced, full, options }]
                   advanced inputs move to a collapsed panel by the chart
                   full    : the field spans the whole row
@@ -366,6 +369,7 @@ function formulaBoxHTML(f) {
       </div>
       <p class="sub">${esc(f.desc)}</p>
       ${setting('showEquation', true) ? `<div class="eq">${esc(f.eq)}</div>` : ''}
+      ${f.diagram ? `<figure class="schematic"><img src="${esc(f.diagram)}" alt="${esc(f.diagramAlt || '')}"></figure>` : ''}
       <div class="fields">${fields}</div>
       <button class="calc" onclick="doCalc('${f.id}')">Calculate</button>
       <div class="result" id="result">

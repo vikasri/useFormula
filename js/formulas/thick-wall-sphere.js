@@ -18,6 +18,8 @@ registerFormula({
     'For the same diameter and wall, a sphere sees roughly half the hoop stress a cylinder does. Hence the domed ends on pressure vessels, and hence spherical storage tanks.',
     'Assumes an even wall of elastic, isotropic material. Openings, nozzles and welds all lift the local stress above these numbers. It is not a code check: where a vessel has to be certified, the code sets the allowable stress and the factors.',
   ],
+  diagram: '/img/thick-wall-sphere.svg',
+  diagramAlt: 'Section through a thick wall sphere, showing inner radius a, outer radius b, internal and external pressure, and the hoop and radial stresses.',
   eq: 'σθ,max = (pᵢ(2a³ + b³) − 3pₒb³) / (2(b³ − a³))',
   inputs: [
     { key: 'sys', label: 'Units', full: true,

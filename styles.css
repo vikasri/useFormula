@@ -167,6 +167,10 @@ h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.5px; }
   margin: 2px 0 16px;
   overflow-x: auto;
 }
+/* Problem schematic: sits under the equation, defining the symbols in it. */
+.schematic { margin: 0 0 16px; text-align: center; }
+.schematic img { width: 100%; max-width: 340px; height: auto; display: inline-block; }
+
 .fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 13px 12px; margin-bottom: 14px; }
 /* Label takes the slack so every input in a row lines up, however many lines
    its label wrapped to. A lone field on the last row spans the full width. */

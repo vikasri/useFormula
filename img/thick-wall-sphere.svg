@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 228" role="img" aria-label="Section through a thick wall sphere: inner radius a, outer radius b, internal pressure pushing outward, external pressure pushing inward, and the hoop and radial stresses in the wall.">
+  <defs>
+    <marker id="g" viewBox="0 0 8 8" refX="7.5" refY="4" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M0 0 L8 4 L0 8 Z" fill="#5f6e75"/></marker>
+    <marker id="o" viewBox="0 0 8 8" refX="7.5" refY="4" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M0 0 L8 4 L0 8 Z" fill="#e76f51"/></marker>
+    <marker id="b" viewBox="0 0 8 8" refX="7.5" refY="4" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M0 0 L8 4 L0 8 Z" fill="#2f6bff"/></marker>
+  </defs>
+  <g font-family="-apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif" font-size="13">
+    <circle cx="128" cy="100" r="62" fill="#fbece6" stroke="#263238" stroke-width="1.6"/>
+    <ellipse cx="128" cy="100" rx="62" ry="18" fill="none" stroke="#263238" stroke-width="1" stroke-dasharray="4 3" opacity="0.35"/>
+    <circle cx="128" cy="100" r="34" fill="#ffffff" stroke="#263238" stroke-width="1.6"/>
+    <circle cx="128" cy="100" r="2.2" fill="#263238"/>
+
+    <line x1="128" y1="100" x2="162" y2="100" stroke="#2f6bff" stroke-width="1.4" marker-end="url(#b)"/>
+    <text x="145" y="93" fill="#2f6bff" text-anchor="middle" font-style="italic">a</text>
+    <line x1="128" y1="100" x2="171.8" y2="143.8" stroke="#2f6bff" stroke-width="1.4" marker-end="url(#b)"/>
+    <text x="159" y="122" fill="#2f6bff" font-style="italic">b</text>
+    <line x1="120.9" y1="92.9" x2="108.2" y2="80.2" stroke="#5f6e75" stroke-width="1.35" marker-end="url(#g)"/>
+    <line x1="118.0" y1="100.0" x2="100.0" y2="100.0" stroke="#5f6e75" stroke-width="1.35" marker-end="url(#g)"/>
+    <line x1="120.9" y1="107.1" x2="108.2" y2="119.8" stroke="#5f6e75" stroke-width="1.35" marker-end="url(#g)"/>
+    <text x="130" y="130" fill="#5f6e75" text-anchor="middle">p&#7522;</text>
+    <line x1="68.6" y1="40.6" x2="81.3" y2="53.3" stroke="#5f6e75" stroke-width="1.35" marker-end="url(#g)"/>
+    <line x1="44.0" y1="100.0" x2="62.0" y2="100.0" stroke="#5f6e75" stroke-width="1.35" marker-end="url(#g)"/>
+    <line x1="68.6" y1="159.4" x2="81.3" y2="146.7" stroke="#5f6e75" stroke-width="1.35" marker-end="url(#g)"/>
+    <text x="30" y="90" fill="#5f6e75">p&#8338;</text>
+    <line x1="128" y1="64" x2="128" y2="34" stroke="#e76f51" stroke-width="1.5" marker-end="url(#o)"/>
+    <text x="134" y="32" fill="#e76f51">&#963;&#7523;</text>
+    <path d="M 155.5 60.7 A 48 48 0 0 1 174.4 87.6" fill="none" stroke="#e76f51" stroke-width="1.5" marker-end="url(#o)"/>
+    <text x="182" y="68" fill="#e76f51">&#963;&#952;</text>
+    <text x="150" y="202" fill="#5f6e75" text-anchor="middle" font-size="11.5">Cut through the centre.</text>
+    <text x="150" y="217" fill="#5f6e75" text-anchor="middle" font-size="11.5">Hoop stress acts around the wall in every direction.</text>
+  </g>
+</svg>
