@@ -30,6 +30,14 @@
      slug     : optional shorter web address, e.g. slug 'loan' puts
                   loan-payment at /loan/. Re-run tools/build-pages.py after
                   adding, renaming or removing a formula.
+     title    : optional <title> for the page, when the formula's name alone
+                  is not what someone would type into a search box
+     blurb    : optional meta description, when `desc` is too terse to earn
+                  a click from a results page
+     about    : optional [ 'paragraph', … ] shown under the calculator.
+                  What the formula does, what the inputs mean, what it
+                  leaves out. Write it for a reader; a page with nothing but
+                  a form on it gives a search engine nothing to rank.
    ============================================================ */
 
 /* Registries. TOPICS comes from js/topics.js.
@@ -58,6 +66,12 @@ const kmoney = n => { const a = Math.abs(n); if (a >= 1e6) return '$' + (n / 1e6
 
 // Most-used formulas shown at the top of the home page (by formula id).
 const FEATURED = ['loan-payment', 'compound-interest', 'fv-annuity'];
+
+/* The home page's heading and standfirst. tools/build-pages.py reads these
+   two lines so the served HTML carries the same words the app renders. */
+const HOME_TITLE = 'Free calculators for everyday formulas';
+const HOME_INTRO = 'Loan payments, compound interest, annuities and physics. ' +
+  'Enter what you know and get the answer. No account, nothing to install, no charge.';
 
 /* Favourites live in this browser only: no account, no server, nothing leaves
    the machine. Cleared if the visitor clears site data. */
@@ -150,6 +164,17 @@ function byId(ids) { return ids.map(id => FORMULAS.find(f => f.id === id)).filte
    visitor somewhere to go once they have their answer, and gives each page
    more than one way in for a crawler — which matters more with every formula
    added, since the home page only has room for a handful. */
+/* The prose under the calculator. Same text the generated page ships in its
+   HTML, so a reader who arrives before the script does sees no less. */
+function aboutFormulaHTML(f) {
+  if (!f.about || !f.about.length) return '';
+  return `
+    <section class="explainer">
+      <h2>About the ${esc(shortName(f))}</h2>
+      ${f.about.map(p => `<p>${esc(p)}</p>`).join('\n      ')}
+    </section>`;
+}
+
 function relatedHTML(f) {
   const topic = TOPICS.find(t => t.id === f.topic) || {};
   const others = FORMULAS.filter(x => x.topic === f.topic && x.id !== f.id);
@@ -183,7 +208,12 @@ function renderHome() {
   const favNote = favIds.length > ROW_SLOTS
     ? `<span class="label-note">newest ${ROW_SLOTS} of ${favIds.length}</span>` : '';
 
+  /* The heading and the line under it are the only words on the home page.
+     They are here as well as in the generated HTML so the rendered page and
+     the served one say the same thing. */
   app.innerHTML = `
+    <h1>${esc(HOME_TITLE)}</h1>
+    <p class="sub">${esc(HOME_INTRO)}</p>
     <div class="search">
       <span class="mag">🔍</span>
       <input id="searchBox" type="text" autocomplete="off" spellcheck="false"
@@ -351,7 +381,7 @@ function renderFormula(key) {
       <a href="/">Home</a> ›
       <a href="${topicURL(topic.id)}">${esc(topic.name)}</a> ›
       ${esc(f.name)}
-    </div>` + formulaBoxHTML(f) + relatedHTML(f);
+    </div>` + formulaBoxHTML(f) + aboutFormulaHTML(f) + relatedHTML(f);
   (f.sliders || []).forEach(s => paintSlider(document.getElementById('sl_' + s.key)));
   if (f.series) doCalc(f.id);
 }

@@ -6,7 +6,15 @@ registerFormula({
   name: 'Loan Payment Calculator',
   short: 'Loan Calculator',
   desc: 'Monthly payment for a fixed-rate loan or mortgage',
-  keywords: 'mortgage loan emi installment repayment amortization home car borrow monthly payment principal debt',
+  keywords: 'mortgage loan emi installment repayment amortization amortisation home house car auto personal borrow monthly payment principal interest downpayment down payment debt fixed rate term extra payment payoff',
+  title: 'Loan Payment Calculator: Monthly Mortgage & Car Payments',
+  blurb: 'Work out the monthly payment on a fixed-rate loan or mortgage. See the total interest, how the balance falls year by year, and what an extra payment a year would save.',
+  about: [
+    'This calculator answers one question: on a loan at a fixed interest rate, repaid in equal instalments, what is the monthly payment? Give it the amount you need, the downpayment as a percentage, the annual interest rate and the term in years. It works out the amount actually borrowed, then the payment that clears it over the term.',
+    'The rate you enter is annual; the formula divides it by twelve for the monthly rate and multiplies the years by twelve for the number of payments. Every payment is the same size, but its split is not: early on most of it goes to interest, and the share going to principal grows each month. The chart plots the balance falling and the interest and principal adding up, so that shift is visible rather than described.',
+    'What the payment does not include: property tax, homeowners or mortgage insurance, PMI, HOA dues, origination or closing fees. On a house these can add a large amount to what actually leaves your account each month, so treat the figure here as principal and interest only. It also assumes the rate never changes, which is not true of a variable-rate loan.',
+    'Open "What if you paid extra?" to add a lump sum or a regular overpayment. Because the extra comes off the principal, it saves every future month of interest on the amount paid off, which is why a modest overpayment can shorten the term by years.',
+  ],
   eq: 'M = P · r(1+r)ⁿ / ((1+r)ⁿ − 1)',
   inputs: [
     { key: 'total', label: 'Total money required', unit: '$', hint: 'e.g. 375000' },

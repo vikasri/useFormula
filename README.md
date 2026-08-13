@@ -10,7 +10,8 @@ or search by name/keyword, enter your known values, and get the answer.
 ## Project structure
 
 ```
-index.html      – home page, and the shell every other page is built from
+tools/shell.html – the page shell every page is built from (hand-edited)
+index.html      – generated home page, do not edit
 styles.css      – all styling
 favicon.svg     – tab icon
 js/settings.js  – on/off switches for site features
@@ -22,7 +23,7 @@ js/index.js     – generated; every formula's name/desc/keywords, nothing more
 js/boot.js      – starts the app
 tools/build-pages.py – writes a real page per formula (see Addresses below)
 
-loan/, roi/, …  – generated, do not edit
+index.html, loan/, roi/, … – generated, do not edit
 topics/…        – generated, do not edit
 about/, 404.html, sitemap.xml, robots.txt – generated, do not edit
 ```
@@ -69,7 +70,7 @@ python3 tools/build-pages.py
 ```
 
 Skipping it leaves the new formula reachable in the app but with no page of its own,
-and missing from `sitemap.xml`. The script fails loudly rather than writing a half-built
+and missing from `sitemap.xml` and the home page. The script fails loudly rather than writing a half-built
 site: an unknown topic, a duplicate id or two formulas wanting the same address all stop it.
 
 A formula sits at its `id` unless it sets `slug`, which puts a much-used calculator on a
@@ -87,6 +88,26 @@ from the day the build ran, so rebuilding does not claim unchanged pages are new
 Every calculator also lists the others in its topic at the foot of the page. That is
 the main thing keeping new formulas reachable as the site grows: the home page only
 has room for a handful.
+
+## Being found
+
+Titles, meta descriptions and the words on the page are what a search engine has to
+work with, so three optional fields on a formula exist for it:
+
+- `title` — the `<title>`, when the formula's name is not what someone would type
+  into a search box. Used verbatim; keep it under ~60 characters or Google clips it.
+- `blurb` — the meta description. Does not affect ranking, decides whether the result
+  gets clicked. ~155 characters.
+- `about` — an array of paragraphs shown under the calculator. This is the one that
+  matters. A page with nothing but a form on it gives a search engine no reason to
+  rank it above the hundred other loan calculators; a page that explains what the
+  inputs mean and what the answer leaves out does.
+
+`keywords` feeds the site's own search box, not Google — `<meta name="keywords">` has
+been ignored since 2009 and is not used here. Put the words people would search for
+into the title, the heading and the `about` text instead, where they count.
+
+`/loan/` is the worked example of all three. The rest have none yet.
 
 ## Editing
 
