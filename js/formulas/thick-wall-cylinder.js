@@ -52,7 +52,14 @@ registerFormula({
        about the part, not about the pressure, and it changes the third
        principal stress — so it changes von Mises, and by more than people
        expect: an open end is the worse of the two here. */
+    /* Both end conditions, because whether the ends are capped changes the
+       third principal stress and so changes this — and not the way people
+       expect: the open end is the worse of the two here. */
+    const vmOpen = peakMises(a, b, r => { const s = at(r); return [s.hoop, 0, s.radial]; });
+    const vmCap = peakMises(a, b, r => { const s = at(r); return [s.hoop, s.axial, s.radial]; });
     const rows = [
+      { label: MISES_LABEL, wide: true,
+        value: `${S(vmOpen)} with open ends, ${S(vmCap)} capped — ${MISES_NOTE}` },
       { label: 'Radial stress at the internal surface', value: S(bore.radial) },
       { label: 'Hoop stress at the outer surface', value: S(out.hoop) },
       { label: 'Axial stress, open ends', value: S(0) },
@@ -63,9 +70,6 @@ registerFormula({
         value: S(Math.abs(bore.hoop - bore.radial) / 2) },
       { label: 'Outer diameter', detail: true,
         value: num(+(v.di + 2 * v.t).toFixed(3)) + ' ' + u.length },
-      { label: 'Von Mises at the internal surface, open ends then capped', wide: true, detail: true,
-        value: `${S(vonMises(bore.hoop, 0, bore.radial))}, `
-             + `then ${S(vonMises(bore.hoop, bore.axial, bore.radial))}` },
     ];
     /* Thin-wall is pd/2t for a cylinder — twice the sphere's, for the same
        reason a sphere is the stronger shape. What drives it is the pressure

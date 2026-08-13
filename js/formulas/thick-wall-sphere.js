@@ -48,7 +48,11 @@ registerFormula({
     const at = r => sphereStresses(v.p, v.po || 0, a, b, r);
     const bore = at(a), out = at(b);
     const S = n => num(+n.toFixed(3)) + ' ' + u.pressure;
+    /* Hoop acts in both surface directions, so two of the three principals
+       are equal and this collapses to the hoop-radial difference. */
+    const vmMax = peakMises(a, b, r => { const s = at(r); return [s.hoop, s.hoop, s.radial]; });
     const rows = [
+      { label: MISES_LABEL, wide: true, value: `${S(vmMax)} — ${MISES_NOTE}` },
       { label: 'Radial stress at the internal surface', value: S(bore.radial) },
       { label: 'Outer diameter', value: num(+(v.di + 2 * v.t).toFixed(3)) + ' ' + u.length },
       { label: 'Hoop stress at the outer surface', detail: true, value: S(out.hoop) },
@@ -57,10 +61,6 @@ registerFormula({
          qualifier to make. */
       { label: 'Maximum shear at the internal surface', detail: true,
         value: S(Math.abs(bore.hoop - bore.radial) / 2) },
-      /* Hoop acts in both surface directions, so two of the three principals
-         are equal and von Mises collapses to the hoop-radial difference. */
-      { label: 'Von Mises at the internal surface', detail: true,
-        value: S(vonMises(bore.hoop, bore.hoop, bore.radial)) },
     ];
     /* Thin-wall is pd/4t for a sphere. How far it is out is the answer to
        "did I need the thick-wall equations at all". What drives it is the

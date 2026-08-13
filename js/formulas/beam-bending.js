@@ -264,7 +264,17 @@ registerFormula({
     const big = n => num(Math.abs(n) >= 1000 ? Math.round(n) : +(+n).toPrecision(4));
     const M = n => big(Math.abs(n)) + ' ' + u.moment;
     const X = n => num(+n.toFixed(1)) + ' ' + u.length + ' from the left';
+    /* Bending puts the outer fibre in tension or compression along the beam
+       and nothing across it, so the state there is uniaxial and von Mises is
+       just that stress. Reported anyway, in the same words as the other
+       mechanics pages, because it is the number a design is checked against.
+       Transverse shear peaks at the neutral axis where bending is zero, and on
+       a beam slender enough for this page it stays far below. */
+    const sigma = Math.abs(p.M) * p.sec.c / p.sec.I;
     const rows = [
+      { label: MISES_LABEL, wide: true,
+        value: `${num(+sigma.toFixed(sigma < 100 ? 3 : 1))} ${u.stress}, the bending stress `
+             + `itself at the outer fibre — ${MISES_NOTE}` },
       { label: 'Maximum deflection', value: D(p.defl) },
       { label: 'Maximum bending moment', value: M(p.M) },
       { label: 'Where the stress is worst', detail: true, value: X(p.xM) },

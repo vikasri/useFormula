@@ -48,6 +48,26 @@ function vonMises(s1, s2, s3) {
   return Math.sqrt(0.5 * ((s1 - s2) ** 2 + (s2 - s3) ** 2 + (s3 - s1) ** 2));
 }
 
+/* The single figure a ductile part is checked against, said the same way on
+   every page that reports it. Three stresses at a point cannot be compared to
+   a yield strength one at a time; von Mises is what reduces them to one number
+   that can be. */
+const MISES_LABEL = 'Highest equivalent (von Mises) stress';
+const MISES_NOTE = "keep this below the material's yield strength";
+
+/* The worst von Mises anywhere between two radii. Sampled rather than taken at
+   the inner surface: that is where it sits in the ordinary case, but external
+   pressure can move it, and assuming is how a peak gets missed. */
+function peakMises(r0, r1, principalsAt) {
+  let worst = 0;
+  for (let i = 0; i <= 60; i++) {
+    const s = principalsAt(r0 + (r1 - r0) * i / 60);
+    const m = vonMises(s[0], s[1], s[2]);
+    if (m > worst) worst = m;
+  }
+  return worst;
+}
+
 /* A disk of uniform thickness spinning about its centre, plane stress. `scale`
    carries the unit system: see DISK_UNITS below. ω is in rad/s either way.
 

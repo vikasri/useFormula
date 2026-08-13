@@ -70,7 +70,11 @@ registerFormula({
     if (!(a > 0) || !(b > a)) return [];
     const at = r => diskStresses(v.rho, w, nu, a, b, r, u.scale);
     const S = n => num(+n.toFixed(2)) + ' ' + u.stress;
+    /* Plane stress: nothing acts through the thickness, so the third
+       principal is zero. */
+    const vmMax = peakMises(a, b, r => { const s = at(r); return [s.hoop, s.radial, 0]; });
     const rows = [
+      { label: MISES_LABEL, wide: true, value: `${S(vmMax)} — ${MISES_NOTE}` },
       { label: 'Hoop stress at the rim', value: S(at(b).hoop) },
       /* Radial stress is zero at both faces and peaks between them. */
       { label: 'Peak radial stress', value: S(at(Math.sqrt(a * b)).radial) },
