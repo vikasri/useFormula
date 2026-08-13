@@ -140,7 +140,7 @@ function misesFigureElement(v, u) {
   };
 
   let g = '';
-  /* Direct stress, one arrow per visible face, along that face's own axis. */
+  /* Normal stress, one arrow per visible face, along that face's own axis. */
   const direct = [
     ['s11', [1, 0.5, 0.5], [1, 0, 0], 0.62, '\u03C3\u2081\u2081', 10, 4, 'start'],
     ['s22', [0.5, 1, 0.5], [0, 1, 0], 0.62, '\u03C3\u2082\u2082', 0, -10, 'middle'],
@@ -296,66 +296,78 @@ function misesFigure3D(s, u) {
     </g></svg>`;
 }
 
-/* The same surface cut through the plane of the third principal stress, which
-   is the picture with numbers on it: an ellipse for von Mises, and Tresca's
-   hexagon sitting inside it wherever the two disagree. */
-function misesFigure2D(s, u) {
-  const W = 520, H = 380, sy = s.R > 0 ? s.R / Math.sqrt(2 / 3) : 0;
-  if (!(sy > 0)) return '';
-  const c = s.p3;
-  /* In coordinates measured from (c, c) the section is u^2 - uv + v^2 = sy^2,
-     an ellipse at 45 degrees: sqrt(2)*sy along the diagonal, sqrt(2/3)*sy
-     across it. */
+/* Three sections of the same cylinder, one for each pair of principal
+   stresses, with the third held at the value it actually has.
+
+   All three ellipses are the same size and shape — the section of a round
+   cylinder cut at a fixed angle does not change — and what moves between the
+   panels is where the centre sits, which is the held stress sliding it along
+   the diagonal. Drawn on one shared scale so that is visible rather than
+   asserted. */
+function misesSectionPanel(xv, yv, c, xName, yName, cName, sy, u, lo, hi) {
+  const W = 250, H = 272, BOX = 190, OX = 32, OY = 14;
+  const k = BOX / (hi - lo);
+  const X = x => (OX + (x - lo) * k).toFixed(1);
+  const Y = y => (OY + (hi - y) * k).toFixed(1);
   const ell = [];
-  for (let i = 0; i <= 96; i++) {
-    const th = i / 96 * 2 * Math.PI;
+  for (let i = 0; i <= 72; i++) {
+    const th = i / 72 * 2 * Math.PI;
     const P = Math.SQRT2 * sy * Math.cos(th), Q = Math.sqrt(2 / 3) * sy * Math.sin(th);
     ell.push([c + (P + Q) / Math.SQRT2, c + (P - Q) / Math.SQRT2]);
   }
-  const hexPts = [[c + sy, c], [c + sy, c + sy], [c, c + sy],
-                  [c - sy, c], [c - sy, c - sy], [c, c - sy]];
-  const all = ell.concat(hexPts, [[s.p1, s.p2], [0, 0]]);
-  const xs = all.map(p => p[0]), ys = all.map(p => p[1]);
-  const lo = Math.min(...xs, ...ys), hi = Math.max(...xs, ...ys);
-  const pad = (hi - lo) * 0.1 || 1;
-  const min = lo - pad, max = hi + pad;
-  /* One scale for both axes, or the ellipse would not look like one. */
-  const box = 300, ox = (W - box) / 2 + 10, oy = 22;
-  const k = box / (max - min);
-  const X = x => (ox + (x - min) * k).toFixed(1);
-  const Y = y => (oy + (max - y) * k).toFixed(1);
-  const path = pts => pts.map((p, i) => (i ? 'L' : 'M') + X(p[0]) + ' ' + Y(p[1])).join(' ');
-  const inside = s.vm <= sy;
+  const hex = [[c + sy, c], [c + sy, c + sy], [c, c + sy],
+               [c - sy, c], [c - sy, c - sy], [c, c - sy]];
+  const path = pts => pts.map((q, i) => (i ? 'L' : 'M') + X(q[0]) + ' ' + Y(q[1])).join(' ');
+  const inside = Math.hypot(xv - c, yv - c) === 0
+    || Math.sqrt((xv - yv) ** 2 + (yv - c) ** 2 + (c - xv) ** 2) <= Math.SQRT2 * sy;
   const dot = inside ? FIG_GOOD : FIG_BAD;
   const tick = n => num(+n.toPrecision(3));
-  return `${figOpen(W, H)} aria-label="The yield surface cut through the third principal stress:
-    an ellipse for von Mises with Tresca's hexagon inside it, and the stress state marked
-    ${inside ? 'inside' : 'outside'} the ellipse.">
-    <g font-family="-apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif" font-size="12">
-      <line x1="${X(min)}" y1="${Y(0)}" x2="${X(max)}" y2="${Y(0)}" stroke="${FIG_INK}"
-            stroke-width="1" opacity="0.45"/>
-      <line x1="${X(0)}" y1="${Y(min)}" x2="${X(0)}" y2="${Y(max)}" stroke="${FIG_INK}"
-            stroke-width="1" opacity="0.45"/>
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" class="figure panel"
+    role="img" aria-label="Section of the yield surface in the ${xName} ${yName} plane, with
+    ${cName} held at ${tick(c)}.">
+    <g font-family="-apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif" font-size="11">
+      <line x1="${X(lo)}" y1="${Y(0)}" x2="${X(hi)}" y2="${Y(0)}" stroke="${FIG_INK}"
+            stroke-width="0.9" opacity="0.4"/>
+      <line x1="${X(0)}" y1="${Y(lo)}" x2="${X(0)}" y2="${Y(hi)}" stroke="${FIG_INK}"
+            stroke-width="0.9" opacity="0.4"/>
       <path d="${path(ell)} Z" fill="${FIG_BLUE}" fill-opacity="0.08" stroke="${FIG_BLUE}"
-            stroke-width="2"/>
-      <path d="${path(hexPts)} Z" fill="none" stroke="${FIG_WARM}" stroke-width="1.6"
-            stroke-dasharray="5 4"/>
-      <line x1="${X(0)}" y1="${Y(0)}" x2="${X(s.p1)}" y2="${Y(s.p2)}" stroke="${dot}"
-            stroke-width="1.4" opacity="0.75"/>
-      <circle cx="${X(s.p1)}" cy="${Y(s.p2)}" r="5.5" fill="${dot}"/>
-      <text x="${X(max)}" y="${(+Y(0) + 16).toFixed(1)}" fill="${FIG_GREY}" text-anchor="end"
-            font-style="italic">&#963;&#8321;</text>
-      <text x="${(+X(0) + 6).toFixed(1)}" y="${(+Y(max) + 2).toFixed(1)}" fill="${FIG_GREY}"
-            font-style="italic">&#963;&#8322;</text>
-      <text x="${X(c + Math.SQRT2 * sy * 0.72)}" y="${Y(c + Math.SQRT2 * sy * 0.72)}"
-            fill="${FIG_BLUE}" font-weight="600">von Mises</text>
-      <text x="${(+X(c - sy) - 6).toFixed(1)}" y="${(+Y(c) + 14).toFixed(1)}" fill="${FIG_WARM}"
-            text-anchor="end">Tresca</text>
-      <text x="${X(s.p1)}" y="${(+Y(s.p2) - 11).toFixed(1)}" fill="${dot}" text-anchor="middle"
-            font-weight="600">(${tick(s.p1)}, ${tick(s.p2)})</text>
-      <text x="${(W / 2).toFixed(0)}" y="${H - 10}" fill="${FIG_GREY}" text-anchor="middle">
-        cut at &#963;&#8323; = ${tick(s.p3)} ${u.stress}, with &#963;&#7522; = ${tick(sy)} ${u.stress}</text>
+            stroke-width="1.8"/>
+      <path d="${path(hex)} Z" fill="none" stroke="${FIG_WARM}" stroke-width="1.3"
+            stroke-dasharray="4 3"/>
+      <circle cx="${X(xv)}" cy="${Y(yv)}" r="4.5" fill="${dot}"/>
+      <text x="${X(hi)}" y="${(+Y(0) + 13).toFixed(1)}" fill="${FIG_GREY}" text-anchor="end"
+            font-style="italic">${xName}</text>
+      <text x="${(+X(0) + 5).toFixed(1)}" y="${(+Y(hi) + 9).toFixed(1)}" fill="${FIG_GREY}"
+            font-style="italic">${yName}</text>
+      <text x="${(W / 2).toFixed(0)}" y="${H - 24}" fill="${dot}" text-anchor="middle"
+            font-weight="600">(${tick(xv)}, ${tick(yv)})</text>
+      <text x="${(W / 2).toFixed(0)}" y="${H - 8}" fill="${FIG_GREY}" text-anchor="middle">
+        held at ${cName} = ${tick(c)} ${u.stress}</text>
     </g></svg>`;
+}
+
+function misesFigureSections(s, u) {
+  const sy = s.R > 0 ? s.R / Math.sqrt(2 / 3) : 0;
+  if (!(sy > 0)) return '';
+  const pairs = [
+    [s.p1, s.p2, s.p3, '\u03C3\u2081', '\u03C3\u2082', '\u03C3\u2083'],
+    [s.p2, s.p3, s.p1, '\u03C3\u2082', '\u03C3\u2083', '\u03C3\u2081'],
+    [s.p3, s.p1, s.p2, '\u03C3\u2083', '\u03C3\u2081', '\u03C3\u2082'],
+  ];
+  /* One scale across all three, or a shifted ellipse would look like a
+     different ellipse. */
+  let lo = 0, hi = 0;
+  for (const [xv, yv, c] of pairs) {
+    for (const q of [c - Math.SQRT2 * sy, c + Math.SQRT2 * sy, xv, yv, 0]) {
+      lo = Math.min(lo, q); hi = Math.max(hi, q);
+    }
+  }
+  const pad = (hi - lo) * 0.08 || 1;
+  lo -= pad; hi += pad;
+  return '<div class="fig-row">'
+    + pairs.map(([xv, yv, c, xn, yn, cn]) =>
+        misesSectionPanel(xv, yv, c, xn, yn, cn, sy, u, lo, hi)).join('')
+    + '</div>';
 }
 
 registerFormula({
@@ -376,7 +388,7 @@ registerFormula({
     'A point in a loaded part is rarely pulled in one direction only. It is stretched one way, squeezed another and sheared at the same time, which is six numbers, and a material data sheet gives you one: the yield strength, measured by pulling a bar. Von Mises is how the six are reduced to something that can be compared with the one.',
     'What it measures is distortion — change of shape, not change of size. Squeeze something equally hard from every direction and it gets smaller without changing shape, and a ductile metal will take enormous pressure that way without yielding.',
     'That is why the surface is a cylinder and not a closed shape like an ellipsoid. Add the same stress to all three principal stresses and every difference in the equation is unchanged, so the answer does not move: a point on the surface stays on it however far you slide along the line of equal stress. A closed surface would have to yield at some pressure, and metals do not. Criteria that do close, like Drucker-Prager, are for soil and concrete, where pressure genuinely matters.',
-    'The ellipse in the second drawing is that same cylinder, cut. The plane of constant σ₃ meets the axis at 35.3°, and an angled cut through a round cylinder is an ellipse — one whose short radius is exactly the cylinder\'s radius and whose long one is √3 times it. Straight across the cylinder instead, square to its axis, the cut is a circle.',
+    'The three ellipses at the foot of the page are that same cylinder, cut. A plane holding one principal stress fixed meets the axis at 35.3°, and an angled cut through a round cylinder is an ellipse — one whose short radius is exactly the cylinder\'s radius and whose long one is √3 times it. That is why all three come out the same size: only the centre moves, sliding along the diagonal with the stress being held. Cut square to the axis instead and you get a circle.',
     'Tresca is drawn alongside because it answers the same question differently, using the largest shear stress rather than the distortion energy. Its hexagon sits inside the ellipse and touches it at six points, so Tresca never permits more than von Mises and sometimes permits about 15% less. Codes often prefer it for exactly that reason.',
     'This is a criterion for ductile materials that yield, not for brittle ones that crack, and it says nothing about fatigue, fracture, buckling or creep. The stresses are taken as given and elastic. There is no factor of safety built in beyond the one reported, and this follows no design code.',
   ],
@@ -461,7 +473,7 @@ registerFormula({
     return [
       { svg: misesFigureElement(v, u),
         title: 'The stress state you entered, on a stress element',
-        caption: 'Blue is direct stress and orange is shear. An arrow pointing out of a face is '
+        caption: 'Blue is normal stress and orange is shear. An arrow pointing out of a face is '
           + 'tension, one pointing into it is compression. Shear comes in pairs because a '
           + 'component on one face is matched on the face beside it — which is why the tensor is '
           + 'symmetric, and why six numbers describe it rather than nine.' },
@@ -472,11 +484,14 @@ registerFormula({
           + 'sliding along the line of equal stress changes the size of a part, not its shape, so '
           + 'it never causes yield however far you go. Only the distance out from that line '
           + 'counts, which is why the radius is the only scale that matters here.' },
-      { svg: misesFigure2D(s, u),
-        title: 'The same surface, cut through σ₃',
-        caption: 'Inside the ellipse the material is elastic; on it, yielding starts. Tresca’s '
-          + 'hexagon is the same prediction made from the largest shear stress instead, and it '
-          + 'sits inside, so it never allows more than von Mises does.' },
+      { svg: misesFigureSections(s, u),
+        title: 'The same surface, cut three ways — one for each pair',
+        caption: 'Each panel takes two principal stresses and holds the third at the value it '
+          + 'has, so together they are three views of the one cylinder. Inside the blue ellipse '
+          + 'the material is elastic; on it, yielding starts. Tresca’s dashed hexagon is the same '
+          + 'prediction made from the largest shear stress instead, and it sits inside, so it '
+          + 'never allows more than von Mises does. All three ellipses are the same size — the '
+          + 'held stress only slides the centre along the diagonal.' },
     ];
   },
 });

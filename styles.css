@@ -301,6 +301,10 @@ button.calc:active { transform: translateY(1px); }
 /* How to fill the form, said above it rather than in six separate hints. */
 .input-note { margin: 0 0 12px; color: var(--muted); font-size: 14px; }
 .figure { width: 100%; max-width: 500px; height: auto; display: block; overflow: visible; }
+/* Three sections of one surface, read across. They wrap to a column on a
+   narrow screen rather than shrinking to the point of being decorative. */
+.fig-row { display: flex; flex-wrap: wrap; gap: 8px; max-width: 100%; }
+.fig-row .figure.panel { flex: 1 1 30%; min-width: 190px; max-width: none; }
 .extras { display: none; margin-top: 14px; border-top: 1px solid var(--border); }
 .extras.show { display: block; }
 #extrasDetail { margin-top: 6px; border-top: 0; }
