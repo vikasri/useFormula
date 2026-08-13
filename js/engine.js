@@ -658,7 +658,7 @@ function renderAbout() {
       <p>Results are estimates for general informational purposes only and are not
       professional advice. Verify all results with qualified professionals and
       authoritative sources before relying on them. useFormula disclaims any
-      liability to the fullest extent permitted by law.</p>
+      liability.</p>
     </div>`;
 }
 

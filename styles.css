@@ -69,16 +69,16 @@ h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.5px; }
   padding: 14px 16px 14px 44px;
   font-size: 17px;
   background: var(--card);
-  border: 1.5px solid var(--num);
+  border: 1.5px solid var(--border);
   border-radius: 8px;
   color: var(--text);
   outline: none;
   box-shadow: var(--shadow);
   transition: border-color .12s ease, box-shadow .12s ease;
 }
-/* Blue outline, and blue again on focus — an orange ring appearing around a
-   blue box would read as a state change rather than just focus. The search
-   box only exists on the landing pages. */
+/* Quiet until you go near it: the border turns blue under the pointer and
+   stays blue while you type, with a ring to match. */
+.search input:hover { border-color: var(--num); }
 .search input:focus { border-color: var(--num); box-shadow: 0 0 0 3px var(--num-soft); }
 .search input::placeholder { color: var(--muted); }
 .search .mag { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 17px; pointer-events: none; }
@@ -94,7 +94,7 @@ h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.5px; }
   display: flex; align-items: center; min-height: 42px;
 }
 .featured-grid .card:hover { transform: translateY(-1px); border-color: var(--accent); box-shadow: var(--shadow); background: var(--accent-soft); }
-.featured-grid .card .title { font-size: 15.5px; font-weight: 650; margin-bottom: 0; line-height: 1.3; padding-right: 18px; }
+.featured-grid .card .title { font-size: 17px; font-weight: 650; margin-bottom: 0; line-height: 1.3; padding-right: 18px; }
 .featured-grid .card .desc, .featured-grid .card .count { display: none; }
 .card .count .topic-tag { color: var(--muted); }
 .section-label .label-note {
@@ -118,7 +118,7 @@ h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.5px; }
   display: flex; align-items: center; justify-content: center;
   text-align: center; min-height: 42px; padding: 8px 10px;
   background: transparent; border: 1.5px dashed var(--border);
-  box-shadow: none; color: var(--muted); font-size: 12.5px; cursor: default;
+  box-shadow: none; color: var(--muted); font-size: 13.5px; cursor: default;
 }
 .card.slot.wide-slot { grid-column: 1 / -1; min-height: 40px; }
 .featured-grid .card.slot:hover {
@@ -389,12 +389,12 @@ footer a:hover { color: var(--accent); }
      Everything inside them shrinks to fit roughly a third of the screen. */
   .featured-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 20px; }
   .featured-grid .card { padding: 9px 8px; }
-  .featured-grid .card .title { font-size: 13.5px; line-height: 1.25; padding-right: 15px; }
+  .featured-grid .card .title { font-size: 15px; line-height: 1.25; padding-right: 15px; }
   .featured-grid .card .count { font-size: 11px; margin-top: 4px; }
   .featured-grid .card .topic-tag { display: none; }   /* no room for it beside the name */
   .featured-grid .heart { top: 2px; right: 1px; font-size: 14px; padding: 2px 3px; }
   .card.slot, .featured-grid .card.slot { font-size: 11px; min-height: 46px; padding: 8px 6px; }
-  .card.slot.wide-slot { font-size: 12.5px; min-height: 38px; }
+  .card.slot.wide-slot { font-size: 13.5px; min-height: 40px; }
   /* Topic tiles: the icon was taking a fifth of the tile on a phone */
   .card { padding: 13px 14px; }
   .card .icon { font-size: 20px; margin-bottom: 4px; }
