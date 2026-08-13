@@ -25,9 +25,9 @@ registerFormula({
   ],
   eq: 't = ln( (A + PMT/r) / (P + PMT/r) ) / ln(1 + r)',
   inputs: [
-    { key: 'now', label: 'What you have now', unit: '$', hint: 'e.g. 20000' },
-    { key: 'goal', label: 'What you are aiming for', unit: '$', hint: 'e.g. 100000' },
-    { key: 'rate', label: 'Return rate per period', unit: '%', hint: 'e.g. 6' },
+    { key: 'now', label: 'What you have now', unit: '$', hint: 'e.g. 10000' },
+    { key: 'goal', label: 'What you are aiming for', unit: '$', hint: 'e.g. 200000' },
+    { key: 'rate', label: 'Return rate per period', unit: '%', hint: 'e.g. 5' },
     { key: 'pmt', label: 'Paid in each period', unit: '$', hint: '0 if nothing is added' },
   ],
   output: { label: 'Periods to reach it', unit: '' },
@@ -65,7 +65,7 @@ registerFormula({
     return rows;
   },
 
-  defaults: { now: 20000, goal: 100000, rate: 6, pmt: 500 },
+  defaults: { now: 10000, goal: 200000, rate: 5, pmt: 4000 },
   sliders: [
     { key: 'rate', span: 5, floor: 0.1, step: 0.1 },
     { key: 'goal', span: 80000, floor: 1000, step: 1000 },
