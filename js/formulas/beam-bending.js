@@ -190,7 +190,7 @@ registerFormula({
     'A beam carries a load across a gap by bending. One face stretches, the other squashes, and the further those faces sit from the middle the less stress it takes to hold the load — which is the whole reason a joist is stood on edge rather than laid flat.',
     'The ends decide most of the answer. A cantilever holding a load at its tip bends sixteen times as far as the same beam simply supported; building both ends in instead quarters it. Each end here is pinned, fixed or free, and the combinations that would let the beam turn and fall are refused rather than answered.',
     'Stress and deflection rarely peak in the same place and neither stands in for the other. A beam can sit well below its yield stress and still sag more than anyone will put up with, which is why floors are held to a fraction of the span rather than to a stress. That check is in the panel.',
-    'One point load, constant section, small deflections, and the material still elastic — below the stress at which it would take a permanent set. Self weight is not included, and nor is shear deflection, which starts to tell on beams that are short and deep. There is no factor of safety here and this follows no design code.',
+    'One point load, constant section, small deflections, and the material still elastic — below the stress at which it would take a permanent set. It also takes the beam as slender, spanning at least ten times its own depth. A short deep one picks up shear deflection that is not counted here, and sags more than this says. Self weight is not included either. There is no factor of safety here and this follows no design code.',
   ],
   eq: 'σmax = Mmax·c / I',
   inputs: [
