@@ -102,6 +102,7 @@ registerFormula({
     return {
       title: 'Stress through the wall, inside to outside',
       xLabel: 'Radius (' + vesselUnits(v).length + ')',
+      yLabel: 'Stress (' + vesselUnits(v).pressure + ')',
       points: hoop, label: 'Hoop',
       extra: [{ points: radial, label: 'Radial', cls: 'red' }],
       yTickFmt: n => num(+n.toFixed(1)),

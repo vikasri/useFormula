@@ -227,6 +227,7 @@ registerFormula({
     const out = {
       title: 'Buckling load against length',
       xLabel: 'Length (' + columnUnits(v).length + ')',
+      yLabel: 'Load (' + columnUnits(v).force + ')',
       points: pts, label: 'Euler',
       yTickFmt: n => num(+n.toPrecision(3)),
       xTickFmt: n => +n.toFixed(0),

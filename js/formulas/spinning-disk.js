@@ -117,6 +117,7 @@ registerFormula({
     return {
       title: 'Stress across the disk, inside to rim',
       xLabel: 'Radius (' + u.length + ')',
+      yLabel: 'Stress (' + u.stress + ')',
       points: hoop, label: 'Hoop',
       extra: [{ points: radial, label: 'Radial', cls: 'red' }],
       yTickFmt: n => num(+n.toFixed(0)),

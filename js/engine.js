@@ -34,7 +34,7 @@
      format   : optional function(n) -> string  (defaults to num)
      defaults : optional {key: value}   pre-filled values
      sliders  : optional [{ key, span, floor, ceil, step }]
-     series   : optional function(v) -> { points, xLabel, title, yTickFmt,
+     series   : optional function(v) -> { points, xLabel, yLabel, title, yTickFmt,
                   label, extra: [{ points, label, cls }] }   extra = more lines
      extras   : optional function(v, answer) -> [{ label, value, wide, detail }]
                   listed under the answer, two per row; detail rows go
@@ -623,12 +623,15 @@ function onSlider(id, key, val) {
 /* series.points is the main line (drawn with a filled area under it).
    series.extra is an optional list of further lines plotted on the same axes:
    [{ points, label, cls }], where cls picks the colour, e.g. 'green'.
+   series.xLabel and yLabel name the axes; the y one is turned on its side and
+   widens the left margin to fit.
    A legend appears only when there is more than one line to tell apart. */
 function renderChartSVG(series) {
   const pts = series.points || [];
   if (pts.length < 2) return '';
   const extra = (series.extra || []).filter(s => s.points && s.points.length > 1);
-  const W = 560, H = 205, padL = 58, padR = 12, padT = 12, padB = 40;
+  /* A y-axis label needs room of its own to the left of the tick figures. */
+  const W = 560, H = 205, padL = series.yLabel ? 80 : 58, padR = 12, padT = 12, padB = 40;
   const scalePts = pts.concat(...extra.map(s => s.points));   // every line shares one y-scale
   const xs = scalePts.map(p => p.x), ys = scalePts.map(p => p.y);
   const xMin = Math.min(...xs), xMax = Math.max(...xs);
@@ -671,6 +674,7 @@ function renderChartSVG(series) {
       <circle cx="${sx(last.x).toFixed(1)}" cy="${sy(last.y).toFixed(1)}" r="4" class="dot"/>
       ${xlabels}
       <text x="${((padL + (W - padR)) / 2).toFixed(1)}" y="${H - 4}" class="axlab" text-anchor="middle">${esc(series.xLabel || '')}</text>
+      ${series.yLabel ? `<text transform="rotate(-90)" x="${(-(padT + H - padB) / 2).toFixed(1)}" y="12" class="axlab" text-anchor="middle">${esc(series.yLabel)}</text>` : ''}
     </svg>`;
 }
 
