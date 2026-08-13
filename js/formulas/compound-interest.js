@@ -15,6 +15,7 @@ registerFormula({
   blurb: 'See what a sum grows to when its interest earns interest too. Enter what you start with, the rate per period, and how many periods.',
   about: [
     'Leave a sum alone at a fixed rate and each period it earns interest on the interest already added, not just on what you started with. That is the whole of it, and it is why the line on the chart bends upward instead of running straight: the amount earning is bigger every period.',
+    'The rate never changes, but what it earns does. Additional Information shows the interest in the first period against the last, and in the first half of the term against the second — the gap between those pairs is the compounding, and it is the reason a few extra periods at the end are worth far more than the same few at the start.',
     'The rate and the period have to describe the same stretch of time. A monthly rate with a number of months gives an answer in months; a yearly rate with a number of years gives one in years. 6% a year is roughly 0.5% a month, not 6%.',
     'This is a lump sum left to itself. It assumes the rate never changes and that nothing is paid in or taken out along the way — for regular deposits, the Annuity Value calculator is the one you want, and to find how long a target takes rather than what a sum reaches, Savings Goal. Tax, fees and inflation are not modelled.',
   ],
@@ -33,9 +34,23 @@ registerFormula({
       { label: 'Interest earned', value: money(out - v.P) },
       { label: 'Every $1 becomes', value: '$' + (v.P > 0 ? (out / v.P).toFixed(2) : '0.00') },
     ];
-    if (v.P > 0 && r > 0) {
-      rows.push({ label: 'Doubles every', detail: true,
-                  value: (Math.log(2) / Math.log(1 + r)).toFixed(1) + ' periods' });
+    if (!(v.P > 0) || !(r > 0)) return rows;
+    rows.push({ label: 'Doubles every', detail: true,
+                value: (Math.log(2) / Math.log(1 + r)).toFixed(1) + ' periods' });
+    /* The same rate on a bigger balance: the last period earns more than the
+       first without anything about the deal changing. This is the whole of
+       compounding, and it is the one thing the headline figure hides. */
+    if (v.n >= 1) {
+      rows.push({ label: 'Interest in the first period, then the last', wide: true, detail: true,
+                  value: `${money(v.P * r)}, then ${money(out * r / (1 + r))}` });
+    }
+    /* Where the growth actually lands. Half the term earns nowhere near half
+       the interest, which is why leaving it a few periods longer pays so well. */
+    if (v.n >= 2) {
+      const half = v.P * Math.pow(1 + r, v.n / 2);
+      rows.push({ label: 'Interest in the first half of the term, then the second',
+                  wide: true, detail: true,
+                  value: `${money(half - v.P)}, then ${money(out - half)}` });
     }
     return rows;
   },
