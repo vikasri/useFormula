@@ -16,11 +16,11 @@ registerFormula({
   desc: 'How long until your savings reach a target',
   keywords: 'savings goal target how long time to reach years to save deposit house down payment emergency fund retirement million back calculate solve for time when will i have',
   title: 'Savings Goal Calculator: How Long Until You Reach a Target',
-  blurb: 'Say what you have, what you pay in each year and the return you expect — this gives the years to reach your target, and how much of that is growth.',
+  blurb: 'How many years until your savings hit a target. Give it what you have, what you add each year and the return you expect.',
   about: [
-    'Every other calculator here is given a length of time and asked for an amount. This one runs the other way: give it the figure you are aiming at and it returns the years, solved outright rather than searched for.',
-    'What you pay in each year is usually the difference between a goal that arrives and one that does not. Set it to 0 to see how long the sum takes on its own — Additional Information gives that figure either way.',
-    'The answer keeps its fraction rather than rounding up, so 23.3 means the target is passed part way through the twenty-fourth year. It assumes the rate holds throughout, that payments arrive at each year end, and that nothing is withdrawn. Tax, fees and inflation are not modelled.',
+    'Most calculators here take a term and give you an amount. This one goes the other way. You give it the figure you want and it returns the years, worked out directly rather than by trial.',
+    'What you put in each year usually decides whether the target is reachable at all. Set it to zero to see how long the starting sum needs on its own, which is normally a very long time.',
+    'The answer is not rounded up: 23.3 years means you cross the line during the twenty-fourth. Payments are taken at each year end, the rate is held flat, and nothing comes out along the way. No tax, no fees, no inflation.',
   ],
   eq: 't = ln( (A + PMT/r) / (P + PMT/r) ) / ln(1 + r)',
   inputs: [
@@ -52,7 +52,7 @@ registerFormula({
     if (v.pmt > 0) {
       const alone = periodsToGoal(v.now, 0, r, v.goal);
       rows.push({ label: 'Paying in nothing, the same sum would take', wide: true, detail: true,
-                  value: alone === null ? 'longer than any term — it never gets there'
+                  value: alone === null ? 'longer than any term; it never gets there'
                     : `${alone.toFixed(1)} years, ${(alone - n).toFixed(1)} more` });
     }
     return rows;

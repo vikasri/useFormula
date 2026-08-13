@@ -12,17 +12,17 @@ registerFormula({
   desc: 'Hoop, radial and axial stress through the wall of a pressurised cylinder',
   keywords: 'thick wall cylinder pressure vessel pipe tube hoop stress circumferential radial axial longitudinal lame internal external pressurised pressurized bore von mises gun barrel hydraulic',
   title: 'Thick Wall Cylinder Calculator: Hoop, Radial, Axial Stress',
-  blurb: 'Stress through the wall of a thick wall pressurised cylinder, from the Lamé equations. Hoop, radial, axial, shear and von Mises, in SI or English units.',
+  blurb: 'Lamé stresses in a pressurised tube: hoop, radial and axial for open or capped ends, with shear and von Mises at the internal surface. SI or English.',
   about: [
-    'Pressure inside a cylinder stretches it around the circumference, and that hoop stress is the one that governs. It is largest at the internal surface and falls towards the outside, while the radial stress runs the other way: minus the pressure there, and zero at the outer surface if nothing presses on it.',
-    'Capped ends add an axial stress along the tube, uniform through the wall and about half the hoop stress at the internal surface. An open end — a gun barrel, a roller, a tube in a fitting that takes the thrust elsewhere — carries none, so both are given. The choice matters more than it looks: the open case has no axial stress to sit between the hoop and the radial, so its von Mises comes out higher, not lower.',
-    'Elastic, isotropic material and an even wall are assumed, well away from the ends. Nozzles, welds, threads and supports concentrate stress above these figures, and none of this is a code calculation — for a vessel that must be certified, the governing code sets the allowable stress and the safety factors.',
+    'Pressure inside a tube tries to split it around the circumference, and that hoop stress is usually what governs. It is highest at the internal surface and drops towards the outside. Radial stress runs the opposite way, equal to minus the internal pressure at the inside face and zero at the outer one.',
+    'Cap the ends and the pressure pushes along the axis as well, adding a stress that is even through the wall and about half the hoop figure. Leave them open, as on a gun barrel or a roller, and there is none. Both are listed because the difference does not go the way people expect: take the axial stress away and the von Mises figure rises.',
+    'These hold well away from the ends, in a plain tube of even wall. Threads, ports, welds and supports concentrate stress locally. Nothing here is a code calculation.',
   ],
   eq: 'σθ,max = (pᵢ(a² + b²) − 2pₒb²) / (b² − a²)',
   inputs: [
     { key: 'sys', label: 'Units', full: true,
-      options: [{ value: 0, label: 'SI — MPa and mm' },
-                { value: 1, label: 'English — psi and inches' }] },
+      options: [{ value: 0, label: 'SI (MPa, mm)' },
+                { value: 1, label: 'English (psi, inches)' }] },
     { key: 'p', label: 'Internal pressure', unit: 'MPa', hint: 'e.g. 10' },
     { key: 'di', label: 'Inner diameter', unit: 'mm', hint: 'e.g. 200' },
     { key: 't', label: 'Wall thickness', unit: 'mm', hint: 'e.g. 20' },
@@ -72,7 +72,7 @@ registerFormula({
 
   advanced: {
     summary: 'What if there is pressure outside too?',
-    intro: 'Blank means atmospheric outside, which is the usual case. Enter a figure for a tube under water, in a borehole, or inside another pressure, and both curves shift with it.',
+    intro: 'Leave this blank for a tube in open air. Down a borehole, under water, or inside a jacket there is pressure on the outside as well: put it in and both curves move.',
     note: (v, hoop) => {
       if (!(v.po > 0)) return '';
       const a = v.di / 2, b = a + v.t;

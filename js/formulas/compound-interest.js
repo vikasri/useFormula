@@ -12,11 +12,11 @@ registerFormula({
   desc: 'What a lump sum grows to when the interest earns interest',
   keywords: 'compound interest future value savings investment growth deposit accumulate lump sum principal doubling per period monthly yearly',
   title: 'Compound Interest Calculator: What a Lump Sum Grows To',
-  blurb: 'See what a sum grows to when its interest earns interest too. Enter what you start with, the rate per period, and how many periods.',
+  blurb: 'What a lump sum grows to once its interest starts earning interest. Give it the starting amount, the rate per period and the number of periods.',
   about: [
-    'Leave a sum alone at a fixed rate and each period it earns interest on the interest already added, not just on what you started with. That is why the line bends upward instead of running straight: the amount earning is bigger every period.',
-    'The rate and the period must describe the same stretch of time. A monthly rate with a number of months gives an answer in months; 6% a year is roughly 0.5% a month, not 6%.',
-    'This is a lump sum left to itself, at a rate that never changes, with nothing paid in or taken out. For regular deposits use Annuity Value, and to find how long a target takes, Savings Goal.',
+    'Interest left in the account starts earning interest of its own. Run that for a few periods and the balance climbs faster each time round, because there is more sitting there to earn on.',
+    'Whatever period you count in, quote the rate in it too. Ten months at 0.5% a month, not ten months at 6% a year.',
+    'One sum, left alone. Nothing paid in, nothing taken out, rate fixed. For regular deposits use Annuity Value. To find how long a target takes, Savings Goal.',
   ],
   eq: 'A = P · (1 + r)ⁿ',
   inputs: [
@@ -67,7 +67,7 @@ registerFormula({
     };
     /* The principal flat underneath, so the gap above it is the interest. */
     return {
-      title: 'What it grows to, and how much of that you put in',
+      title: 'The balance climbing, with the principal flat beneath it',
       xLabel: 'Periods',
       points: curve(p => v.P * Math.pow(1 + r, p)),
       label: 'Value',

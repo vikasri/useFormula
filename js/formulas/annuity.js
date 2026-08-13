@@ -13,11 +13,11 @@ registerFormula({
   desc: 'What regular payments add up to by a future date',
   keywords: 'annuity future value regular payments deposits sip savings recurring contributions retirement pension growing graduated escalating income stream level ordinary compounding',
   title: 'Annuity Calculator: Future Value of Regular Payments',
-  blurb: 'Work out what regular payments add up to by a future date. Level payments by default, or set a growth rate if each payment is larger than the last.',
+  blurb: 'What regular payments add up to by a future date. Level payments to start with, or set a growth rate if each one is bigger than the last.',
   about: [
-    'Pay in the same amount every period and this is what it comes to. Each payment earns for however long it has left, so the first does the most work and the last almost none — which is why the total runs well above the sum of the payments.',
-    'The rate and the period must describe the same stretch of time. Monthly payments want a monthly rate: 6% a year is roughly 0.5% a month, not 6%.',
-    'Growth is 0 by default, the ordinary annuity. Set it and each payment is that much larger than the one before, the way a contribution tied to a salary rises. Payments are assumed to land at the end of each period, at a rate that never changes, with nothing withdrawn.',
+    'Put the same amount away each period and this is what you finish with. The first payment compounds for the whole term. The last one earns nothing at all. Stack those up and the total lands well above the sum of what you paid in.',
+    'Keep the rate on the same footing as the period. Paying in monthly means a monthly rate, near enough 0.5% a month for 6% a year.',
+    'Growth starts at zero, which is the plain annuity. Raise it and every payment is a little larger than the one before, as a contribution tied to a salary would be. Payments are taken at the end of each period and the rate is held flat.',
   ],
   eq: 'FV = PMT · ((1+r)ⁿ − (1+g)ⁿ) / (r − g)',
   inputs: [
@@ -58,7 +58,7 @@ registerFormula({
      it needs filling in. */
   advanced: {
     summary: 'What if the payments grow?',
-    intro: 'Blank means every payment is the same size. Enter a growth rate and each is that much larger than the one before, the way a contribution tied to a salary rises. The chart draws both plans so the gap shows.',
+    intro: 'Left blank, every payment is the same size. Give it a growth rate and each one steps up from the last, as a contribution tied to a salary would. Both plans go on the chart so you can see the gap open.',
     note: (v, out) => {
       if (!v.growth) return '';
       const n = Math.max(0, Math.round(v.n));
@@ -66,8 +66,9 @@ registerFormula({
       if (n < 1 || !isFinite(level)) return '';
       const last = v.PMT * Math.pow(1 + v.growth / 100, n - 1);
       return `Growing ${v.growth}% a period takes the last payment to ${money(last)} `
-        + `and the total to ${money(out)}, against ${money(level)} on level payments `
-        + `— ${money(Math.abs(out - level))} ${out >= level ? 'more' : 'less'}.`;
+        + `and the total to ${money(out)}. Level payments would have reached `
+        + `${money(level)}, so growth is worth ${money(Math.abs(out - level))} `
+        + `${out >= level ? 'more' : 'less'}.`;
     },
   },
   defaults: { PMT: 5000, rate: 6, n: 20 },

@@ -8,11 +8,11 @@ registerFormula({
   desc: "Today's worth of a future amount",
   keywords: 'present value pv discount rate discounting time value of money today worth future amount lump sum npv discounted cash flow settlement payout inheritance',
   title: 'Present Value Calculator: What Future Money Is Worth Today',
-  blurb: 'What a sum arriving in the future is worth today, once the return you could have earned in the meantime is discounted out.',
+  blurb: 'What money arriving later is worth today, once you discount out the return it could have been earning in the meantime.',
   about: [
-    'Money later is worth less than money now, because money now can be earning. This asks how much you would need today to end up with the future amount, at the return you expect — the same compounding as growth, run backwards.',
-    'The discount rate is the return you could get on the money instead, so it is a judgement rather than a lookup. A higher rate means waiting costs more, and a longer wait costs more again: at 7%, $20,000 in ten years is worth about half that today.',
-    'The rate and the period must describe the same stretch of time, and the amount is assumed to be certain. A payment that might not arrive is worth less again than this gives.',
+    'A dollar next year is worth less than a dollar today, because today’s dollar can be earning in the meantime. This works out what you would need to hold now to end up with the amount you have been promised.',
+    'The discount rate is your call rather than a lookup. It stands for the return you could get on the money instead. Raise it and waiting costs more; stretch the wait and it costs more again. At 7%, twenty thousand dollars ten years out is worth a shade over half that today.',
+    'Rate and periods have to match, annual with years or monthly with months. The figure also assumes the money certainly turns up. If there is any doubt it does, it is worth less than this.',
   ],
   eq: 'PV = FV / (1 + r)ⁿ',
   inputs: [

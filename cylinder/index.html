@@ -5,11 +5,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Thick Wall Cylinder Calculator: Hoop, Radial, Axial Stress</title>
-  <meta name="description" content="Stress through the wall of a thick wall pressurised cylinder, from the Lamé equations. Hoop, radial, axial, shear and von Mises, in SI or English units.">
+  <meta name="description" content="Lamé stresses in a pressurised tube: hoop, radial and axial for open or capped ends, with shear and von Mises at the internal surface. SI or English.">
   <link rel="canonical" href="https://useformula.com/cylinder/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Thick Wall Cylinder Calculator: Hoop, Radial, Axial Stress">
-  <meta property="og:description" content="Stress through the wall of a thick wall pressurised cylinder, from the Lamé equations. Hoop, radial, axial, shear and von Mises, in SI or English units.">
+  <meta property="og:description" content="Lamé stresses in a pressurised tube: hoop, radial and axial for open or capped ends, with shear and von Mises at the internal surface. SI or English.">
   <meta property="og:url" content="https://useformula.com/cylinder/">
   <script type="application/ld+json">
   {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://useformula.com/"}, {"@type": "ListItem", "position": 2, "name": "Engineering Mechanics", "item": "https://useformula.com/topics/mechanics/"}, {"@type": "ListItem", "position": 3, "name": "Thick Wall Cylinder", "item": "https://useformula.com/cylinder/"}]}
@@ -35,9 +35,9 @@
     </div>
     <section class="explainer">
       <h2>About Thick Wall Cylinder</h2>
-      <p>Pressure inside a cylinder stretches it around the circumference, and that hoop stress is the one that governs. It is largest at the internal surface and falls towards the outside, while the radial stress runs the other way: minus the pressure there, and zero at the outer surface if nothing presses on it.</p>
-      <p>Capped ends add an axial stress along the tube, uniform through the wall and about half the hoop stress at the internal surface. An open end — a gun barrel, a roller, a tube in a fitting that takes the thrust elsewhere — carries none, so both are given. The choice matters more than it looks: the open case has no axial stress to sit between the hoop and the radial, so its von Mises comes out higher, not lower.</p>
-      <p>Elastic, isotropic material and an even wall are assumed, well away from the ends. Nozzles, welds, threads and supports concentrate stress above these figures, and none of this is a code calculation — for a vessel that must be certified, the governing code sets the allowable stress and the safety factors.</p>
+      <p>Pressure inside a tube tries to split it around the circumference, and that hoop stress is usually what governs. It is highest at the internal surface and drops towards the outside. Radial stress runs the opposite way, equal to minus the internal pressure at the inside face and zero at the outer one.</p>
+      <p>Cap the ends and the pressure pushes along the axis as well, adding a stress that is even through the wall and about half the hoop figure. Leave them open, as on a gun barrel or a roller, and there is none. Both are listed because the difference does not go the way people expect: take the axial stress away and the von Mises figure rises.</p>
+      <p>These hold well away from the ends, in a plain tube of even wall. Threads, ports, welds and supports concentrate stress locally. Nothing here is a code calculation.</p>
     </section>
     <nav class="related">
       <h2>More Engineering Mechanics calculators</h2>
@@ -57,11 +57,11 @@
 </div>
 
 <script src="/js/settings.js?v=35502a14"></script>
-<script src="/js/engine.js?v=d1a1685a"></script>
+<script src="/js/engine.js?v=36799ba9"></script>
 <script src="/js/topics.js?v=d7155719"></script>
 <script src="/js/index.js?v=20453dc7"></script>
-<script src="/js/shared/mechanics.js?v=52e79816"></script>
-<script src="/js/formulas/thick-wall-cylinder.js?v=91ade96f"></script>
+<script src="/js/shared/mechanics.js?v=deec6f91"></script>
+<script src="/js/formulas/thick-wall-cylinder.js?v=12173a92"></script>
 <script src="/js/boot.js?v=e66f6931"></script>
 </body>
 </html>

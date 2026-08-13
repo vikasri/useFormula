@@ -12,17 +12,17 @@ registerFormula({
   desc: 'Hoop and radial stress through the wall of a pressurised sphere',
   keywords: 'thick wall sphere pressure vessel spherical hoop stress radial lame tangential internal external pressurised pressurized shell bore von mises design storage tank',
   title: 'Thick Wall Sphere Calculator: Hoop and Radial Stress',
-  blurb: 'Stress through the wall of a thick wall pressurised sphere, from the Lamé equations. Hoop, radial, shear and von Mises, in SI or English units.',
+  blurb: 'Lamé stresses through the wall of a pressurised sphere: hoop, radial, shear and von Mises, plotted from the inside face to the outside. SI or English.',
   about: [
-    'A sphere under pressure is stretched around every direction at once, so the hoop stress is the same whichever way you cut it. It is largest at the internal surface and falls towards the outside, while the radial stress runs the other way: equal to minus the pressure there, and zero at the outer surface if nothing presses on it.',
-    'A sphere carries roughly half the hoop stress of a cylinder of the same diameter and wall, which is why pressure vessels are domed at the ends and why a spherical tank holds more for the same steel.',
-    'Elastic, isotropic material and a wall of even thickness are assumed. Nozzles, welds, supports and openings concentrate stress well above these figures, and none of this is a code calculation — for a vessel that has to be certified, the governing code sets the allowable stress and the safety factors.',
+    'Pressure inside a sphere pulls the wall apart the same amount in every direction, so there is one hoop stress and it makes no difference where you cut. It peaks at the internal surface and eases towards the outside. Radial stress does the reverse: minus the pressure at the inside face, zero at the outer one.',
+    'For the same diameter and wall, a sphere sees roughly half the hoop stress a cylinder does. Hence the domed ends on pressure vessels, and hence spherical storage tanks.',
+    'Assumes an even wall of elastic, isotropic material. Openings, nozzles and welds all lift the local stress above these numbers. It is not a code check: where a vessel has to be certified, the code sets the allowable stress and the factors.',
   ],
   eq: 'σθ,max = (pᵢ(2a³ + b³) − 3pₒb³) / (2(b³ − a³))',
   inputs: [
     { key: 'sys', label: 'Units', full: true,
-      options: [{ value: 0, label: 'SI — MPa and mm' },
-                { value: 1, label: 'English — psi and inches' }] },
+      options: [{ value: 0, label: 'SI (MPa, mm)' },
+                { value: 1, label: 'English (psi, inches)' }] },
     { key: 'p', label: 'Internal pressure', unit: 'MPa', hint: 'e.g. 10' },
     { key: 'di', label: 'Inner diameter', unit: 'mm', hint: 'e.g. 200' },
     { key: 't', label: 'Wall thickness', unit: 'mm', hint: 'e.g. 20' },
@@ -68,7 +68,7 @@ registerFormula({
      vessel, and a field asking for it invites a number that should be 0. */
   advanced: {
     summary: 'What if there is pressure outside too?',
-    intro: 'Blank means atmospheric outside, which is the usual case. Enter a figure for a vessel under water or inside another pressure, and both curves shift with it.',
+    intro: 'Usually there is nothing but air outside, so leave this blank. For a vessel sitting under water, or inside a larger pressure, put that figure in and both curves move.',
     note: (v, hoop) => {
       if (!(v.po > 0)) return '';
       const a = v.di / 2, b = a + v.t;

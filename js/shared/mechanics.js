@@ -9,8 +9,8 @@
    is why switching it leaves every number where it was and still gives a
    correct answer, as long as your own figures are all in the one system. */
 const VESSEL_UNITS = [
-  { value: 0, label: 'SI — MPa and mm', pressure: 'MPa', length: 'mm' },
-  { value: 1, label: 'English — psi and inches', pressure: 'psi', length: 'in' },
+  { value: 0, label: 'SI (MPa, mm)', pressure: 'MPa', length: 'mm' },
+  { value: 1, label: 'English (psi, inches)', pressure: 'psi', length: 'in' },
 ];
 function vesselUnits(v) { return VESSEL_UNITS[+v.sys === 1 ? 1 : 0]; }
 

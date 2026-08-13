@@ -77,7 +77,7 @@ const FEATURED = ['loan-payment', 'compound-interest', 'annuity'];
    two lines so the served HTML carries the same words the app renders. */
 const HOME_TITLE = 'Free calculators for everyday formulas';
 const HOME_INTRO = 'Loan payments, compound interest, annuities, savings goals and ' +
-  'pressure vessels. Enter what you know and get the answer — free, no sign-up.';
+  'pressure vessels. Fill in what you know and read off the answer. Free, no sign-up.';
 
 /* Favourites live in this browser only: no account, no server, nothing leaves
    the machine. Cleared if the visitor clears site data. */
@@ -636,15 +636,14 @@ function renderAbout() {
     <div class="crumbs"><a href="/">Home</a> › About</div>
     <div class="prose">
       <h1>About useFormula</h1>
-      <p>useFormula is a free calculator for everyday formulas. Pick a formula, enter
-      what you know, and get the answer. There is no account to make, nothing to
-      install, and no charge.</p>
-      <p>Topics today are Finance and Mechanics. More will follow.</p>
+      <p>Free calculators for the formulas people actually look up. Pick one, fill in
+      what you know, read off the answer. No account, no download, no charge.</p>
+      <p>Finance and engineering mechanics so far. More to come.</p>
 
       <h2>Your favorites stay on your device</h2>
-      <p>Tapping ♡ on a formula saves it in your own browser's storage. It is never
-      sent to a server, never shared, and never used to identify you. Clearing your
-      browser data removes it, and favorites do not follow you to another device.</p>
+      <p>Tapping ♡ writes the formula into your browser's own storage. Nothing is sent
+      to a server, shared, or used to work out who you are. Clear your browser data and
+      the list goes with it, and it will not follow you to another device.</p>
 
       <h2>Disclaimer</h2>
       <p>Results are estimates for general informational purposes only and are not

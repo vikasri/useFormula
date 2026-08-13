@@ -8,15 +8,15 @@ registerFormula({
   desc: 'Monthly payment for a fixed-rate loan or mortgage',
   keywords: 'mortgage loan emi installment repayment amortization amortisation home house car auto personal borrow monthly payment principal interest downpayment down payment debt fixed rate term extra payment payoff',
   title: 'Loan Payment Calculator: Monthly Mortgage & Car Payments',
-  blurb: 'The monthly payment on a fixed-rate loan or mortgage, with the total interest, how the balance falls, and what one extra payment a year saves.',
+  blurb: 'Monthly payment on a fixed-rate loan or mortgage. Shows the total interest, how the balance comes down, and what one extra payment a year is worth.',
   about: [
-    'A fixed-rate loan repaid in equal instalments. Give it the amount you need, the downpayment as a percentage, the annual rate and the term; it works out what is actually borrowed and the payment that clears it.',
-    'Every payment is the same size, but its split is not. Early on most of it is interest, and the share going to principal grows each month — which is why the halfway point in the debt arrives well past the halfway point in time.',
-    'The figure is principal and interest only. Property tax, insurance, PMI, HOA dues and fees are not in it, and on a house those can add a lot to what actually leaves your account. It also assumes the rate never changes.',
+    'Give it the amount you need, the downpayment, the rate and the term. It takes the downpayment off the top and works out the level payment that clears what is left.',
+    'The payment never changes. What it buys does. Nearly all of the first one is interest and nearly all of the last one is principal, so the balance barely moves in the early years. You pass the halfway mark on the debt long after the halfway mark in time.',
+    'This is principal and interest. Property tax, insurance, PMI, HOA dues and lender fees sit on top of it, and on a house they are not small. The rate is taken as fixed for the full term.',
   ],
   eq: 'M = P · r(1+r)ⁿ / ((1+r)ⁿ − 1)',
   inputs: [
-    { key: 'total', label: 'Total money required', unit: '$', hint: 'e.g. 375000' },
+    { key: 'total', label: 'Amount needed', unit: '$', hint: 'e.g. 375000' },
     { key: 'downPct', label: 'Downpayment', unit: '%', hint: 'e.g. 20' },
     { key: 'annualRate', label: 'Annual interest rate', unit: '%', hint: 'e.g. 6.5' },
     { key: 'years', label: 'Loan term', unit: 'years', hint: 'e.g. 30' },
@@ -89,7 +89,7 @@ registerFormula({
      would only mislead. */
   advanced: {
     summary: 'What if you paid extra?',
-    intro: 'A one-off extra payment leaves the monthly payment alone — it shortens the loan and cuts the interest instead. Enter an amount to see by how much.',
+    intro: 'A one-off extra payment does not change what you pay each month. It shortens the loan and cuts the interest instead. Put in an amount and see by how much.',
     note: (v, M) => {
       if (!(v.extra > 0)) return '';
       const P = loanPrincipal(v);
