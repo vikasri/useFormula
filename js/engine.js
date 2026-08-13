@@ -240,7 +240,7 @@ function renderHome() {
       <div class="section-label">📊 Popular calculators</div>
       <div class="grid featured-grid">${featured}</div>
       <div class="section-label next">❤️ Your favorites ${favNote}</div>
-      <div class="grid featured-grid">${favCards}</div>
+      <div class="grid featured-grid favorites">${favCards}</div>
       <div class="section-label next">Browse by topic</div>
       <div class="grid">${cards}</div>
     </div>`;

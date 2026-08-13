@@ -112,6 +112,23 @@ h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.5px; }
   transform: translateY(2px);
   box-shadow: 0 1px 0 #1f4fd0, 0 2px 5px rgba(38, 50, 56, 0.18);
 }
+/* Favourites are the visitor's own row rather than ours, so they carry their
+   own colour: indigo beside the blue of the shortcuts above. */
+.featured-grid.favorites .card {
+  background: #6366f1;
+  box-shadow: 0 3px 0 #4348cc, 0 5px 12px rgba(38, 50, 56, 0.20);
+}
+.featured-grid.favorites .card:hover {
+  background: #6366f1;
+  box-shadow: 0 5px 0 #4348cc, 0 9px 18px rgba(38, 50, 56, 0.26);
+}
+.featured-grid.favorites .card:active {
+  box-shadow: 0 1px 0 #4348cc, 0 2px 5px rgba(38, 50, 56, 0.18);
+}
+/* Empty slots keep the row in the same colour without pretending to be full. */
+.featured-grid.favorites .card.slot {
+  background: #f1f1fe; border-color: #cbcbf6; color: #4348cc;
+}
 .featured-grid .card .title { font-size: 17px; font-weight: 650; margin-bottom: 0; line-height: 1.3; padding-right: 18px; }
 .featured-grid .card .desc, .featured-grid .card .count { display: none; }
 .card .count .topic-tag { color: var(--muted); }
