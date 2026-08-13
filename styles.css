@@ -168,7 +168,10 @@ h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.5px; }
   overflow-x: auto;
 }
 /* Problem schematic: sits under the equation, defining the symbols in it. */
-.schematic { margin: 0 0 16px; text-align: center; }
+/* Pulled up tight under the equation it labels, since the two are one thought.
+   The negative top margin eats most of the equation's own bottom margin, which
+   works in every browser; :has() on the parent would not. */
+.schematic { margin: -12px 0 8px; text-align: center; }
 .schematic img { width: 100%; max-width: 340px; height: auto; display: inline-block; }
 
 .fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 13px 12px; margin-bottom: 14px; }
