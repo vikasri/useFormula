@@ -290,6 +290,17 @@ button.calc:active { transform: translateY(1px); }
 
 /* Breakdown under the answer (see a formula's `extras`): two per row, each a
    small label over its value. Rows flagged wide take the whole width. */
+/* A sentence that has to be read before the numbers mean anything. Set apart
+   from the result above it and the breakdown below it, and quieter than both. */
+.explain {
+  margin: 14px 0 0; padding: 12px 14px;
+  background: var(--accent-soft); border-radius: var(--field-radius);
+  color: var(--text); font-size: 15px; line-height: 1.5;
+}
+.fig-caption { margin: 6px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.45; }
+/* How to fill the form, said above it rather than in six separate hints. */
+.input-note { margin: 0 0 12px; color: var(--muted); font-size: 14px; }
+.figure { width: 100%; max-width: 500px; height: auto; display: block; overflow: visible; }
 .extras { display: none; margin-top: 14px; border-top: 1px solid var(--border); }
 .extras.show { display: block; }
 #extrasDetail { margin-top: 6px; border-top: 0; }
@@ -366,7 +377,9 @@ button.calc:active { transform: translateY(1px); }
 .slider input[type=range]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px var(--accent-soft); }
 .chart-wrap { margin-top: 22px; }
 /* A second chart under the first keeps its distance from it. */
-.chart-wrap .chart + .chart-title { margin-top: 24px; }
+.chart-wrap .chart + .chart-title,
+.chart-wrap .figure + .chart-title,
+.chart-wrap .fig-caption + .chart-title { margin-top: 26px; }
 .chart-title { font-size: 14px; font-weight: 600; color: var(--muted); margin-bottom: 10px; }
 .chart { width: 100%; max-width: 500px; height: auto; display: block; overflow: visible; }
 .chart .grid { stroke: var(--border); stroke-width: 1; }

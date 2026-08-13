@@ -54,6 +54,10 @@
                   is not what someone would type into a search box
      blurb    : optional meta description, when `desc` is too terse to earn
                   a click from a results page
+     inputNote: optional line above the form, for a convention the visitor has
+                  to know before typing (a sign convention, say)
+     explain  : optional sentence under the answer, for a page that has to
+                  teach what its number means before the breakdown makes sense
      about    : optional [ 'paragraph', … ] shown under the calculator.
                   What the formula does, what the inputs mean, what it
                   leaves out. Write it for a reader; a page with nothing but
@@ -95,7 +99,7 @@ const FEATURED = ['loan-payment', 'annuity', 'beam-bending'];
    two lines so the served HTML carries the same words the app renders. */
 const HOME_TITLE = 'Free calculators for everyday formulas';
 const HOME_INTRO = 'Loan payments, compound interest, annuities, savings goals, ' +
-  'beam bending, pressure vessels, rotating disks and column buckling. Fill in what you know and read off the answer.';
+  'beam bending, pressure vessels, rotating disks, column buckling and von Mises stress. Fill in what you know and read off the answer.';
 
 /* Favourites live in this browser only: no account, no server, nothing leaves
    the machine. Cleared if the visitor clears site data. */
@@ -385,12 +389,14 @@ function formulaBoxHTML(f) {
       <p class="sub">${esc(f.desc)}</p>
       ${setting('showEquation', true) ? `<div class="eq">${esc(f.eq)}</div>` : ''}
       ${f.diagram ? `<figure class="schematic"><img src="${esc(f.diagram)}" alt="${esc(f.diagramAlt || '')}"></figure>` : ''}
+      ${f.inputNote ? `<p class="input-note">${esc(f.inputNote)}</p>` : ''}
       <div class="fields">${fields}</div>
       <button class="calc" onclick="doCalc('${f.id}')">Calculate</button>
       <div class="result" id="result">
         <div class="label" id="result-label"></div>
         <div class="value" id="result-value"></div>
       </div>
+      ${f.explain ? `<p class="explain">${esc(f.explain)}</p>` : ''}
       ${f.extras ? `<div class="extras" id="extras"></div>` : ''}
       ${f.series ? `<div class="chart-wrap" id="chartWrap"></div>` : ''}
       ${f.sliders ? `<div class="sliders"><div class="sliders-label">Adjust to see the effect</div>${sliders}</div>` : ''}
@@ -647,6 +653,13 @@ function onSlider(id, key, val) {
    widens the left margin to fit.
    A legend appears only when there is more than one line to tell apart. */
 function renderChartSVG(series) {
+  /* Some things are not a line against an axis. A formula may hand over its
+     own drawing, already built from the current numbers, and it is placed
+     where a chart would have gone. */
+  if (series.svg) {
+    return `<div class="chart-title">${esc(series.title || '')}</div>${series.svg}` +
+      (series.caption ? `<p class="fig-caption">${esc(series.caption)}</p>` : '');
+  }
   const pts = series.points || [];
   if (pts.length < 2) return '';
   const extra = (series.extra || []).filter(s => s.points && s.points.length > 1);
