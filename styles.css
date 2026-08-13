@@ -69,14 +69,17 @@ h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.5px; }
   padding: 14px 16px 14px 44px;
   font-size: 17px;
   background: var(--card);
-  border: 1.5px solid var(--border);
+  border: 1.5px solid var(--num);
   border-radius: 8px;
   color: var(--text);
   outline: none;
   box-shadow: var(--shadow);
   transition: border-color .12s ease, box-shadow .12s ease;
 }
-.search input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+/* Blue outline, and blue again on focus — an orange ring appearing around a
+   blue box would read as a state change rather than just focus. The search
+   box only exists on the landing pages. */
+.search input:focus { border-color: var(--num); box-shadow: 0 0 0 3px var(--num-soft); }
 .search input::placeholder { color: var(--muted); }
 .search .mag { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 17px; pointer-events: none; }
 .results-head { font-size: 14px; color: var(--muted); margin: 0 0 12px; }
