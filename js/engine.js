@@ -657,8 +657,8 @@ function renderAbout() {
       <h2>Disclaimer</h2>
       <p>Results are estimates for general informational purposes only and are not
       professional advice. Verify all results with qualified professionals and
-      authoritative sources before relying on them. useFormula disclaims any
-      liability.</p>
+      authoritative sources before relying on them. useFormula accepts no
+      liability, as far as the law allows.</p>
     </div>`;
 }
 
