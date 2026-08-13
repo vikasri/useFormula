@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200"><rect width="1200" height="1200" fill="#ffffff"/><g transform="translate(0,285)">
+  <rect width="1200" height="630" fill="#fdf4ee"/>
+  <rect x="56" y="56" width="1088" height="518" rx="20" fill="#ffffff" stroke="#ede0d6" stroke-width="3"/>
+  <g font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+    <text x="110" y="222" font-size="96" font-weight="700" letter-spacing="-3" fill="#263238">use<tspan fill="#e76f51">Formula</tspan></text>
+    <text x="114" y="286" font-size="38" fill="#5f6e75">Free calculators for everyday formulas</text>
+    <g transform="translate(114,340)">
+      <rect x="0" y="0" width="236" height="60" rx="10" fill="#2f6bff"/>
+      <text x="118" y="40" font-size="25" font-weight="700" fill="#ffffff" text-anchor="middle">Loan Calculator</text>
+      <rect x="256" y="0" width="160" height="60" rx="10" fill="#2f6bff"/>
+      <text x="336" y="40" font-size="25" font-weight="700" fill="#ffffff" text-anchor="middle">Annuity</text>
+      <rect x="422" y="0" width="230" height="60" rx="10" fill="#2f6bff"/>
+      <text x="537" y="40" font-size="25" font-weight="700" fill="#ffffff" text-anchor="middle">Beam Bending</text>
+      <rect x="658" y="0" width="196" height="60" rx="10" fill="#2f6bff"/>
+      <text x="756" y="40" font-size="25" font-weight="700" fill="#ffffff" text-anchor="middle">Buckling</text>
+    </g>
+    <text x="114" y="452" font-size="26" fill="#5f6e75">Finance and engineering mechanics. No sign-up, nothing to install.</text>
+    <g font-family="Menlo, monospace" font-size="25">
+      <text x="114" y="516" fill="#2f6bff">Pcr = &#960;&#178;EI / (KL)&#178;</text>
+      <text x="404" y="516" fill="#16a34a">&#963;max = Mc / I</text>
+      <text x="644" y="516" fill="#e76f51">A = P(1+r)&#8319;</text>
+    </g>
+  </g></g></svg>

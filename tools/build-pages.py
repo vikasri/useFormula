@@ -202,11 +202,22 @@ def head_block(title, description, canonical, trail, website=False):
         '  <meta property="og:title" content="%s">' % e(title),
         '  <meta property="og:description" content="%s">' % e(description),
         '  <meta property="og:url" content="%s">' % e(canonical),
+        '  <meta property="og:site_name" content="useFormula">',
+        # Shared links get a card instead of a bare grey box. Absolute, because
+        # the sites that fetch it are not on this domain.
+        '  <meta property="og:image" content="%s/img/og-image.png?v=%s">' % (SITE, stamp('img/og-image.png').split('v=')[-1]),
+        '  <meta property="og:image:width" content="1200">',
+        '  <meta property="og:image:height" content="630">',
+        '  <meta property="og:image:alt" content="useFormula - free calculators for everyday formulas">',
+        '  <meta name="twitter:card" content="summary_large_image">',
     ]
     if website:
         out += ['  <script type="application/ld+json">',
                 '  ' + json.dumps({'@context': 'https://schema.org', '@type': 'WebSite',
-                                   'name': 'useFormula', 'url': SITE + '/'}),
+                                   'name': 'useFormula', 'url': SITE + '/',
+                                   'publisher': {'@type': 'Organization', 'name': 'useFormula',
+                                                 'url': SITE + '/',
+                                                 'logo': SITE + '/img/og-image.png'}}),
                 '  </script>']
     elif trail:
         out += ['  <script type="application/ld+json">',
