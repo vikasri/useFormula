@@ -447,7 +447,7 @@ def main():
         template,
         'Free Loan, Savings & Engineering Calculators — useFormula',
         'Free online calculators for loan and mortgage payments, compound interest, '
-        'annuities, stress, circuits and engineering mechanics. Enter what you know, '
+        'annuities, savings goals and engineering mechanics. Enter what you know, '
         'get the answer. '
         'No account, nothing to install.',
         '%s/' % SITE,

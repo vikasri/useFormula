@@ -71,7 +71,7 @@ const FEATURED = ['loan-payment', 'compound-interest', 'annuity'];
    two lines so the served HTML carries the same words the app renders. */
 const HOME_TITLE = 'Free calculators for everyday formulas';
 const HOME_INTRO = 'Loan payments, compound interest, annuities, savings goals and ' +
-  'engineering formulas. Enter what you know and get the answer — free, no sign-up.';
+  'work done. Enter what you know and get the answer — free, no sign-up.';
 
 /* Favourites live in this browser only: no account, no server, nothing leaves
    the machine. Cleared if the visitor clears site data. */
