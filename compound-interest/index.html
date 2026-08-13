@@ -36,14 +36,14 @@
     <nav class="related">
       <h2>More Finance calculators</h2>
       <ul>
-        <li><a href="/loan/">Loan Calculator</a>
-        <span>Monthly payment for a fixed-rate loan or mortgage</span></li>
-        <li><a href="/growing-annuity/">Growing Annuity</a>
-        <span>Recurring income growing at a constant rate, valued at a future point</span></li>
-        <li><a href="/present-value/">Present Value</a>
-        <span>Today&#x27;s worth of a future amount</span></li>
         <li><a href="/fv-annuity/">Value of Annuity</a>
         <span>Value of equal recurring deposits</span></li>
+        <li><a href="/growing-annuity/">Growing Annuity</a>
+        <span>Recurring income growing at a constant rate, valued at a future point</span></li>
+        <li><a href="/loan/">Loan Calculator</a>
+        <span>Monthly payment for a fixed-rate loan or mortgage</span></li>
+        <li><a href="/present-value/">Present Value</a>
+        <span>Today&#x27;s worth of a future amount</span></li>
         <li><a href="/roi/">ROI</a>
         <span>Total percentage return, including income received</span></li>
       </ul>
@@ -58,20 +58,12 @@
   </footer>
 </div>
 
-<!-- Site settings: on/off switches, edit this file to change what shows -->
 <script src="/js/settings.js"></script>
-
-<!-- Engine: rendering, routing, calculation, sliders, charts -->
 <script src="/js/engine.js"></script>
-
-<!-- Broad topics -->
 <script src="/js/topics.js"></script>
-
-<!-- One file per topic: its formulas -->
-<script src="/js/finance.js"></script>
-<script src="/js/mechanics.js"></script>
-
-<!-- Start the app once every topic's formulas are registered -->
+<script src="/js/index.js"></script>
+<script src="/js/shared/finance.js"></script>
+<script src="/js/formulas/compound-interest.js"></script>
 <script src="/js/boot.js"></script>
 </body>
 </html>

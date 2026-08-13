@@ -36,20 +36,14 @@
   </footer>
 </div>
 
-<!-- Site settings: on/off switches, edit this file to change what shows -->
+<!-- page-scripts: rewritten per page by tools/build-pages.py. A calculator's
+     own page loads its definition here too; this listing is the home page's,
+     which needs the index only. -->
 <script src="/js/settings.js"></script>
-
-<!-- Engine: rendering, routing, calculation, sliders, charts -->
 <script src="/js/engine.js"></script>
-
-<!-- Broad topics -->
 <script src="/js/topics.js"></script>
-
-<!-- One file per topic: its formulas -->
-<script src="/js/finance.js"></script>
-<script src="/js/mechanics.js"></script>
-
-<!-- Start the app once every topic's formulas are registered -->
+<script src="/js/index.js"></script>
 <script src="/js/boot.js"></script>
+<!-- /page-scripts -->
 </body>
 </html>

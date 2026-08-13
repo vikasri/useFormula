@@ -16,9 +16,10 @@ favicon.svg     – tab icon
 js/settings.js  – on/off switches for site features
 js/engine.js    – rendering, routing, calculation, sliders, charts (no data)
 js/topics.js    – the broad topics (Finance, Mechanics, …)
-js/finance.js   – Finance formulas
-js/mechanics.js – Mechanics formulas
-js/boot.js      – starts the app after all topics have registered
+js/formulas/<id>.js – one formula each: inputs, compute, chart, everything
+js/shared/<topic>.js – helpers several formulas in a topic share (optional)
+js/index.js     – generated; every formula's name/desc/keywords, nothing more
+js/boot.js      – starts the app
 tools/build-pages.py – writes a real page per formula (see Addresses below)
 
 loan/, roi/, …  – generated, do not edit
@@ -30,6 +31,30 @@ Generated files carry a marker comment on line 1. The script only ever rewrites 
 deletes files carrying that marker, so a hand-written file cannot be clobbered. Two
 runs in a row produce byte-identical output, so a rebuild never shows up as a diff
 unless something really changed.
+
+## What a page loads
+
+A calculator's page loads the engine, `js/index.js`, its topic's shared helpers if
+that file exists, and **its own definition only** — never any other formula's:
+
+```
+/js/settings.js  /js/engine.js  /js/topics.js  /js/index.js
+/js/shared/finance.js          ← only if js/shared/<topic>.js exists
+/js/formulas/loan-payment.js   ← only this one
+/js/boot.js
+```
+
+`js/index.js` is generated and holds just the descriptive fields (id, slug, topic,
+name, short, desc, keywords) for every formula — enough for the cards, the search box
+and the related links. The definitions stay in `js/formulas/<id>.js` and are only ever
+fetched by that formula's own page. The build script writes the `<script>` tags per
+page, so this stays true without anyone having to remember it.
+
+That keeps a page the same weight at 100 formulas as at 10: `/loan/` is ~61 KB
+uncompressed, ~19 KB over the wire. The only part that grows is `js/index.js`
+(~2.8 KB today, ~25 KB at 100 formulas, ~9 KB gzipped). If that ever gets heavy, the
+`keywords` field is the bulk of it and could move to a file the search box loads on
+demand — not worth doing before it matters.
 
 ## Addresses
 
@@ -66,12 +91,16 @@ has room for a handful.
 ## Editing
 
 - **Add a topic** → add an entry to `js/topics.js`, create `js/<topic>.js` with its
-  formulas, add a `<script src="/js/<topic>.js">` line to `index.html`, then run
-  `python3 tools/build-pages.py`.
-- **Add a formula** → add an object to the relevant `js/<topic>.js` via
-  `registerFormulas([...])` (id, topic, name, desc, keywords, eq, inputs, output,
-  compute; optional format, defaults, sliders, series, slug), then run
-  `python3 tools/build-pages.py` to give it a page.
+  formulas under `js/formulas/`, then run `python3 tools/build-pages.py`. No script
+  tags to add by hand.
+- **Add a formula** → create `js/formulas/<id>.js` with a single `registerFormula({...})`
+  (id, topic, name, desc, keywords, eq, inputs, output, compute; optional format,
+  defaults, sliders, series, slug), then run `python3 tools/build-pages.py`. The file
+  must be named after the id and hold exactly one formula — the build fails otherwise.
+  Nothing else needs editing: the index, the page, the sitemap and the script tags are
+  all written for you.
+- **Share a helper between formulas in a topic** → put it in `js/shared/<topic>.js`.
+  It is loaded on that topic's formula pages, ahead of the formula itself.
 - **Hide a what-if input from the main form** → mark it `advanced: true` and give the
   formula an `advanced: { summary, intro, note }`. It renders in a collapsed panel above
   the chart, so the basic path stays short.

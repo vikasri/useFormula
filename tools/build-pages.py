@@ -78,31 +78,39 @@ def read_topics():
 
 
 def read_formulas():
-    """One dict per formula. The topic files are hand-written in a steady
-    shape - four spaces, `key: 'value',` - so the fields are read line by line
-    rather than by pulling in a JavaScript engine to evaluate them."""
+    """One dict per file in js/formulas/. Only the descriptive fields are read
+    - the inputs and compute function are the browser's business. The files are
+    hand-written in a steady shape (two spaces, `key: 'value',`), so this reads
+    them line by line rather than pulling in a JavaScript engine."""
     formulas = []
-    for path in sorted((ROOT / 'js').glob('*.js')):
-        if path.name in ('engine.js', 'boot.js', 'settings.js', 'topics.js'):
-            continue
+    for path in sorted((ROOT / 'js' / 'formulas').glob('*.js')):
         current = None
         for line in path.read_text(encoding='utf-8').splitlines():
-            m = re.match(r"^    id: '([^']+)',", line)
+            m = re.match(r"^  id: '([^']+)',", line)
             if m:
-                current = {'id': m.group(1), 'inputs': [], 'file': path.name}
+                if current is not None:
+                    die('%s holds more than one formula; one file each, named '
+                        'after the id' % path.name)
+                current = {'id': m.group(1), 'inputs': [],
+                           'file': 'formulas/' + path.name}
                 formulas.append(current)
                 continue
             if current is None:
                 continue
-            m = re.match(r"""^    (%s): (['"])(.*)\2,?\s*$""" % '|'.join(FIELDS), line)
+            m = re.match(r"""^  (%s): (['"])(.*)\2,?\s*$""" % '|'.join(FIELDS), line)
             if m:
                 current[m.group(1)] = unquote(m.group(3))
                 continue
             # Input rows, for the sentence naming what the calculator asks for.
             # Advanced ones sit behind a panel, so they are left out of it.
-            m = re.match(r"^      \{ key: '[^']+', label: (['\"])(.*?)\1", line)
+            m = re.match(r"^    \{ key: '[^']+', label: (['\"])(.*?)\1", line)
             if m and 'advanced: true' not in line:
                 current['inputs'].append(unquote(m.group(2)))
+        if current is None:
+            die('%s registers no formula (no `  id:` line)' % path.name)
+        if current['id'] != path.stem:
+            die('%s holds formula %r; the file must be named after the id'
+                % (path.name, current['id']))
     return formulas
 
 
@@ -154,7 +162,21 @@ def head_block(title, description, canonical, trail):
     return '\n'.join(out)
 
 
-def page(template, title, description, canonical, prerender, trail=None):
+def script_tags(f=None):
+    """Every page needs the engine and the index. A calculator's page adds its
+    topic's shared helpers, if that file exists, and then its own definition -
+    and nothing else, so opening one calculator never downloads the rest."""
+    src = ['/js/settings.js', '/js/engine.js', '/js/topics.js', '/js/index.js']
+    if f is not None:
+        shared = 'js/shared/%s.js' % f['topic']
+        if (ROOT / shared).exists():
+            src.append('/' + shared)
+        src.append('/js/%s' % f['file'])
+    src.append('/js/boot.js')
+    return '\n'.join('<script src="%s"></script>' % u for u in src)
+
+
+def page(template, title, description, canonical, prerender, trail=None, formula=None):
     """The shell from index.html with this page's head and body dropped in."""
     out, n = re.subn(
         r'  <!-- page-head -->.*?  <!-- /page-head -->',
@@ -166,6 +188,10 @@ def page(template, title, description, canonical, prerender, trail=None):
                      lambda _: '<div id="app">\n%s\n  </div>' % prerender, out)
     if n != 1:
         die('index.html has no empty <div id="app"></div> to fill in')
+    out, n = re.subn(r'<!-- page-scripts.*?<!-- /page-scripts -->',
+                     lambda _: script_tags(formula), out, flags=re.S)
+    if n != 1:
+        die('index.html has no <!-- page-scripts --> block to fill in')
     return MARKER + '\n' + out
 
 
@@ -217,6 +243,16 @@ def topic_prerender(topic, formulas):
         links,
         '    </ul>',
     ])
+
+
+def index_js(formulas):
+    """Every formula, with only what a card, the search box or a related link
+    needs. Loaded by every page, so it is kept to the descriptive fields."""
+    keep = ('id', 'slug', 'topic', 'name', 'short', 'desc', 'keywords')
+    rows = [{k: f[k] for k in keep if f.get(k)} for f in formulas]
+    body = ',\n'.join('  ' + json.dumps(r, ensure_ascii=False) for r in rows)
+    return ('// %s\n// Built from js/formulas/*.js - edit those, then re-run.\n'
+            'registerIndex([\n%s\n]);\n' % (MARKER.strip('<!- >'), body))
 
 
 def write(path, text):
@@ -272,6 +308,8 @@ def main():
         if s in ('topics', 'about', 'js', 'tools', 'index.html'):
             die('slug %r collides with a path the site already uses' % s)
 
+    write(ROOT / 'js' / 'index.js', index_js(formulas))
+
     print('build-pages: %d formulas, %d topics' % (len(formulas), len(topics)))
     written = set()
     urls = [('%s/' % SITE, changed('index.html'))]
@@ -289,7 +327,8 @@ def main():
             '%s/%s/' % (SITE, slug),
             formula_prerender(f, topic, siblings, show_eq),
             trail=[('Home', '/'), (topic['name'], '/topics/%s/' % topic['id']),
-                   (f['name'], '/%s/' % slug)]))
+                   (f['name'], '/%s/' % slug)],
+            formula=f))
         written.add(rel)
         urls.append(('%s/%s/' % (SITE, slug), changed('js/' + f['file'])))
 

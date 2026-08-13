@@ -4,9 +4,10 @@
 
    DATA MODEL
    Topics are registered by js/topics.js (registerTopics).
-   Formulas are registered by one file per topic
-   (js/finance.js, js/mechanics.js)
-   via registerFormulas([...]). No data lives in this file.
+   Formulas live one per file in js/formulas/<id>.js, each calling
+   registerFormula({...}). js/index.js — generated — lists them all with
+   their descriptive fields only, and is what every page loads; a formula's
+   own page is the only one that loads its definition. No data lives here.
 
    Each formula:
      id, topic, name, desc, keywords
@@ -31,11 +32,24 @@
                   adding, renaming or removing a formula.
    ============================================================ */
 
-// Registries — populated by the topic files, then read by the renderers.
+/* Registries. TOPICS comes from js/topics.js.
+
+   FORMULAS is filled in two passes. js/index.js — generated, loaded by every
+   page — lists every formula with only the fields the cards, the search and
+   the related links read: id, slug, topic, name, short, desc, keywords. A
+   calculator's own page then loads js/formulas/<id>.js on top, which carries
+   the inputs, the compute function and the rest.
+
+   The point of the split is that a page's weight does not grow with the site:
+   opening one calculator never downloads the other ninety-nine. */
 const TOPICS = [];
 const FORMULAS = [];
 function registerTopics(list) { TOPICS.push(...list); }
-function registerFormulas(list) { FORMULAS.push(...list); }
+function registerIndex(list) { FORMULAS.push(...list); }
+function registerFormula(def) {
+  const at = FORMULAS.findIndex(f => f.id === def.id);
+  if (at === -1) FORMULAS.push(def); else Object.assign(FORMULAS[at], def);
+}
 
 // Formatting helpers (available to every topic file's format/series).
 const money = n => '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -326,6 +340,11 @@ function renderNotFound() {
 function renderFormula(key) {
   const f = findFormula(key);
   if (!f) return renderNotFound();
+  /* Only the index is loaded here — this is an old #formula/... link landing
+     on a page that never asked for this calculator's definition. Its own page
+     does load it, so hand the visitor over to it, upgrading the address on the
+     way. replace(), not assign(), so Back still leaves the site. */
+  if (!f.inputs) { location.replace(formulaURL(f)); return; }
   const topic = TOPICS.find(t => t.id === f.topic);
   app.innerHTML = `
     <div class="crumbs">
