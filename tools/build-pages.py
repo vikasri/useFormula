@@ -25,6 +25,7 @@ line is ever rewritten or deleted, so a hand-written file cannot be clobbered
 by a stray run. Re-run after editing any formula's name, desc or eq.
 """
 
+import hashlib
 import html
 import json
 import re
@@ -200,18 +201,31 @@ def head_block(title, description, canonical, trail, website=False):
     return '\n'.join(out)
 
 
+def stamp(rel):
+    """The file's URL with a short hash of its contents on the end.
+
+    Pages serves js and css with `cache-control: max-age=600`, so for ten
+    minutes after a deploy a browser will use what it already has without
+    asking. That is long enough to pair a fresh formula with the stale helper
+    file it depends on - the formula calls a function the old helper has never
+    heard of, compute throws, and the page loses its answer and its chart. A
+    changed file gets a new address here, so that pairing cannot happen."""
+    digest = hashlib.sha256((ROOT / rel).read_bytes()).hexdigest()[:8]
+    return '/%s?v=%s' % (rel, digest)
+
+
 def script_tags(f=None):
     """Every page needs the engine and the index. A calculator's page adds its
     topic's shared helpers, if that file exists, and then its own definition -
     and nothing else, so opening one calculator never downloads the rest."""
-    src = ['/js/settings.js', '/js/engine.js', '/js/topics.js', '/js/index.js']
+    src = ['js/settings.js', 'js/engine.js', 'js/topics.js', 'js/index.js']
     if f is not None:
         shared = 'js/shared/%s.js' % f['topic']
         if (ROOT / shared).exists():
-            src.append('/' + shared)
-        src.append('/js/%s' % f['file'])
-    src.append('/js/boot.js')
-    return '\n'.join('<script src="%s"></script>' % u for u in src)
+            src.append(shared)
+        src.append('js/%s' % f['file'])
+    src.append('js/boot.js')
+    return '\n'.join('<script src="%s"></script>' % stamp(u) for u in src)
 
 
 def page(template, title, description, canonical, prerender,
@@ -231,6 +245,10 @@ def page(template, title, description, canonical, prerender,
                      lambda _: script_tags(formula), out, flags=re.S)
     if n != 1:
         die('tools/shell.html has no <!-- page-scripts --> block to fill in')
+    out, n = re.subn(r'href="/styles\.css"',
+                     lambda _: 'href="%s"' % stamp('styles.css'), out)
+    if n != 1:
+        die('tools/shell.html has no <link href="/styles.css"> to stamp')
     return MARKER + '\n' + out
 
 

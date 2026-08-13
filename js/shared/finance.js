@@ -82,3 +82,32 @@ function compoundingName(m) {
                   26: 'fortnightly', 52: 'weekly', 365: 'daily' };
   return named[m] || (+m.toFixed(2)) + ' times a year';
 }
+
+/* Periods needed to get from `now` to `goal`, earning r per period and paying
+   in PMT at the end of each one. Rearranged from the balance after n periods,
+
+     A = P(1+r)ⁿ + PMT · ((1+r)ⁿ − 1) / r
+       = (1+r)ⁿ · (P + PMT/r) − PMT/r
+
+   which solves exactly, no searching:
+
+     n = ln( (A + PMT/r) / (P + PMT/r) ) / ln(1+r)
+
+   Returns null when the goal is out of reach — no growth and nothing paid in,
+   or a balance the payments can never lift because they only replace what the
+   negative rate takes. */
+function periodsToGoal(now, pmt, r, goal) {
+  if (goal <= now) return 0;
+  if (r === 0) return pmt > 0 ? (goal - now) / pmt : null;
+  const base = pmt / r;
+  if (now + base <= 0 || goal + base <= 0) return null;
+  const n = Math.log((goal + base) / (now + base)) / Math.log(1 + r);
+  return isFinite(n) && n > 0 ? n : null;
+}
+
+/* Balance after n periods, same convention: payment at the end of each. */
+function balanceAfter(now, pmt, r, n) {
+  if (n <= 0) return now;
+  if (r === 0) return now + pmt * n;
+  return now * Math.pow(1 + r, n) + pmt * (Math.pow(1 + r, n) - 1) / r;
+}
