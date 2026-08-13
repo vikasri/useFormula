@@ -45,6 +45,7 @@ header.site {
 header.site .brand {
   display: flex; align-items: baseline; gap: 10px;
   cursor: pointer; min-width: 0; flex-wrap: wrap;
+  text-decoration: none; color: inherit;
 }
 header.site .logo {
   font-size: 22px; font-weight: 700; letter-spacing: -0.5px;
@@ -255,8 +256,12 @@ button.calc:active { transform: translateY(1px); }
   display: flex; align-items: center; gap: 8px; list-style: none;
 }
 .advanced > summary::-webkit-details-marker { display: none; }
-.advanced > summary::before { content: '\25B8'; color: var(--muted); font-size: 12px; }
-.advanced[open] > summary::before { content: '\25BE'; }
+/* Down arrow in the brand colour, big enough to read as "there is more here";
+   it flips up once the panel is open. */
+.advanced > summary::before {
+  content: '\25BC'; color: var(--accent); font-size: 19px; line-height: 1;
+}
+.advanced[open] > summary::before { content: '\25B2'; }
 .advanced > summary:hover { color: var(--accent); }
 .advanced .body { padding: 0 14px 14px; }
 .advanced-intro { color: var(--muted); font-size: 15px; margin: 0 0 11px; }

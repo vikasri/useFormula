@@ -56,6 +56,7 @@ function extraPaymentMonth(v) {
 registerFormulas([
   {
     id: 'loan-payment',
+    slug: 'loan',
     topic: 'finance',
     name: 'Loan Payment Calculator',
     short: 'Loan Calculator',

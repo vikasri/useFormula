@@ -26,6 +26,9 @@
      advanced : optional { summary, intro, note(v, answer) -> string }
                   the panel holding the advanced inputs
      short    : optional shorter name for cards and shortcuts
+     slug     : optional shorter web address, e.g. slug 'loan' puts
+                  loan-payment at /loan/. Re-run tools/build-pages.py after
+                  adding, renaming or removing a formula.
    ============================================================ */
 
 // Registries — populated by the topic files, then read by the renderers.
@@ -59,6 +62,18 @@ function setting(key, dflt) {
 
 function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
+/* Every page is a real file, written by tools/build-pages.py: /loan/,
+   /topics/finance/, /about/. Links use these paths so a visitor can copy the
+   address bar and a search engine has something to index; the old #formula/...
+   addresses still work, see currentRoute.
+
+   A formula sits at its id unless it sets `slug`, which puts a much-used
+   calculator on a shorter one: loan-payment answers at /loan/. */
+function slugOf(f) { return f.slug || f.id; }
+function formulaURL(f) { return '/' + slugOf(f) + '/'; }
+function topicURL(id) { return '/topics/' + id + '/'; }
+function findFormula(key) { return FORMULAS.find(f => f.id === key || f.slug === key); }
+
 /* localStorage throws in some private-browsing modes, so every use is guarded
    and the site stays usable with favourites simply doing nothing. */
 function getFavs() {
@@ -79,8 +94,7 @@ function toggleFav(id, ev) {
   if (at === -1) list.unshift(id); else list.splice(at, 1);
   try { localStorage.setItem(FAV_KEY, JSON.stringify(list)); } catch (e) {}
 
-  const page = location.hash.replace(/^#/, '').split('/')[0];
-  if (!page) { renderHome(); return false; }        // home: the card moves rows, so redraw
+  if (currentRoute().page === 'home') { renderHome(); return false; }   // the card moves rows, so redraw
   const on = isFav(id);                             // elsewhere: update in place, keep typed values
   document.querySelectorAll('[data-fav="' + id + '"]').forEach(el => {
     el.classList.toggle('on', on);
@@ -108,7 +122,7 @@ function formulaCardHTML(f, showTopic) {
      leave a stray "·" in front of Open. */
   const tag = showTopic === false ? '' :
     `<span class="topic-tag">${topic.icon || ''} ${esc(topic.name || '')} · </span>`;
-  return `<a class="card" onclick="location.hash='formula/${f.id}'">
+  return `<a class="card" href="${formulaURL(f)}">
       ${heartHTML(f.id)}
       <div class="title">${esc(shortName(f))}</div>
       <div class="desc">${esc(f.desc)}</div>
@@ -121,16 +135,16 @@ function formulaCardHTML(f, showTopic) {
 function renderNav() {
   const el = document.getElementById('topnav');
   if (!el) return;
-  const here = location.hash.replace(/^#/, '').split('/');
+  const here = currentRoute();
   el.innerHTML = TOPICS.map(t =>
-    `<a class="navlink${here[0] === 'topic' && here[1] === t.id ? ' on' : ''}"
-        onclick="location.hash='topic/${t.id}'">${t.icon} ${esc(t.name)}</a>`).join('');
+    `<a class="navlink${here.page === 'topic' && here.arg === t.id ? ' on' : ''}"
+        href="${topicURL(t.id)}">${t.icon} ${esc(t.name)}</a>`).join('');
 }
 
 function byId(ids) { return ids.map(id => FORMULAS.find(f => f.id === id)).filter(Boolean); }
 
 function renderHome() {
-  const cards = TOPICS.map(t => `<a class="card" onclick="location.hash='topic/${t.id}'">
+  const cards = TOPICS.map(t => `<a class="card" href="${topicURL(t.id)}">
       <div class="icon">${t.icon}</div>
       <div class="title">${esc(t.name)}</div>
       <div class="desc">${esc(t.desc)}</div>
@@ -201,7 +215,7 @@ function renderTopic(topicId) {
   const list = FORMULAS.filter(f => f.topic === topicId);
   const cards = topicCardsHTML(list) || `<p class="sub">No formulas here yet.</p>`;
   app.innerHTML = `
-    <div class="crumbs"><a onclick="location.hash=''">Home</a> › ${esc(topic.name)}</div>
+    <div class="crumbs"><a href="/">Home</a> › ${esc(topic.name)}</div>
     <h1>${topic.icon} ${esc(topic.name)}</h1>
     <p class="sub">${esc(topic.desc)}</p>
     <div class="search">
@@ -275,7 +289,7 @@ function formulaBoxHTML(f, opts) {
   /* On the home page the section label above already names the calculator, so
      the box shows only its description and a link to its own page. */
   const heading = opts.asFlagship
-    ? `<a class="open-page" onclick="location.hash='formula/${f.id}'">Open its own page →</a>`
+    ? `<a class="open-page" href="${formulaURL(f)}">Open its own page →</a>`
     : `<h1>${esc(f.name)}</h1>`;
 
   return `
@@ -301,14 +315,25 @@ function formulaBoxHTML(f, opts) {
     </div>`;
 }
 
-function renderFormula(id) {
-  const f = FORMULAS.find(x => x.id === id);
-  if (!f) return renderHome();
+/* Also what 404.html runs, since Pages serves it at whatever address was
+   asked for: the message matches the address instead of quietly showing home. */
+function renderNotFound() {
+  app.innerHTML = `
+    <div class="prose">
+      <h1>Page not found</h1>
+      <p>That address does not match any calculator.
+      <a href="/">Start from the home page</a>.</p>
+    </div>`;
+}
+
+function renderFormula(key) {
+  const f = findFormula(key);
+  if (!f) return renderNotFound();
   const topic = TOPICS.find(t => t.id === f.topic);
   app.innerHTML = `
     <div class="crumbs">
-      <a onclick="location.hash=''">Home</a> ›
-      <a onclick="location.hash='topic/${topic.id}'">${esc(topic.name)}</a> ›
+      <a href="/">Home</a> ›
+      <a href="${topicURL(topic.id)}">${esc(topic.name)}</a> ›
       ${esc(f.name)}
     </div>` + formulaBoxHTML(f);
   (f.sliders || []).forEach(s => paintSlider(document.getElementById('sl_' + s.key)));
@@ -525,7 +550,7 @@ function renderChartSVG(series) {
 
 function renderAbout() {
   app.innerHTML = `
-    <div class="crumbs"><a onclick="location.hash=''">Home</a> › About</div>
+    <div class="crumbs"><a href="/">Home</a> › About</div>
     <div class="prose">
       <h1>About useFormula</h1>
       <p>useFormula is a free calculator for everyday formulas. Pick a formula, enter
@@ -546,12 +571,31 @@ function renderAbout() {
     </div>`;
 }
 
-function route() {
+/* Which page to draw. The path is the address now — /loan-payment/ is its own
+   file on the server — but the site ran on #formula/loan-payment for a while,
+   so a hash is still honoured first and anything already shared keeps working. */
+function currentRoute() {
   const h = location.hash.replace(/^#/, '');
-  const [page, arg] = h.split('/');
-  if (page === 'topic') renderTopic(arg);
-  else if (page === 'formula') renderFormula(arg);
-  else if (page === 'about') renderAbout();
+  if (h) {
+    const [page, arg] = h.split('/');
+    if (page === 'formula') return { page: 'formula', arg };
+    if (page === 'topic') return { page: 'topic', arg };
+    if (page === 'about') return { page: 'about' };
+  }
+  /* index.html is dropped so the file and the directory it lives in are the
+     same page, whether the server spells it out or not. */
+  const parts = location.pathname.split('/').filter(p => p && p !== 'index.html');
+  if (!parts.length) return { page: 'home' };
+  if (parts[0] === 'topics') return { page: 'topic', arg: parts[1] };
+  if (parts[0] === 'about') return { page: 'about' };
+  return { page: 'formula', arg: parts[0] };
+}
+
+function route() {
+  const r = currentRoute();
+  if (r.page === 'topic') renderTopic(r.arg);
+  else if (r.page === 'formula') renderFormula(r.arg);
+  else if (r.page === 'about') renderAbout();
   else renderHome();
   renderNav();
   window.scrollTo(0, 0);
