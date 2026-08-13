@@ -423,7 +423,8 @@ def main():
             '%s. %d free calculators: enter what you know and get the answer.' % (t['desc'], len(mine)),
             '%s/topics/%s/' % (SITE, t['id']),
             topic_prerender(t, mine),
-            trail=[('Home', '/'), (t['name'], '/topics/%s/' % t['id'])]))
+            trail=[('Home', '/'), (t['name'], '/topics/%s/' % t['id'])],
+            body_class='landing'))
         written.add(rel)
         urls.append(('%s/topics/%s/' % (SITE, t['id']),
                      changed('js/topics.js', *('js/' + f['file'] for f in mine))))
@@ -453,7 +454,7 @@ def main():
         '    <h1>%s</h1>\n    <p class="sub">%s</p>\n%s'
         % (html.escape(read_const('HOME_TITLE')), html.escape(read_const('HOME_INTRO')),
            home_links(formulas)),
-        website=True, body_class='home'))
+        website=True, body_class='landing'))
 
     write(ROOT / '404.html', page(
         template,
