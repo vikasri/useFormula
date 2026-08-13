@@ -223,7 +223,7 @@ registerFormula({
     { key: 'c', label: 'Distance to the outer fibre', unit: 'mm', hint: 'half the depth',
       showIf: v => +v.sec === SEC_GIVEN },
     { key: 'len', label: 'Span', unit: 'mm', hint: 'e.g. 2000' },
-    { key: 'P', label: 'Load', unit: 'N', hint: 'e.g. 1000' },
+    { key: 'P', label: 'Load', unit: 'N', hint: 'e.g. 10000' },
     { key: 'a', label: 'Load position, from the left end', unit: 'mm', hint: 'e.g. 1000' },
     { key: 'E', label: 'Modulus of elasticity', unit: 'MPa', hint: '200000 for steel' },
     { key: 'lim', label: 'Deflection limit, span ÷', unit: '', hint: 'e.g. 360',
@@ -297,7 +297,7 @@ registerFormula({
     },
   },
   defaults: { sys: 0, sec: SEC_RECT, endL: END_PIN, endR: END_PIN,
-              w: 50, h: 100, len: 2000, P: 1000, a: 1000, E: 200000 },
+              w: 50, h: 100, len: 2000, P: 10000, a: 1000, E: 200000 },
   sliders: [
     { key: 'a', span: 2000, floor: 0, ceil: 2000, step: 10 },
   ],
