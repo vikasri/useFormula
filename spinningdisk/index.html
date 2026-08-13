@@ -5,17 +5,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Spinning Disk Calculator: Stress in a Rotating Hollow Disk</title>
-  <meta name="description" content="Hoop and radial stress in a hollow disk spinning at speed, with the bore figure that governs and the tip speed alongside it.">
+  <meta name="description" content="Hoop and radial stress in a hollow disk spinning at speed, with the bore figure that governs and the rim speed alongside it. SI or English.">
   <link rel="canonical" href="https://useformula.com/spinningdisk/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Spinning Disk Calculator: Stress in a Rotating Hollow Disk">
-  <meta property="og:description" content="Hoop and radial stress in a hollow disk spinning at speed, with the bore figure that governs and the tip speed alongside it.">
+  <meta property="og:description" content="Hoop and radial stress in a hollow disk spinning at speed, with the bore figure that governs and the rim speed alongside it. SI or English.">
   <meta property="og:url" content="https://useformula.com/spinningdisk/">
   <script type="application/ld+json">
   {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://useformula.com/"}, {"@type": "ListItem", "position": 2, "name": "Engineering Mechanics", "item": "https://useformula.com/topics/mechanics/"}, {"@type": "ListItem", "position": 3, "name": "Hollow Spinning Disk", "item": "https://useformula.com/spinningdisk/"}]}
   </script>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/styles.css?v=5fcb1d41">
+<link rel="stylesheet" href="/styles.css?v=500112d5">
 </head>
 <body>
 <div class="wrap">
@@ -31,13 +31,14 @@
       <div class="formula-head"><div class="formula-title"><h1>Hollow Spinning Disk</h1></div></div>
       <p class="sub">Stress raised in a rotating disk by its own mass</p>
       <div class="eq">σθ,max = ((3+ν)/4) · ρω² · (b² + a²(1−ν)/(3+ν))</div>
-      <figure class="schematic"><img src="/img/spinning-disk.svg" alt="A hollow disk of uniform thickness spinning about its centre, with bore radius a, outer radius b, and the hoop and radial stresses in the material."></figure>
-      <p class="notes">Enter rotational speed, outer diameter, bore diameter, density and poisson&#x27;s ratio to work out the stress raised in a rotating disk by its own mass.</p>
+      <figure class="schematic"><img src="/img/spinning-disk.svg" alt="A hollow disk of uniform thickness spinning about its centre, with internal radius a, outer radius b, and the hoop and radial stresses in the material."></figure>
+      <p class="notes">Enter units, rotational speed, outer diameter, internal diameter, density and poisson&#x27;s ratio to work out the stress raised in a rotating disk by its own mass.</p>
     </div>
     <section class="explainer">
       <h2>About Spinning Disk</h2>
-      <p>Nothing is pushing on a spinning disk. The stress comes from its own mass: every part of it is trying to carry on in a straight line, and the material inboard has to hold it in. That pull is worst at the bore, where the least material is doing the most holding.</p>
-      <p>Cutting a hole in the middle roughly doubles the peak stress, however small the hole. A solid disk carries its highest stress at the dead centre; put a bore in and the material that used to sit there is gone, so what remains at the edge of the hole takes twice the load. The figure under Additional Information compares the two.</p>
+      <p>Nothing is pushing on a spinning disk. The stress comes from its own mass: every part of it is trying to carry on in a straight line, and the material inboard has to hold it in. That pull is worst at the internal surface, where the least material is doing the most holding.</p>
+      <p>Cutting a hole in the middle roughly doubles the peak stress, however small the hole. A solid disk carries its highest stress at the dead centre; put a hole there and what remains at its edge takes twice the load. Additional Information compares the two.</p>
+      <p>Switching the unit system here converts the numbers, since ρω²r² carries dimensions and the arithmetic genuinely changes. Rev/min means the same thing either way, so only the diameters and the density move.</p>
       <p>Uniform thickness, free at both faces, thin enough to treat as plane stress. Blades, a shrunk-on rim, a keyway or a press fit all change it, and none of that is here. Nor is any allowance for temperature, creep or the margin a real rotor is designed to.</p>
     </section>
     <nav class="related">
@@ -60,11 +61,11 @@
 </div>
 
 <script src="/js/settings.js?v=35502a14"></script>
-<script src="/js/engine.js?v=b93217ff"></script>
+<script src="/js/engine.js?v=2aefad70"></script>
 <script src="/js/topics.js?v=29e1a660"></script>
 <script src="/js/index.js?v=f10a8a32"></script>
-<script src="/js/shared/mechanics.js?v=558ebcd7"></script>
-<script src="/js/formulas/spinning-disk.js?v=3c4700b4"></script>
+<script src="/js/shared/mechanics.js?v=1fa88170"></script>
+<script src="/js/formulas/spinning-disk.js?v=3402bf97"></script>
 <script src="/js/boot.js?v=e66f6931"></script>
 </body>
 </html>

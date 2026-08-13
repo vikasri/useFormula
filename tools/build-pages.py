@@ -449,10 +449,8 @@ def main():
     write(ROOT / 'index.html', page(
         template,
         'Free Loan, Savings & Engineering Calculators — useFormula',
-        'Free online calculators for loan and mortgage payments, compound interest, '
-        'annuities, savings goals and thick wall pressure vessels. Enter what you know, '
-        'get the answer. '
-        'No account, nothing to install.',
+        'Free calculators for loan payments, compound interest, annuities, savings '
+        'goals, pressure vessels and rotating disks. No sign-up, nothing to install.',
         '%s/' % SITE,
         '    <h1>%s</h1>\n    <p class="sub">%s</p>\n%s'
         % (html.escape(read_const('HOME_TITLE')), html.escape(read_const('HOME_INTRO')),

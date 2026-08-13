@@ -19,6 +19,8 @@
                   advanced inputs move to a collapsed panel by the chart
                   full    : the field spans the whole row
                   options : [{ value, label }] renders a select, not a number
+     onFieldChange : optional function(key) called when a field changes,
+                  before the recalculation, for rewriting sibling fields
      unitsFor : optional function(v) -> { inputKey: 'unit', … }
                   relabels the units after every calculation, for a formula
                   carrying a unit-system selector. output.unit may be a
@@ -79,8 +81,8 @@ const FEATURED = ['loan-payment', 'compound-interest', 'annuity'];
 /* The home page's heading and standfirst. tools/build-pages.py reads these
    two lines so the served HTML carries the same words the app renders. */
 const HOME_TITLE = 'Free calculators for everyday formulas';
-const HOME_INTRO = 'Loan payments, compound interest, annuities, savings goals and ' +
-  'pressure vessels. Fill in what you know and read off the answer. Free, no sign-up.';
+const HOME_INTRO = 'Loan payments, compound interest, annuities, savings goals, ' +
+  'pressure vessels and rotating disks. Fill in what you know and read off the answer.';
 
 /* Favourites live in this browser only: no account, no server, nothing leaves
    the machine. Cleared if the visitor clears site data. */
@@ -566,6 +568,9 @@ function recenterSlider(s, val) {
 // so its range spans both below and above the entered value, then recompute.
 function onField(id, key) {
   const f = FORMULAS.find(x => x.id === id);
+  /* One field can change what the others mean. A unit-system selector has to
+     carry the numbers across with it, or kg/m³ silently becomes lb/in³. */
+  if (f.onFieldChange) f.onFieldChange(key);
   const s = (f.sliders || []).find(sl => sl.key === key);
   if (s) {
     const val = parseFloat(document.getElementById('in_' + key).value);

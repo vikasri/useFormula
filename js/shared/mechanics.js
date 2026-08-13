@@ -45,16 +45,16 @@ function vonMises(s1, s2, s3) {
   return Math.sqrt(0.5 * ((s1 - s2) ** 2 + (s2 - s3) ** 2 + (s3 - s1) ** 2));
 }
 
-/* A disk of uniform thickness spinning about its centre, plane stress. Radii
-   in mm, density in kg/m³, ω in rad/s; the answer comes back in MPa.
+/* A disk of uniform thickness spinning about its centre, plane stress. `scale`
+   carries the unit system: see DISK_UNITS below. ω is in rad/s either way.
 
      σr(r) = k(a² + b² − a²b²/r² − r²)
      σθ(r) = k(a² + b² + a²b²/r² − r²(1+3ν)/(3+ν))     k = (3+ν)ρω²/8
 
    Nothing presses on either face, so σr is zero at both and peaks in between,
    at r = √(ab). σθ is largest at the bore. */
-function diskStresses(rho, omega, nu, a, b, r) {
-  const k = (3 + nu) * rho * omega * omega / 8 / 1e12;   // mm and kg/m³ into MPa
+function diskStresses(rho, omega, nu, a, b, r, scale) {
+  const k = (3 + nu) * rho * omega * omega / 8 * (scale === undefined ? 1 / 1e12 : scale);
   const aa = a * a, bb = b * b, rr = r * r;
   return {
     radial: k * (aa + bb - aa * bb / rr - rr),
@@ -67,3 +67,27 @@ function diskPoisson(v) { return v.nu > 0 ? v.nu : 0.3; }
 
 /* rev/min to rad/s. */
 function rpmToRad(rpm) { return rpm * 2 * Math.PI / 60; }
+
+/* Unit systems for the spinning disk.
+
+   Unlike the vessels, this one converts for real: ρω²r² carries dimensions, so
+   the numbers have to change when the system does. Speed is left out of it,
+   rev/min meaning the same thing either way.
+
+   SI  ρ kg/m³, radii mm, answer MPa      scale 1/1e12
+   Eng ρ lb/in³, radii in, answer psi     scale 1/g, g = 386.0886 in/s², since
+                                          lb/in³ is a weight density */
+const DISK_UNITS = [
+  { value: 0, label: 'SI (MPa, mm, kg/m³)', stress: 'MPa', length: 'mm',
+    density: 'kg/m³', speed: 'm/s', perSpeed: 1000, scale: 1 / 1e12 },
+  { value: 1, label: 'English (psi, in, lb/in³)', stress: 'psi', length: 'in',
+    density: 'lb/in³', speed: 'ft/s', perSpeed: 12, scale: 1 / 386.0886 },
+];
+function diskUnits(v) { return DISK_UNITS[+v.sys === 1 ? 1 : 0]; }
+function diskUnitsFor(v) {
+  const u = diskUnits(v);
+  return { do: u.length, di: u.length, rho: u.density };
+}
+
+/* 1 in = 25.4 mm exactly; 1 lb/in³ = 27679.905 kg/m³. */
+const MM_PER_IN = 25.4, KGM3_PER_LBIN3 = 27679.905;

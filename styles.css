@@ -53,7 +53,7 @@ header.site .brand {
   text-decoration: none; color: inherit;
 }
 header.site .logo {
-  font-size: 22px; font-weight: 700; letter-spacing: -0.5px;
+  font-size: 29px; font-weight: 700; letter-spacing: -0.6px;
 }
 header.site .tagline { color: var(--muted); font-size: 15.5px; }
 header.site .logo span { color: var(--accent); }
@@ -374,7 +374,7 @@ footer a:hover { color: var(--accent); }
   /* Header carries the tagline on phones, so keep it to two tight lines */
   header.site { padding: 2px 0 14px; gap: 8px; }
   header.site .brand { gap: 0 8px; }
-  header.site .logo { font-size: 20px; }
+  header.site .logo { font-size: 25px; }
   header.site .tagline { font-size: 13px; line-height: 1.35; }
   .section-label { margin-bottom: 9px; }
   .section-label.next { margin-top: 18px; }
