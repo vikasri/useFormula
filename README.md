@@ -62,7 +62,9 @@ demand — not worth doing before it matters.
 
 ## Addresses
 
-Each formula has a page of its own: `/loan/`, `/compound-interest/`, `/topics/finance/`.
+Each formula and topic has a page of its own at the root: `/loan/`, `/compound/`,
+`/finance/`. Topics and formulas share that space, so the build refuses a formula
+slug that matches a topic id, and either that matches a file already at the root.
 GitHub Pages has no rewrites, so each of those is a real `index.html` on disk, written
 by the build script from the formula definitions in `js/`.
 

@@ -16,7 +16,7 @@ Reads the formulas from js/formulas/*.js and the shell from tools/shell.html,
 then writes
     index.html                  the home page
     <slug>/index.html           e.g. loan/index.html
-    topics/<topic-id>/index.html
+    <topic-id>/index.html          e.g. finance/index.html
     about/index.html
     404.html, sitemap.xml, robots.txt
 
@@ -275,7 +275,7 @@ def formula_prerender(f, topic, siblings, show_eq):
     e = html.escape
     bits = [
         '    <div class="crumbs"><a href="/">Home</a> › '
-        '<a href="/topics/%s/">%s</a> › %s</div>' % (topic['id'], e(topic['name']), e(f['name'])),
+        '<a href="/%s/">%s</a> › %s</div>' % (topic['id'], e(topic['name']), e(f['name'])),
         '    <div class="formula-box">',
         '      <div class="formula-head"><div class="formula-title">'
         '<h1>%s</h1></div></div>' % e(f['name']),
@@ -386,11 +386,19 @@ def main():
     # A slug becomes a directory at the site root, so it must not shadow a
     # file already sitting there (styles.css, sitemap.xml, CNAME, …) or one of
     # the directories the site reserves.
-    reserved = {'topics', 'about', 'js', 'tools'}
+    reserved = {'about', 'js', 'tools', 'img'}
     reserved |= {item.name for item in ROOT.iterdir() if item.is_file()}
+    # the topics/ prefix used to keep these apart; the check does it now 
+    topic_ids = {t['id'] for t in topics}
     for s in slugs:
         if s in reserved:
             die('slug %r collides with a path the site already uses' % s)
+        if s in topic_ids:
+            die('formula slug %r is also a topic id. They share the root now, '
+                'so one page would overwrite the other.' % s)
+    for t in sorted(topic_ids):
+        if t in reserved:
+            die('topic id %r collides with a path the site already uses' % t)
 
     write(ROOT / 'js' / 'index.js', index_js(formulas))
 
@@ -411,7 +419,7 @@ def main():
             '%s. Free online calculator: enter your values and get the answer.' % f['desc'],
             '%s/%s/' % (SITE, slug),
             formula_prerender(f, topic, siblings, show_eq),
-            trail=[('Home', '/'), (topic['name'], '/topics/%s/' % topic['id']),
+            trail=[('Home', '/'), (topic['name'], '/%s/' % topic['id']),
                    (f['name'], '/%s/' % slug)],
             formula=f))
         written.add(rel)
@@ -419,17 +427,17 @@ def main():
 
     for t in topics:
         mine = [f for f in formulas if f['topic'] == t['id']]
-        rel = Path('topics') / t['id'] / 'index.html'
+        rel = Path(t['id']) / 'index.html'
         write(ROOT / rel, page(
             template,
             '%s Calculators — useFormula' % t['name'],
             '%s. %d free calculators: enter what you know and get the answer.' % (t['desc'], len(mine)),
-            '%s/topics/%s/' % (SITE, t['id']),
+            '%s/%s/' % (SITE, t['id']),
             topic_prerender(t, mine),
-            trail=[('Home', '/'), (t['name'], '/topics/%s/' % t['id'])],
+            trail=[('Home', '/'), (t['name'], '/%s/' % t['id'])],
             body_class='landing nocalc'))
         written.add(rel)
-        urls.append(('%s/topics/%s/' % (SITE, t['id']),
+        urls.append(('%s/%s/' % (SITE, t['id']),
                      changed('js/topics.js', *('js/' + f['file'] for f in mine))))
 
     rel = Path('about') / 'index.html'

@@ -102,7 +102,7 @@ function setting(key, dflt) {
 function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
 /* Every page is a real file, written by tools/build-pages.py: /loan/,
-   /topics/finance/, /about/. Links use these paths so a visitor can copy the
+   /finance/, /about/. Links use these paths so a visitor can copy the
    address bar and a search engine has something to index; the old #formula/...
    addresses still work, see currentRoute.
 
@@ -110,7 +110,7 @@ function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt
    calculator on a shorter one: loan-payment answers at /loan/. */
 function slugOf(f) { return f.slug || f.id; }
 function formulaURL(f) { return '/' + slugOf(f) + '/'; }
-function topicURL(id) { return '/topics/' + id + '/'; }
+function topicURL(id) { return '/' + id + '/'; }
 function findFormula(key) { return FORMULAS.find(f => f.id === key || f.slug === key); }
 
 /* localStorage throws in some private-browsing modes, so every use is guarded
@@ -677,8 +677,10 @@ function currentRoute() {
      same page, whether the server spells it out or not. */
   const parts = location.pathname.split('/').filter(p => p && p !== 'index.html');
   if (!parts.length) return { page: 'home' };
-  if (parts[0] === 'topics') return { page: 'topic', arg: parts[1] };
   if (parts[0] === 'about') return { page: 'about' };
+  /* Topics and formulas share the root, so the id decides which this is. The
+     build refuses a formula slug that matches a topic, so it cannot be both. */
+  if (TOPICS.some(t => t.id === parts[0])) return { page: 'topic', arg: parts[0] };
   return { page: 'formula', arg: parts[0] };
 }
 
