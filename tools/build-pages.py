@@ -44,6 +44,20 @@ FIELDS = ('topic', 'name', 'short', 'slug', 'desc', 'keywords', 'eq',
           'title', 'blurb', 'diagram', 'diagramAlt')
 
 
+# Pages that are only words: written once as a fragment in tools/pages/ and
+# served as-is. The engine leaves them alone, so the text a reader sees is the
+# text in the file — there is no second copy in the JS to drift from it, and a
+# crawler or anyone checking the terms sees it without running any script.
+STATIC_PAGES = [
+    ('terms', 'Copyright and Terms of Use — useFormula',
+     'What you may and may not do with the writing, the code and the pages on '
+     'useFormula, and why a public repository is not a licence.'),
+    ('privacy', 'Privacy — useFormula',
+     'No accounts, no analytics, no cookies and no third-party scripts. What '
+     'useFormula stores on your device and what it never collects.'),
+]
+
+
 def address(f):
     """Where a formula answers: its id, or its slug when it has one."""
     return f.get('slug') or f['id']
@@ -320,7 +334,10 @@ def index_js(formulas):
     keep = ('id', 'slug', 'topic', 'name', 'short', 'desc', 'keywords')
     rows = [{k: f[k] for k in keep if f.get(k)} for f in formulas]
     body = ',\n'.join('  ' + json.dumps(r, ensure_ascii=False) for r in rows)
-    return ('// %s\n// Built from js/formulas/*.js - edit those, then re-run.\n'
+    return ('/* Copyright (c) 2026 useFormula. All rights reserved.\n'
+            '   Not open source. Published to be read, not reused: see LICENSE and\n'
+            '   https://useformula.com/terms/ */\n'
+            '// %s\n// Built from js/formulas/*.js - edit those, then re-run.\n'
             'registerIndex([\n%s\n]);\n' % (MARKER.strip('<!- >'), body))
 
 
@@ -387,6 +404,7 @@ def main():
     # file already sitting there (styles.css, sitemap.xml, CNAME, …) or one of
     # the directories the site reserves.
     reserved = {'about', 'js', 'tools', 'img'}
+    reserved |= {name for name, _, _ in STATIC_PAGES}
     reserved |= {item.name for item in ROOT.iterdir() if item.is_file()}
     # the topics/ prefix used to keep these apart; the check does it now 
     topic_ids = {t['id'] for t in topics}
@@ -453,6 +471,19 @@ def main():
         trail=[('Home', '/'), ('About', '/about/')], body_class='nocalc'))
     written.add(rel)
     urls.append(('%s/about/' % SITE, changed('js/engine.js')))
+
+    for name, title, desc in STATIC_PAGES:
+        src = Path(__file__).resolve().parent / 'pages' / ('%s.html' % name)
+        if not src.exists():
+            die('no tools/pages/%s.html for the %s page' % (name, name))
+        rel = Path(name) / 'index.html'
+        body = '\n'.join('    ' + ln for ln in src.read_text(encoding='utf-8').rstrip().splitlines())
+        write(ROOT / rel, page(
+            template, title, desc, '%s/%s/' % (SITE, name), body,
+            trail=[('Home', '/'), (title.split(' — ')[0], '/%s/' % name)],
+            body_class='nocalc'))
+        written.add(rel)
+        urls.append(('%s/%s/' % (SITE, name), changed('tools/pages/%s.html' % name)))
 
     write(ROOT / 'index.html', page(
         template,

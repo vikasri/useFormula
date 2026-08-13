@@ -1,3 +1,6 @@
+/* Copyright (c) 2026 useFormula. All rights reserved.
+   Not open source. Published to be read, not reused: see LICENSE and
+   https://useformula.com/terms/ */
 /* Broad topics shown on the home page.
    To add a topic: add an entry here, then create js/<topic>.js with its
    formulas and include it in index.html. */

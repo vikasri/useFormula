@@ -1,3 +1,6 @@
+/* Copyright (c) 2026 useFormula. All rights reserved.
+   Not open source. Published to be read, not reused: see LICENSE and
+   https://useformula.com/terms/ */
 /* euler-buckling. `num` comes from engine.js; MM_PER_IN, PSI_PER_MPA and
    convertField from js/shared/mechanics.js.
 

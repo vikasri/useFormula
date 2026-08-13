@@ -1,3 +1,6 @@
+/* Copyright (c) 2026 useFormula. All rights reserved.
+   Not open source. Published to be read, not reused: see LICENSE and
+   https://useformula.com/terms/ */
 /* Site settings.
 
    Change a value below, save the file, and push. Nothing else needs to

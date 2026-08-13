@@ -1,3 +1,6 @@
+/* Copyright (c) 2026 useFormula. All rights reserved.
+   Not open source. Published to be read, not reused: see LICENSE and
+   https://useformula.com/terms/ */
 /* spinning-disk. `num` comes from engine.js; the stress equations, the unit
    systems and the Poisson default from js/shared/mechanics.js.
 

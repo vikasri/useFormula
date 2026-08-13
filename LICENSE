@@ -1,0 +1,33 @@
+Copyright (c) 2026 useFormula. All rights reserved.
+
+This repository is published so that the working behind useformula.com can be
+read and checked. It is not open source, and publishing it grants no licence.
+
+You may read this source, and you may use the calculators at useformula.com for
+any purpose, including paid work.
+
+You may not copy, reproduce, modify, distribute, publish, mirror or create
+derivative works from this source code, the page text, the schematics, or the
+selection and arrangement of the material, in whole or in substantial part,
+without prior written permission. Forking on GitHub for the purpose of
+proposing a change back is permitted; running a copy elsewhere is not.
+
+The copyright notices in these files are copyright management information.
+Removing or altering them is separately prohibited.
+
+WHAT THIS DOES NOT COVER
+
+The formulas are mathematics and facts, and are not claimed by anyone. Euler's
+buckling load, the Lame equations, the compound interest and annuity formulas
+and everything else of that kind may be used freely by anybody. What is
+protected here is this expression of them: the code, the words, the drawings
+and the arrangement.
+
+Nothing here limits fair use or fair dealing.
+
+For permission beyond the above, write to strategychoice1@gmail.com.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED. THE RESULTS ARE ESTIMATES FOR GENERAL INFORMATIONAL PURPOSES ONLY AND
+ARE NOT PROFESSIONAL ADVICE. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM THE SOFTWARE OR ITS USE.

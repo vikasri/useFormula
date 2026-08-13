@@ -1,3 +1,6 @@
+/* Copyright (c) 2026 useFormula. All rights reserved.
+   Not open source. Published to be read, not reused: see LICENSE and
+   https://useformula.com/terms/ */
 /* Helpers shared by Engineering Mechanics formulas. Loaded only on a mechanics
    formula page, ahead of the formula itself. `num` comes from engine.js. */
 

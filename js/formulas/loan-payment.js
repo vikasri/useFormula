@@ -1,3 +1,6 @@
+/* Copyright (c) 2026 useFormula. All rights reserved.
+   Not open source. Published to be read, not reused: see LICENSE and
+   https://useformula.com/terms/ */
 /* loan-payment. `money`, `num`, `kmoney` come from engine.js; loan helpers from js/shared/finance.js. */
 registerFormula({
   id: 'loan-payment',

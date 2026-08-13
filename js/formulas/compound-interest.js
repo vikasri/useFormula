@@ -1,3 +1,6 @@
+/* Copyright (c) 2026 useFormula. All rights reserved.
+   Not open source. Published to be read, not reused: see LICENSE and
+   https://useformula.com/terms/ */
 /* compound-interest. `money`, `kmoney` come from engine.js.
 
    Everything is per period, the same as Annuity Value and Savings Goal: a

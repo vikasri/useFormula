@@ -1,3 +1,6 @@
+/* Copyright (c) 2026 useFormula. All rights reserved.
+   Not open source. Published to be read, not reused: see LICENSE and
+   https://useformula.com/terms/ */
 /* ============================================================
    useFormula — engine
    Rendering, routing, calculation, sliders and charts.
@@ -79,6 +82,10 @@ function registerFormula(def) {
 const money = n => '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const num   = n => (Math.abs(n) >= 1000 ? n.toLocaleString(undefined, { maximumFractionDigits: 4 }) : +n.toPrecision(6) + '');
 const kmoney = n => { const a = Math.abs(n); if (a >= 1e6) return '$' + (n / 1e6).toFixed(a >= 1e7 ? 0 : 1) + 'M'; if (a >= 1e3) return '$' + Math.round(n / 1e3) + 'k'; return '$' + Math.round(n); };
+
+// Word-only pages the server sends complete. Kept in step with STATIC_PAGES
+// in tools/build-pages.py, which writes them.
+const STATIC_PAGES = ['terms', 'privacy'];
 
 // Most-used formulas shown at the top of the home page (by formula id).
 const FEATURED = ['loan-payment', 'annuity', 'beam-bending'];
@@ -729,6 +736,10 @@ function currentRoute() {
   const parts = location.pathname.split('/').filter(p => p && p !== 'index.html');
   if (!parts.length) return { page: 'home' };
   if (parts[0] === 'about') return { page: 'about' };
+  /* Terms and privacy are served whole. The router has to know them or it
+     would call them missing, but it must not redraw them — the words in the
+     file are the words on the page. */
+  if (STATIC_PAGES.includes(parts[0])) return { page: 'static' };
   /* Topics and formulas share the root, so the id decides which this is. The
      build refuses a formula slug that matches a topic, so it cannot be both. */
   if (TOPICS.some(t => t.id === parts[0])) return { page: 'topic', arg: parts[0] };
@@ -740,6 +751,7 @@ function route() {
   if (r.page === 'topic') renderTopic(r.arg);
   else if (r.page === 'formula') renderFormula(r.arg);
   else if (r.page === 'about') renderAbout();
+  else if (r.page === 'static') { /* already on the page; leave it alone */ }
   else renderHome();
   window.scrollTo(0, 0);
 }

@@ -1,3 +1,6 @@
+/* Copyright (c) 2026 useFormula. All rights reserved.
+   Not open source. Published to be read, not reused: see LICENSE and
+   https://useformula.com/terms/ */
 /* present-value. `money` comes from engine.js. Compound interest run
    backwards: what a future amount is worth if you had it today. */
 registerFormula({

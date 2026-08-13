@@ -1,3 +1,6 @@
+/* Copyright (c) 2026 useFormula. All rights reserved.
+   Not open source. Published to be read, not reused: see LICENSE and
+   https://useformula.com/terms/ */
 /* annuity. `money`, `num`, `kmoney` come from engine.js; annuity helpers from
    js/shared/finance.js.
 

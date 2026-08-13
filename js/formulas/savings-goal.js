@@ -1,3 +1,6 @@
+/* Copyright (c) 2026 useFormula. All rights reserved.
+   Not open source. Published to be read, not reused: see LICENSE and
+   https://useformula.com/terms/ */
 /* savings-goal. `money`, `num`, `kmoney` come from engine.js; periodsToGoal and
    balanceAfter from js/shared/finance.js.
 

@@ -1,5 +1,13 @@
 # useFormula
 
+> **Copyright (c) 2026 useFormula. All rights reserved. Not open source.**
+> This repository is public so the working can be checked, not so it can be
+> reused. See [LICENSE](LICENSE) and [the terms](https://useformula.com/terms/).
+> The calculators at useformula.com are free to use for anything, including
+> paid work; the code, words and drawings behind them are not free to copy.
+> The formulas themselves are mathematics and belong to nobody — use those
+> freely. Permission for anything more: strategychoice1@gmail.com.
+
 A single-page formula calculator site. Browse formulas by topic (Finance, Mechanics)
 or search by name/keyword, enter your known values, and get the answer.
 

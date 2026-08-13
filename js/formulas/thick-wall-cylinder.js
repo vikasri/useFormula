@@ -1,3 +1,6 @@
+/* Copyright (c) 2026 useFormula. All rights reserved.
+   Not open source. Published to be read, not reused: see LICENSE and
+   https://useformula.com/terms/ */
 /* thick-wall-cylinder. `num` comes from engine.js; Lamé helpers and the unit
    systems from js/shared/mechanics.js.
 
