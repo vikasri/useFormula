@@ -38,16 +38,16 @@
     <div class="formula-box">
       <div class="formula-head"><div class="formula-title"><h1>Von Mises Stress</h1></div></div>
       <p class="sub">One equivalent stress from a full 3D stress state, and the margin left before yield</p>
-      <div class="eq">σvm² = ½[(σ₁₁−σ₂₂)² + (σ₂₂−σ₃₃)² + (σ₃₃−σ₁₁)²] + 3(σ₁₂² + σ₂₃² + σ₁₃²)</div>
+      <div class="eq">σvm = √(½[(σ₁₁−σ₂₂)² + (σ₂₂−σ₃₃)² + (σ₃₃−σ₁₁)²] + 3(σ₁₂² + σ₂₃² + σ₁₃²))</div>
       <p class="notes">Enter units, σ₁₁, σ₂₂, σ₃₃, σ₁₂, σ₁₃, σ₂₃ and yield strength of the material to work out the one equivalent stress from a full 3D stress state, and the margin left before yield.</p>
     </div>
     <section class="explainer">
       <h2>About Von Mises Stress</h2>
       <p>A point in a loaded part is rarely pulled in one direction only. It is stretched one way, squeezed another and sheared at the same time, which is six numbers, and a material data sheet gives you one: the yield strength, measured by pulling a bar. Von Mises is how the six are reduced to something that can be compared with the one.</p>
       <p>What it measures is distortion — change of shape, not change of size. Squeeze something equally hard from every direction and it gets smaller without changing shape, and a ductile metal will take enormous pressure that way without yielding.</p>
-      <p>That is why the surface is a cylinder and not a closed shape like an ellipsoid. Add the same stress to all three principal stresses and every difference in the equation is unchanged, so the answer does not move: a point on the surface stays on it however far you slide along the line of equal stress. A closed surface would have to yield at some pressure, and metals do not. Criteria that do close, like Drucker-Prager, are for soil and concrete, where pressure genuinely matters.</p>
+      <p>That is why the surface is a cylinder and not a closed shape like an ellipsoid. Add the same stress to all three principal stresses and every difference in the equation is unchanged, so the answer does not move: a point on the surface stays on it however far you slide along the line of equal stress. A closed surface would have to yield at some pressure, and metals do not. Criteria that do close, like Drucker-Prager, are for materials where pressure genuinely matters, such as soil, concrete and foam.</p>
       <p>The three ellipses at the foot of the page are that same cylinder, cut. A plane holding one principal stress fixed meets the axis at 35.3°, and an angled cut through a round cylinder is an ellipse — one whose short radius is exactly the cylinder&#x27;s radius and whose long one is √3 times it. That is why all three come out the same size: only the centre moves, sliding along the diagonal with the stress being held. Cut square to the axis instead and you get a circle.</p>
-      <p>Tresca is drawn alongside because it answers the same question differently, using the largest shear stress rather than the distortion energy. Its hexagon sits inside the ellipse and touches it at six points, so Tresca never permits more than von Mises and sometimes permits about 15% less. Codes often prefer it for exactly that reason.</p>
+      <p>Tresca is drawn alongside because it answers the same question differently, using the largest shear stress rather than the distortion energy. Its hexagon sits inside the ellipse and touches it at six points, so Tresca never permits more than von Mises and sometimes permits about 13% less. Codes often prefer it for exactly that reason.</p>
       <p>This is a criterion for ductile materials that yield, not for brittle ones that crack, and it says nothing about fatigue, fracture, buckling or creep. The stresses are taken as given and elastic. There is no factor of safety built in beyond the one reported, and this follows no design code.</p>
     </section>
     <nav class="related">
@@ -84,7 +84,7 @@
 <script src="/js/topics.js?v=3386179c"></script>
 <script src="/js/index.js?v=047e6501"></script>
 <script src="/js/shared/mechanics.js?v=d2cd6bf8"></script>
-<script src="/js/formulas/von-mises.js?v=96aef1af"></script>
+<script src="/js/formulas/von-mises.js?v=7e5183db"></script>
 <script src="/js/boot.js?v=8443b96b"></script>
 </body>
 </html>

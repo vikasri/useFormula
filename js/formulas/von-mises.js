@@ -343,7 +343,7 @@ function misesFigure3D(s, u) {
       <text x="${(P2[0] + 9).toFixed(1)}" y="${(P2[1] + 4).toFixed(1)}" fill="${dot}"
             text-anchor="start" font-weight="600">your stress state</text>
       <text x="${(W - 6)}" y="${H - 26}" fill="${FIG_BLUE}" text-anchor="end">radius
-        &#8730;(2/3)&#183;&#963;&#7522; = ${num(+s.R.toFixed(1))} ${u.stress}</text>
+        &#8730;(2/3)&#183;&#963;y = ${num(+s.R.toFixed(1))} ${u.stress}</text>
       <text x="${(W - 6)}" y="${H - 9}" fill="${FIG_GREY}" text-anchor="end">the axis
         &#963;&#8321; = &#963;&#8322; = &#963;&#8323; runs on without end</text>
     </g></svg>`;
@@ -433,16 +433,16 @@ registerFormula({
   keywords: 'von mises stress calculator equivalent effective stress yield criterion distortion energy factor of safety principal stresses tensor sigma 11 22 33 12 13 23 tresca hexagon yield surface ductile multiaxial triaxial octahedral shear invariant',
   title: 'Von Mises Stress Calculator: Equivalent Stress and Factor of Safety',
   blurb: 'Enter the six components of a 3D stress state and get the equivalent von Mises stress, the principal stresses and the factor of safety against yield, with the yield surface drawn.',
-  eq: 'σvm² = ½[(σ₁₁−σ₂₂)² + (σ₂₂−σ₃₃)² + (σ₃₃−σ₁₁)²] + 3(σ₁₂² + σ₂₃² + σ₁₃²)',
+  eq: 'σvm = √(½[(σ₁₁−σ₂₂)² + (σ₂₂−σ₃₃)² + (σ₃₃−σ₁₁)²] + 3(σ₁₂² + σ₂₃² + σ₁₃²))',
   inputNote: 'Enter tensile stress as positive and compressive stress as negative.',
   explain: 'Von Mises stress converts a multiaxial stress state into one equivalent stress. '
     + "For a ductile material, yielding is predicted when the equivalent stress reaches the material's yield strength.",
   about: [
     'A point in a loaded part is rarely pulled in one direction only. It is stretched one way, squeezed another and sheared at the same time, which is six numbers, and a material data sheet gives you one: the yield strength, measured by pulling a bar. Von Mises is how the six are reduced to something that can be compared with the one.',
     'What it measures is distortion — change of shape, not change of size. Squeeze something equally hard from every direction and it gets smaller without changing shape, and a ductile metal will take enormous pressure that way without yielding.',
-    'That is why the surface is a cylinder and not a closed shape like an ellipsoid. Add the same stress to all three principal stresses and every difference in the equation is unchanged, so the answer does not move: a point on the surface stays on it however far you slide along the line of equal stress. A closed surface would have to yield at some pressure, and metals do not. Criteria that do close, like Drucker-Prager, are for soil and concrete, where pressure genuinely matters.',
+    'That is why the surface is a cylinder and not a closed shape like an ellipsoid. Add the same stress to all three principal stresses and every difference in the equation is unchanged, so the answer does not move: a point on the surface stays on it however far you slide along the line of equal stress. A closed surface would have to yield at some pressure, and metals do not. Criteria that do close, like Drucker-Prager, are for materials where pressure genuinely matters, such as soil, concrete and foam.',
     'The three ellipses at the foot of the page are that same cylinder, cut. A plane holding one principal stress fixed meets the axis at 35.3°, and an angled cut through a round cylinder is an ellipse — one whose short radius is exactly the cylinder\'s radius and whose long one is √3 times it. That is why all three come out the same size: only the centre moves, sliding along the diagonal with the stress being held. Cut square to the axis instead and you get a circle.',
-    'Tresca is drawn alongside because it answers the same question differently, using the largest shear stress rather than the distortion energy. Its hexagon sits inside the ellipse and touches it at six points, so Tresca never permits more than von Mises and sometimes permits about 15% less. Codes often prefer it for exactly that reason.',
+    'Tresca is drawn alongside because it answers the same question differently, using the largest shear stress rather than the distortion energy. Its hexagon sits inside the ellipse and touches it at six points, so Tresca never permits more than von Mises and sometimes permits about 13% less. Codes often prefer it for exactly that reason.',
     'This is a criterion for ductile materials that yield, not for brittle ones that crack, and it says nothing about fatigue, fracture, buckling or creep. The stresses are taken as given and elastic. There is no factor of safety built in beyond the one reported, and this follows no design code.',
   ],
   inputs: [
@@ -506,7 +506,11 @@ registerFormula({
         value: `${S(s.p1)}, ${S(s.p2)}, ${S(s.p3)}`,
         note: 'the same stress state with the shear taken out, on its own axes' },
       { label: 'Tresca equivalent stress σ₁ − σ₃', detail: true, value: S(s.tresca),
-        note: `factor of safety ${(v.sy / s.tresca).toFixed(3)}×, the more cautious of the two` },
+        /* Equal in every direction leaves no shear either, so Tresca is never
+           met and there is no factor to report — not an infinite one. */
+        note: s.tresca > 0
+          ? `factor of safety ${(v.sy / s.tresca).toFixed(3)}×, the more cautious of the two`
+          : 'no difference between the principal stresses, so this criterion is never met either' },
       { label: 'Maximum shear stress (σ₁ − σ₃)/2', detail: true, value: S(s.tresca / 2) },
       { label: 'Mean (hydrostatic) stress', detail: true, value: S(s.mean),
         note: 'changes size, not shape, so it does not bring on yield' },
