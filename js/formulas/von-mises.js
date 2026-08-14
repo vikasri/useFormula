@@ -514,8 +514,6 @@ registerFormula({
       { label: 'Maximum shear stress (σ₁ − σ₃)/2', detail: true, value: S(s.tresca / 2) },
       { label: 'Mean (hydrostatic) stress', detail: true, value: S(s.mean),
         note: 'changes size, not shape, so it does not bring on yield' },
-      { label: 'Distance from the axis of equal stress', detail: true, value: S(s.rho),
-        note: `the yield surface sits at ${S(s.R)}` },
     ];
     return rows;
   },
