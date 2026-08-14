@@ -212,24 +212,43 @@ function misesFigureElement(v, u) {
 
 /* The yield surface in three dimensions.
 
-   Drawn with an ordinary two-angle camera — swing round 30 degrees, look down
-   20 — rather than by forcing the hydrostatic axis upright. Forcing it upright
-   compresses one direction only, and that squashes sigma-2 and sigma-3 to 29
-   degrees apart on the page, which makes three axes that are exactly
-   perpendicular in space look as though they are not. This view separates them
-   by 101, 121 and 138 degrees, and the hydrostatic axis sits clear of all
-   three. */
-const CAM_AZ = 349 * Math.PI / 180, CAM_EL = 66 * Math.PI / 180;
+   The view is set by the shape it has to show, not by tidiness. Look exactly
+   across the cylinder and its circular ends project to straight lines: a
+   rectangle. Look along it and there is no length: a circle. The truth is in
+   between, and the tilt between the two sets how open the end ellipses are —
+   minor over major is the sine of it. Tilted 26 degrees, that is 0.44, which
+   reads as a tube.
+   
+   The price is that the three principal axes crowd. Every one of them stands
+   at 54.7 degrees to the axis of the cylinder, so with that axis upright they
+   must all splay into a band, and no rotation gets the closest pair beyond
+   about 30 degrees; a view that spreads them properly is one that has stopped
+   showing the cylinder. They are perpendicular in space regardless, and the
+   caption says so. */
 const HYD = [1 / SQRT3, 1 / SQRT3, 1 / SQRT3];
 /* Two perpendicular directions across the axis, to sweep the circle with. */
-const PU = [1 / Math.SQRT2, -1 / Math.SQRT2, 0];
-const PV = [1 / SQRT6, 1 / SQRT6, -2 / SQRT6];
+const PU = [2 / SQRT6, -1 / SQRT6, -1 / SQRT6];
+const PV = [0, 1 / Math.SQRT2, -1 / Math.SQRT2];
+
+/* Turned 335 degrees about the axis, then tilted 26 out of the side-on view.
+   The rotation is the one that leaves the axes least crowded. */
+const VIEW = (() => {
+  const psi = 335 * Math.PI / 180, tilt = 26 * Math.PI / 180;
+  const cp = Math.cos(psi), sp = Math.sin(psi), ct = Math.cos(tilt), st = Math.sin(tilt);
+  const p = [0, 1, 2].map(i => cp * PU[i] + sp * PV[i]);
+  /* Up the page: what is left of the cylinder axis once the view direction is
+     taken out of it. Across the page: perpendicular to both, so the axis of
+     the cylinder stands upright and only the tilt opens the ends. */
+  const w = [0, 1, 2].map(i => ct * HYD[i] - st * p[i]);
+  const r = [p[1] * HYD[2] - p[2] * HYD[1],
+             p[2] * HYD[0] - p[0] * HYD[2],
+             p[0] * HYD[1] - p[1] * HYD[0]];
+  return { w, r };
+})();
 
 function camera(P) {
-  const sa = Math.sin(CAM_AZ), ca = Math.cos(CAM_AZ);
-  const se = Math.sin(CAM_EL), ce = Math.cos(CAM_EL);
-  return [-sa * P[0] + ca * P[1],
-          ca * se * P[0] + sa * se * P[1] - ce * P[2]];
+  return [P[0] * VIEW.r[0] + P[1] * VIEW.r[1] + P[2] * VIEW.r[2],
+          -(P[0] * VIEW.w[0] + P[1] * VIEW.w[1] + P[2] * VIEW.w[2])];
 }
 const along = (v, k) => [v[0] * k, v[1] * k, v[2] * k];
 const plus = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
@@ -239,7 +258,7 @@ function misesFigure3D(s, u) {
   if (!(R > 0)) return '';
   /* Long enough to hold the state, wherever it sits along the axis. */
   const L = Math.max(1.7 * R, Math.abs(s.xi) + 0.55 * R);
-  const AX = R * 0.95;                                  // how far to draw the axes
+  const AX = R * 1.3;                                   // how far to draw the axes
   const ring = sAx => {
     const out = [];
     for (let i = 0; i <= 64; i++) {
@@ -249,13 +268,14 @@ function misesFigure3D(s, u) {
     }
     return out;
   };
-  const far = ring(L), near = ring(-L);
+  const far = ring(L), near = ring(-L), through = ring(s.xi);
   const pt = [s.p1, s.p2, s.p3];
   const foot = along(HYD, s.xi);
   const axes = [[[AX, 0, 0], '\u03C3\u2081'], [[0, AX, 0], '\u03C3\u2082'], [[0, 0, AX], '\u03C3\u2083']];
 
   /* Everything that has to be on the page, projected once, then fitted. */
-  const world = far.concat(near, [pt, foot, [0, 0, 0], along(HYD, L * 1.2), along(HYD, -L * 1.2)],
+  const world = far.concat(near, through,
+                           [pt, foot, [0, 0, 0], along(HYD, L * 1.2), along(HYD, -L * 1.2)],
                            axes.map(a => a[0]));
   const flat = world.map(camera);
   const xs = flat.map(q => q[0]), ys = flat.map(q => q[1]);
@@ -304,8 +324,9 @@ function misesFigure3D(s, u) {
             x2="${S2(along(HYD, L * 1.2))[0].toFixed(1)}" y2="${S2(along(HYD, L * 1.2))[1].toFixed(1)}"
             stroke="${FIG_INK}" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.55"
             marker-start="url(#ax-end)" marker-end="url(#ax-end)"/>
-      <path d="${poly(near)}" fill="${FIG_BLUE}" fill-opacity="0.07" stroke="${FIG_BLUE}"
-            stroke-width="1.9"/>
+      <path d="${poly(near)}" fill="none" stroke="${FIG_BLUE}" stroke-width="1.9"/>
+      <path d="${poly(through)}" fill="${FIG_BLUE}" fill-opacity="0.09" stroke="${FIG_BLUE}"
+            stroke-width="1.4" stroke-dasharray="4 3" opacity="0.85"/>
       <g stroke="${FIG_GREY}" stroke-width="1.3" marker-end="url(#ax-p)">
         ${axes.map(a => `<line x1="${O2[0].toFixed(1)}" y1="${O2[1].toFixed(1)}"
           x2="${S2(a[0])[0].toFixed(1)}" y2="${S2(a[0])[1].toFixed(1)}"/>`).join('')}
