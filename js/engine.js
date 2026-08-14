@@ -84,9 +84,11 @@ function registerFormula(def) {
 }
 
 // Formatting helpers (available to every topic file's format/series).
-const money = n => '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+// Amounts carry no currency sign: nothing is asked for in one currency, so
+// nothing is answered in one either, and the pages read the same anywhere.
+const money = n => n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const num   = n => (Math.abs(n) >= 1000 ? n.toLocaleString(undefined, { maximumFractionDigits: 4 }) : +n.toPrecision(6) + '');
-const kmoney = n => { const a = Math.abs(n); if (a >= 1e6) return '$' + (n / 1e6).toFixed(a >= 1e7 ? 0 : 1) + 'M'; if (a >= 1e3) return '$' + Math.round(n / 1e3) + 'k'; return '$' + Math.round(n); };
+const kmoney = n => { const a = Math.abs(n); if (a >= 1e6) return (n / 1e6).toFixed(a >= 1e7 ? 0 : 1) + 'M'; if (a >= 1e3) return Math.round(n / 1e3) + 'k'; return '' + Math.round(n); };
 
 // Word-only pages the server sends complete. Kept in step with STATIC_PAGES
 // in tools/build-pages.py, which writes them.

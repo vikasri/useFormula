@@ -19,11 +19,11 @@ registerFormula({
   ],
   eq: 'M = P · r(1+r)ⁿ / ((1+r)ⁿ − 1)',
   inputs: [
-    { key: 'total', label: 'Amount needed', unit: '$', hint: 'e.g. 375000' },
+    { key: 'total', label: 'Amount needed', hint: 'e.g. 375000' },
     { key: 'downPct', label: 'Downpayment', unit: '%', hint: 'e.g. 20' },
     { key: 'annualRate', label: 'Annual interest rate', unit: '%', hint: 'e.g. 6.5' },
     { key: 'years', label: 'Loan term', unit: 'years', hint: 'e.g. 30' },
-    { key: 'extra', label: 'Extra payment', unit: '$', hint: 'e.g. 10000', optional: true, advanced: true },
+    { key: 'extra', label: 'Extra payment', hint: 'e.g. 10000', optional: true, advanced: true },
     { key: 'extraAt', label: 'Paid at year', unit: 'years', hint: 'blank = halfway', optional: true, advanced: true },
   ],
   output: { label: 'Monthly payment', unit: '' },
@@ -55,7 +55,7 @@ registerFormula({
     rows.push(
       { label: 'Total interest', value: money(interest) },
       { label: `Total paid over ${v.years} year${v.years === 1 ? '' : 's'}`, value: money(paid) },
-      { label: 'Interest per $1 borrowed', detail: true, value: '$' + (interest / P).toFixed(2) },
+      { label: 'Interest per 1 borrowed', detail: true, value: (interest / P).toFixed(2) },
       { label: 'Cash out of pocket', detail: true, value: money(down + paid) },
     );
 

@@ -24,7 +24,7 @@ registerFormula({
   ],
   eq: 'FV = PMT · ((1+r)ⁿ − (1+g)ⁿ) / (r − g)',
   inputs: [
-    { key: 'PMT', label: 'Payment per period', unit: '$', hint: 'e.g. 5000' },
+    { key: 'PMT', label: 'Payment per period', hint: 'e.g. 5000' },
     { key: 'rate', label: 'Return rate per period', unit: '%', hint: 'e.g. 6' },
     { key: 'n', label: 'Number of periods', unit: '', hint: 'e.g. 20' },
     { key: 'growth', label: 'Payment growth per period', unit: '%', hint: 'blank = level payments',
@@ -41,8 +41,8 @@ registerFormula({
       { label: 'Growth earned', value: money(out - paidIn) },
     ];
     if (paidIn <= 0) return rows;
-    rows.push({ label: 'Every $1 paid in becomes', detail: true,
-                value: '$' + (out / paidIn).toFixed(2) });
+    rows.push({ label: 'Every 1 paid in becomes', detail: true,
+                value: (out / paidIn).toFixed(2) });
     /* The first payment compounds for the whole term, so it is worth a
        multiple of the last one — the point the chart's curve is making. */
     if (n > 1) {

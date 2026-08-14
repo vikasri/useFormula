@@ -19,7 +19,7 @@ registerFormula({
   ],
   eq: 'PV = FV / (1 + r)ⁿ',
   inputs: [
-    { key: 'FV', label: 'Future amount', unit: '$', hint: 'e.g. 20000' },
+    { key: 'FV', label: 'Future amount', hint: 'e.g. 20000' },
     { key: 'rate', label: 'Discount rate per period', unit: '%', hint: 'e.g. 7' },
     { key: 'n', label: 'Number of periods', unit: '', hint: 'e.g. 10' },
   ],
@@ -34,7 +34,7 @@ registerFormula({
   extras: (v, pv) => {
     const rows = [{ label: 'Given up by waiting', value: money(v.FV - pv) }];
     if (!(v.FV > 0) || !(pv > 0)) return rows;
-    rows.push({ label: 'Each future $1 is worth', value: '$' + (pv / v.FV).toFixed(2) });
+    rows.push({ label: 'Each future 1 is worth', value: (pv / v.FV).toFixed(2) });
     rows.push({ label: 'Waiting one more period would make it', detail: true,
                 value: money(pv / (1 + v.rate / 100)) });
     return rows;

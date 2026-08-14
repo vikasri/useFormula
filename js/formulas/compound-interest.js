@@ -23,7 +23,7 @@ registerFormula({
   ],
   eq: 'A = P · (1 + r)ⁿ',
   inputs: [
-    { key: 'P', label: 'Principal', unit: '$', hint: 'e.g. 10000' },
+    { key: 'P', label: 'Principal', hint: 'e.g. 10000' },
     { key: 'rate', label: 'Interest rate per period', unit: '%', hint: 'e.g. 5' },
     { key: 'n', label: 'Number of periods', unit: '', hint: 'e.g. 10' },
   ],
@@ -34,7 +34,7 @@ registerFormula({
     const r = v.rate / 100;
     const rows = [
       { label: 'Interest earned', value: money(out - v.P) },
-      { label: 'Every $1 becomes', value: '$' + (v.P > 0 ? (out / v.P).toFixed(2) : '0.00') },
+      { label: 'Every 1 becomes', value: v.P > 0 ? (out / v.P).toFixed(2) : '0.00' },
     ];
     if (!(v.P > 0) || !(r > 0)) return rows;
     rows.push({ label: 'Doubles every', detail: true,

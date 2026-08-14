@@ -27,10 +27,10 @@ registerFormula({
   ],
   eq: 'A = P(1 + r)ᵗ + PMT · ((1 + r)ᵗ − 1) / r,  solved for t',
   inputs: [
-    { key: 'now', label: 'What you have now', unit: '$', hint: 'e.g. 10000' },
-    { key: 'goal', label: 'What you are aiming for', unit: '$', hint: 'e.g. 200000' },
+    { key: 'now', label: 'What you have now', hint: 'e.g. 10000' },
+    { key: 'goal', label: 'What you are aiming for', hint: 'e.g. 200000' },
     { key: 'rate', label: 'Annual return rate', unit: '%', hint: 'e.g. 5' },
-    { key: 'pmt', label: 'Paid in each year', unit: '$', hint: '0 if nothing is added' },
+    { key: 'pmt', label: 'Paid in each year', hint: '0 if nothing is added' },
   ],
   output: { label: 'Time to Reach Goal', unit: 'years' },
   compute: v => {
